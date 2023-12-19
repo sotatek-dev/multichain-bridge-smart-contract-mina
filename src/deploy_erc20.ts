@@ -58,15 +58,11 @@ const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
-    mina: MINAURL,
-    archive: ARCHIVEURL,
+  mina: MINAURL,
+  archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-try {
-    const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
-} catch (e) {
-    console.log(e);
-}
+
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
@@ -79,11 +75,13 @@ await TrivialCoin.compile();
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
-  let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-      // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      // await fetchAccount({publicKey: PublicKey.fromBase58("B62qnB6MqHyZPm8f7vo4UHVCKPqzMHScM2bSFY8ygfuJXZi8bEya53L")});
-      await zkApp.deploy();
-  });
+  let tx = await Mina.transaction(
+    { sender: feepayerAddress, fee },
+    async () => {
+      AccountUpdate.fundNewAccount(feepayerAddress, 2);
+      zkApp.deploy();
+    }
+  );
   await tx.prove();
   console.log('send transaction...');
   sentTx = await tx.sign([feepayerKey, zkAppKey]).send();

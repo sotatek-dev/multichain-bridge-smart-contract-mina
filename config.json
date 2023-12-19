@@ -22,6 +22,13 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev.json",
       "feepayerAlias": "ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev",
       "fee": "0.5"
+    },
+    "vipversion": {
+      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
+      "keyPath": "keys/vipversion.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev.json",
+      "feepayerAlias": "ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev",
+      "fee": "0.1"
     }
   }
 }
