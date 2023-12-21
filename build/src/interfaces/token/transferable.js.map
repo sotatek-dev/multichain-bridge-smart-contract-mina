@@ -1,0 +1,1 @@
+{"version":3,"file":"transferable.js","sourceRoot":"","sources":["../../../../src/interfaces/token/transferable.ts"],"names":[],"mappings":"AAAA,4BAA4B;AAC5B,uEAAuE;AACvE,OAAO,EAAE,SAAS,EAAE,MAAM,EAAiB,MAAM,EAAE,MAAM,UAAU,CAAC;AAapE,MAAM,qBAAsB,SAAQ,MAAM,CAAC;IACzC,IAAI,EAAE,SAAS;IACf,EAAE,EAAE,SAAS;IACb,MAAM,EAAE,MAAM;CACf,CAAC;CAAG;AA0BL,OAAO,EAAE,qBAAqB,EAAE,CAAC"}

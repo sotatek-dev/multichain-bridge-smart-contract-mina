@@ -1,0 +1,6 @@
+{
+  "smartContracts": [
+    "Bridge",
+    "TrivialCoin"
+  ]
+}
