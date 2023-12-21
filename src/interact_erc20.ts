@@ -68,45 +68,16 @@ let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new WETH(zkAppAddress);
 
-let sentTx;
-// compile the contract to create prover keys
-console.log('compile the contract...');
-await WETH.compile();
 try {
-  // call update() and send transaction
-  console.log('build transaction and create proof...');
-  let tx = await Mina.transaction(
-    { sender: feepayerAddress, fee },
-    async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 2);
-      zkApp.deploy();
-    }
-  );
-  await tx.prove();
-  console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-} catch (err) {
-  console.log(err);
-}
-if (sentTx?.hash() !== undefined) {
-  console.log(`
-Success! Update transaction sent.
-
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.url, sentTx.hash())}
-`);
-}
-
-function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
-  const txnBroadcastServiceName = new URL(graphQlUrl).hostname
-    .split('.')
-    .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
-  const networkName = new URL(graphQlUrl).hostname
-    .split('.')
-    .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
-  if (txnBroadcastServiceName && networkName) {
-    return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
-  }
-  return `Transaction hash: ${txnHash}`;
+    const pkey = "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q";
+    const target = PublicKey.fromBase58(pkey);
+    await fetchAccount({publicKey: target});
+    console.log("Calculate balance of: ", pkey);
+    const data = await zkApp.balanceOf(target);
+    // const data = await zkApp.symbol();
+    console.log(data.toString());
+} catch (error) {
+    throw new Error(
+        `On-chain zkApp account state doesn't match the expected state. ${error}`
+    );
 }

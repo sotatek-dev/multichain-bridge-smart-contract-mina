@@ -61,21 +61,21 @@ type Erc20 = {
  * Functionality:
  * Just enough to be swapped by the DEX contract, and be secure
  */
-export class TrivialCoin extends SmartContract implements Erc20 {
+export class WETH extends SmartContract implements Erc20 {
   // constant supply
   SUPPLY = UInt64.from(10n ** 18n);
 
   init() {
     super.init();
 
-    this.account.tokenSymbol.set('SOM');
+    this.account.tokenSymbol.set('WETH');
     this.account.permissions.set({
       ...Permissions.default(),
       setPermissions: Permissions.proof(),
     });
 
     // mint the entire supply to the token account with the same address as this contract
-    let address = this.self.body.publicKey;
+    let address = this.sender;
     this.token.mint({
       address,
       amount: this.SUPPLY,
@@ -98,10 +98,10 @@ export class TrivialCoin extends SmartContract implements Erc20 {
 
   // ERC20 API
   name(): CircuitString {
-    return CircuitString.fromString('SomeCoin');
+    return CircuitString.fromString('WETH');
   }
   symbol(): CircuitString {
-    return CircuitString.fromString('SOM');
+    return CircuitString.fromString('WETH');
   }
   decimals(): Field {
     return Field(9);

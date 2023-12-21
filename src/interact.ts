@@ -14,7 +14,7 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey } from 'o1js';
-import { Bridge } from './Add.js';
+import { Bridge } from './Bridge.js';
 
 // check command line arg
 let deployAlias = process.argv[2];

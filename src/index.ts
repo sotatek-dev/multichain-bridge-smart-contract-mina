@@ -1,3 +1,3 @@
-import { Bridge } from './Add.js';
+import { Bridge } from './Bridge.js';
 
 export { Bridge };

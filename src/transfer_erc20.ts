@@ -13,13 +13,13 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import { WETH } from './erc20.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
-  throw Error(`Missing <deployAlias> argument.
+    throw Error(`Missing <deployAlias> argument.
 
 Usage:
 node build/src/interact.js <deployAlias>
@@ -28,26 +28,26 @@ Error.stackTraceLimit = 1000;
 
 // parse config and private key from file
 type Config = {
-  deployAliases: Record<
-    string,
-    {
-      url: string;
-      keyPath: string;
-      fee: string;
-      feepayerKeyPath: string;
-      feepayerAlias: string;
-    }
-  >;
+    deployAliases: Record<
+        string,
+        {
+            url: string;
+            keyPath: string;
+            fee: string;
+            feepayerKeyPath: string;
+            feepayerAlias: string;
+        }
+        >;
 };
 let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
 
 let config = configJson.deployAliases[deployAlias];
 let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.feepayerKeyPath, 'utf8')
+    await fs.readFile(config.feepayerKeyPath, 'utf8')
 );
 
 let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.keyPath, 'utf8')
+    await fs.readFile(config.keyPath, 'utf8')
 );
 
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
@@ -58,8 +58,8 @@ const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
-  mina: MINAURL,
-  archive: ARCHIVEURL,
+    mina: MINAURL,
+    archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
 
@@ -73,23 +73,24 @@ let sentTx;
 console.log('compile the contract...');
 await WETH.compile();
 try {
-  // call update() and send transaction
-  console.log('build transaction and create proof...');
-  let tx = await Mina.transaction(
-    { sender: feepayerAddress, fee },
-    async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 2);
-      zkApp.deploy();
-    }
-  );
-  await tx.prove();
-  console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+    // call update() and send transaction
+    console.log('build transaction and create proof...');
+    let tx = await Mina.transaction(
+        { sender: feepayerAddress, fee },
+        async () => {
+            AccountUpdate.fundNewAccount(feepayerAddress, 1);
+            const receipt = PublicKey.fromBase58("B62qoh8L354vvUPMEwjd5oY8PxmMjgKpeXz7WYg7Vvwko9fUJsKMffv");
+            zkApp.transfer(receipt, UInt64.one);
+        }
+    );
+    await tx.prove();
+    console.log('send transaction...');
+    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
 } catch (err) {
-  console.log(err);
+    console.log(err);
 }
 if (sentTx?.hash() !== undefined) {
-  console.log(`
+    console.log(`
 Success! Update transaction sent.
 
 Your smart contract state will be updated
@@ -99,14 +100,14 @@ ${getTxnUrl(config.url, sentTx.hash())}
 }
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
-  const txnBroadcastServiceName = new URL(graphQlUrl).hostname
-    .split('.')
-    .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
-  const networkName = new URL(graphQlUrl).hostname
-    .split('.')
-    .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
-  if (txnBroadcastServiceName && networkName) {
-    return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
-  }
-  return `Transaction hash: ${txnHash}`;
+    const txnBroadcastServiceName = new URL(graphQlUrl).hostname
+        .split('.')
+        .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
+    const networkName = new URL(graphQlUrl).hostname
+        .split('.')
+        .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
+    if (txnBroadcastServiceName && networkName) {
+        return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
+    }
+    return `Transaction hash: ${txnHash}`;
 }

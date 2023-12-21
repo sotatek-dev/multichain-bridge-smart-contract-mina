@@ -1,34 +1,26 @@
 {
   "version": 1,
   "deployAliases": {
-    "testnet": {
-      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/testnet.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "smartContract": "TrivialCoin",
-      "fee": "0.5"
-    },
     "test": {
       "url": "https://api.minascan.io/node/berkeley/v1/graphql",
       "keyPath": "keys/test.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "fee": "1"
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
+      "fee": "0.2"
     },
-    "test1": {
+    "bridge": {
       "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/test1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev.json",
-      "feepayerAlias": "ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev",
-      "fee": "0.5"
+      "keyPath": "keys/bridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
+      "fee": "0.3"
     },
-    "vipversion": {
+    "interface": {
       "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/vipversion.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev.json",
-      "feepayerAlias": "ekewmppdvecyjcb8yyrts84wdwkvfjozx6kkf6jxd3wcphwmzpev",
-      "fee": "0.1"
+      "keyPath": "keys/interface.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/interfacer.json",
+      "feepayerAlias": "interfacer",
+      "fee": "0.3"
     }
   }
 }
