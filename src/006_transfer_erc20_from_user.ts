@@ -78,6 +78,8 @@ console.log('compile the contract...');
 await Token.compile();
 try {
     // call update() and send transaction
+    await fetchAccount({publicKey: feepayerAddress});
+    // await fetchAccount({publicKey: zkAppAddress});
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },

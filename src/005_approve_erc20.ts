@@ -26,6 +26,13 @@ if (!deployAlias)
 Usage:
 node build/src/interact.js <deployAlias>
 `);
+
+if (!targetAlias)
+    throw Error(`Missing <targetAlias> argument.
+
+Usage:
+node build/src/interact.js <targetAlias>
+`);
 Error.stackTraceLimit = 1000;
 
 // parse config and private key from file
@@ -89,6 +96,8 @@ console.log('compile the contract...');
 await Token.compile();
 try {
     // call update() and send transaction
+    await fetchAccount({publicKey: feepayerAddress});
+    await fetchAccount({publicKey: zkAppAddress});
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },

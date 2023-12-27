@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -52,6 +52,8 @@ await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
+    await fetchAccount({ publicKey: feepayerAddress });
+    await fetchAccount({ publicKey: zkAppAddress });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);

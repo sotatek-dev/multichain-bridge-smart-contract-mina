@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, UInt64 } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
 import { Bridge } from "./Bridge.js";
 // check command line arg
@@ -24,6 +24,12 @@ if (!deployAlias)
 
 Usage:
 node build/src/interact.js <deployAlias>
+`);
+if (!targetAlias)
+    throw Error(`Missing <targetAlias> argument.
+
+Usage:
+node build/src/interact.js <targetAlias>
 `);
 Error.stackTraceLimit = 1000;
 let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
@@ -58,6 +64,8 @@ console.log('compile the contract...');
 await Token.compile();
 try {
     // call update() and send transaction
+    await fetchAccount({ publicKey: feepayerAddress });
+    await fetchAccount({ publicKey: zkAppAddress });
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);

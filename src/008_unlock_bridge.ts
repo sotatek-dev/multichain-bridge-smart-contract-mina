@@ -55,7 +55,7 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -75,6 +75,12 @@ try {
 }
 
 let targetAlias = process.argv[3];
+if (!targetAlias)
+    throw Error(`Missing <targetAlias> argument.
+
+Usage:
+node build/src/interact.js <targetAlias>
+`);
 let configTarget = configJson.deployAliases[targetAlias];
 let zkBridgeKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
     await fs.readFile(configTarget.keyPath, 'utf8')
@@ -107,9 +113,9 @@ try {
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        bridgeApp.unlock(zkAppAddress, feepayerAddress, AMOUNT_TRANSFER_USER)
-        zkApp.approveUpdateAndTransfer(zkApp.self, feepayerAddress, AMOUNT_TRANSFER_USER)
+      // AccountUpdate.fundNewAccount(feepayerAddress, 2);
+      //   bridgeApp.unlock(zkAppAddress, feepayerAddress, AMOUNT_TRANSFER_USER)
+      //   zkApp.approveUpdateAndTransfer(zkApp.self, feepayerAddress, AMOUNT_TRANSFER_USER)
 
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, feepayerAddress, AMOUNT_TRANSFER_USER])
         zkApp.sendTokensFromZkApp(feepayerAddress, AMOUNT_TRANSFER_USER, callback)

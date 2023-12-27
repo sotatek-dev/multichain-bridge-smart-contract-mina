@@ -59,7 +59,7 @@ let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
