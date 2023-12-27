@@ -15,6 +15,7 @@
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey } from 'o1js';
 import { Bridge } from './Bridge.js';
+import {Token} from "./erc20.js";
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -54,7 +55,7 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql/';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -69,30 +70,38 @@ try {
     console.log(e);
 }
 
+console.log('compile the contract...');
+await Bridge.compile();
+await Token.compile();
+
+let tokenAppKey = PrivateKey.fromBase58("EKDr9UhETnYjJS8bBwizP65pJkW2iWjtkXcz4Rc2m5u8zUoLu8MN");
+let tokenAppAddress = tokenAppKey.toPublicKey();
+let tokenApp = new Token(tokenAppAddress);
+
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Bridge(zkAppAddress);
+console.log({tokenId: tokenApp.token.id.toString()})
+let zkApp = new Bridge(zkAppAddress, tokenApp.token.id);
 
 let sentTx;
 // compile the contract to create prover keys
-console.log('compile the contract...');
-await Bridge.compile();
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
 
-    try {
-        const accounts = await fetchAccount({publicKey: feepayerAddress});
-    } catch (e) {
-        console.log(e);
-    }
+    // try {
+    //     const accounts = await fetchAccount({publicKey: feepayerAddress});
+    // } catch (e) {
+    //     console.log(e);
+    // }
 
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1);
       zkApp.deploy();
+      tokenApp.approveUpdate(zkApp.self);
     }
   );
   await tx.prove();

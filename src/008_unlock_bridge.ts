@@ -55,7 +55,8 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -85,15 +86,15 @@ let configTarget = configJson.deployAliases[targetAlias];
 let zkBridgeKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
     await fs.readFile(configTarget.keyPath, 'utf8')
 );
-let bridgeAppKey = PrivateKey.fromBase58(zkBridgeKeysBase58.privateKey);
-let zkBridgeAddress = bridgeAppKey.toPublicKey();
-let bridgeApp = new Bridge(zkBridgeAddress);
-
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
+
+let bridgeAppKey = PrivateKey.fromBase58(zkBridgeKeysBase58.privateKey);
+let zkBridgeAddress = bridgeAppKey.toPublicKey();
+let bridgeApp = new Bridge(zkBridgeAddress, zkApp.token.id);
 
 let sentTx;
 // compile the contract to create prover keys
@@ -109,16 +110,16 @@ try {
     } catch (e) {
         console.log(e);
     }
+    console.log(zkAppAddress.toBase58());
+    console.log(zkBridgeAddress.toBase58());
+    console.log(feepayerAddress.toBase58());
 
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      // AccountUpdate.fundNewAccount(feepayerAddress, 2);
-      //   bridgeApp.unlock(zkAppAddress, feepayerAddress, AMOUNT_TRANSFER_USER)
-      //   zkApp.approveUpdateAndTransfer(zkApp.self, feepayerAddress, AMOUNT_TRANSFER_USER)
-
-        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, feepayerAddress, AMOUNT_TRANSFER_USER])
-        zkApp.sendTokensFromZkApp(feepayerAddress, AMOUNT_TRANSFER_USER, callback)
+      // AccountUpdate.fundNewAccount(feepayerAddress);
+        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, feepayerAddress, UInt64.one])
+        zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
     }
   );
   await tx.prove();

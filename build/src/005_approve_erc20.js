@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
+import { Mina, PrivateKey, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
 import { Bridge } from "./Bridge.js";
 // check command line arg
@@ -57,15 +57,18 @@ let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
-let bridgeApp = new Bridge(zkBridgeAddress);
+let bridgeApp = new Bridge(zkBridgeAddress, zkApp.token.id);
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await Token.compile();
 try {
     // call update() and send transaction
-    await fetchAccount({ publicKey: feepayerAddress });
-    await fetchAccount({ publicKey: zkAppAddress });
+    // await fetchAccount({publicKey: feepayerAddress});
+    // await fetchAccount({publicKey: zkAppAddress});
+    console.log(zkAppAddress.toBase58());
+    console.log(zkBridgeAddress.toBase58());
+    console.log(feepayerAddress.toBase58());
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);

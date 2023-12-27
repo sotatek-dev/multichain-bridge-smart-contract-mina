@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, UInt64 } from 'o1js';
+import { Mina, PrivateKey, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
 import { Bridge } from "./Bridge.js";
 // check command line arg
@@ -31,7 +31,7 @@ let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'u
 let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-let bridgeAppKey = PrivateKey.fromBase58("EKFJWi8VqZYSq9s8VoSCfLtEevPGyJo7MwhWkMD9Nxqse8uGU2Pi");
+let bridgeAppKey = PrivateKey.fromBase58("EKDnWbVYwfgTrHddixKH4ZZg1CCPGP1DoYJEpUwKS9yQnQ5amx51");
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 // set up Mina instance and contract we interact with
@@ -57,7 +57,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
+        // AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.transfer(feepayerAddress, zkBridgeAddress, AMOUNT_TRANSFER);
     });
     await tx.prove();
@@ -84,7 +84,7 @@ function getTxnUrl(graphQlUrl, txnHash) {
         .split('.')
         .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
     if (txnBroadcastServiceName && networkName) {
-        return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
+        return `https://berkeley.minaexplorer.com/transaction/${txnHash}`;
     }
     return `Transaction hash: ${txnHash}`;
 }
