@@ -14,7 +14,7 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate } from 'o1js';
-import { WETH } from './erc20.js';
+import { Token } from './erc20.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -41,16 +41,16 @@ Mina.setActiveInstance(network);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new WETH(zkAppAddress);
+let zkApp = new Token(zkAppAddress);
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await WETH.compile();
+await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress, 2);
+        AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.deploy();
     });
     await tx.prove();

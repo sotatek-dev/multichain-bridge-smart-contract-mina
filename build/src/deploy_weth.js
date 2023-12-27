@@ -13,8 +13,8 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, UInt64 } from 'o1js';
-import { Token } from './erc20.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount } from 'o1js';
+import { TokenContract } from './weth.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -29,7 +29,6 @@ let config = configJson.deployAliases[deployAlias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
 let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-let user1 = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
@@ -39,22 +38,26 @@ const network = Mina.Network({
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
-const AMOUNT_TRANSFER = UInt64.from(5000000000000n);
+try {
+    const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
+}
+catch (e) {
+    console.log(e);
+}
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Token(zkAppAddress);
+let zkApp = new TokenContract(zkAppAddress);
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await Token.compile();
+await TokenContract.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);
+        AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        zkApp.deploy();
     });
     await tx.prove();
     console.log('send transaction...');
@@ -84,4 +87,4 @@ function getTxnUrl(graphQlUrl, txnHash) {
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=transfer_erc20.js.map
+//# sourceMappingURL=deploy_weth.js.map

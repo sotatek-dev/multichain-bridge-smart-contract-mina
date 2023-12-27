@@ -13,9 +13,8 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
-import { WETH } from './erc20.js';
-
+import { Mina, PrivateKey, UInt64 } from 'o1js';
+import { Token } from './erc20.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -25,68 +24,44 @@ Usage:
 node build/src/interact.js <deployAlias>
 `);
 Error.stackTraceLimit = 1000;
-
-// parse config and private key from file
-type Config = {
-    deployAliases: Record<
-        string,
-        {
-            url: string;
-            keyPath: string;
-            fee: string;
-            feepayerKeyPath: string;
-            feepayerAlias: string;
-        }
-        >;
-};
-let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
-
+let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
 let config = configJson.deployAliases[deployAlias];
-let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-    await fs.readFile(config.feepayerKeyPath, 'utf8')
-);
-
-let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-    await fs.readFile(config.keyPath, 'utf8')
-);
-
-let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
+let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
+let user1 = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let feepayerKey = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
-
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-
+const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
+const AMOUNT_TRANSFER = UInt64.from(5000000000000n);
+const AMOUNT_TRANSFER_USER = UInt64.from(5000000000n);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new WETH(zkAppAddress);
-
+let zkApp = new Token(zkAppAddress);
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await WETH.compile();
+await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
-    let tx = await Mina.transaction(
-        { sender: feepayerAddress, fee },
-        async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress, 1);
-            const receipt = PublicKey.fromBase58("B62qoh8L354vvUPMEwjd5oY8PxmMjgKpeXz7WYg7Vvwko9fUJsKMffv");
-            zkApp.transfer(receipt, UInt64.one);
-        }
-    );
+    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
+        // AccountUpdate.fundNewAccount(feepayerAddress);
+        zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER_USER);
+    });
     await tx.prove();
     console.log('send transaction...');
     sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-} catch (err) {
+}
+catch (err) {
     console.log(err);
 }
 if (sentTx?.hash() !== undefined) {
@@ -98,8 +73,7 @@ as soon as the transaction is included in a block:
 ${getTxnUrl(config.url, sentTx.hash())}
 `);
 }
-
-function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
+function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')
         .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
@@ -111,3 +85,4 @@ function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     }
     return `Transaction hash: ${txnHash}`;
 }
+//# sourceMappingURL=006_transfer_erc20_from_user.js.map

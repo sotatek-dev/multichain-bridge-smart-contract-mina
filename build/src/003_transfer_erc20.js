@@ -84,4 +84,4 @@ function getTxnUrl(graphQlUrl, txnHash) {
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=transfer_erc20.js.map
+//# sourceMappingURL=003_transfer_erc20.js.map

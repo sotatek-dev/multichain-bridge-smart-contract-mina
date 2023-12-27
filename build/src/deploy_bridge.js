@@ -56,6 +56,12 @@ await Bridge.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
+    try {
+        const accounts = await fetchAccount({ publicKey: feepayerAddress });
+    }
+    catch (e) {
+        console.log(e);
+    }
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress, 1);
         zkApp.deploy();

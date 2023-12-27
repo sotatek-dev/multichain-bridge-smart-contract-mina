@@ -13,10 +13,13 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
+import {Bridge} from "./Bridge.js";
+
 // check command line arg
 let deployAlias = process.argv[2];
+let targetAlias = process.argv[3];
 if (!deployAlias)
     throw Error(`Missing <deployAlias> argument.
 
@@ -24,27 +27,62 @@ Usage:
 node build/src/interact.js <deployAlias>
 `);
 Error.stackTraceLimit = 1000;
-let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
+
+// parse config and private key from file
+type Config = {
+    deployAliases: Record<
+        string,
+        {
+            url: string;
+            keyPath: string;
+            fee: string;
+            feepayerKeyPath: string;
+            feepayerAlias: string;
+        }
+        >;
+};
+let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
+
 let config = configJson.deployAliases[deployAlias];
-let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
-let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
+let configTarget = configJson.deployAliases[targetAlias];
+let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+    await fs.readFile(config.feepayerKeyPath, 'utf8')
+);
+
+let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+    await fs.readFile(config.keyPath, 'utf8')
+);
+
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let user1 = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+
+let zkBridgeKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+    await fs.readFile(configTarget.keyPath, 'utf8')
+);
+
+let bridgeAppKey = PrivateKey.fromBase58(zkBridgeKeysBase58.privateKey);
+
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
+
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
-const AMOUNT_TRANSFER = UInt64.from(5000000000000n);
+const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
+const AMOUNT_TRANSFER = UInt64.from(5_000_000_000_000n)
+
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
+
+let zkBridgeAddress = bridgeAppKey.toPublicKey();
+let bridgeApp = new Bridge(zkBridgeAddress);
+
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
@@ -52,15 +90,18 @@ await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
-    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);
-    });
+    let tx = await Mina.transaction(
+        { sender: feepayerAddress, fee },
+        async () => {
+            // AccountUpdate.fundNewAccount(feepayerAddress);
+            // zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);
+            zkApp.approveUpdate(bridgeApp.self);
+        }
+    );
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-}
-catch (err) {
+    sentTx = await tx.sign([feepayerKey, bridgeAppKey]).send();
+} catch (err) {
     console.log(err);
 }
 if (sentTx?.hash() !== undefined) {
@@ -72,7 +113,8 @@ as soon as the transaction is included in a block:
 ${getTxnUrl(config.url, sentTx.hash())}
 `);
 }
-function getTxnUrl(graphQlUrl, txnHash) {
+
+function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')
         .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
@@ -84,4 +126,3 @@ function getTxnUrl(graphQlUrl, txnHash) {
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=transfer_erc20.js.map

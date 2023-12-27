@@ -1,26 +1,12 @@
 {
   "version": 1,
   "deployAliases": {
-    "test": {
+    "token": {
       "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/test.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
-      "fee": "0.2"
-    },
-    "bridge": {
-      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/bridge.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
-      "fee": "0.3"
-    },
-    "interface": {
-      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
-      "keyPath": "keys/interface.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/interfacer.json",
-      "feepayerAlias": "interfacer",
-      "fee": "0.3"
+      "keyPath": "keys/token.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
     }
   }
 }
