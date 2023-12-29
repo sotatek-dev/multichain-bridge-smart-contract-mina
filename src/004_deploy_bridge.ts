@@ -74,7 +74,7 @@ console.log('compile the contract...');
 await Bridge.compile();
 await Token.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKDr9UhETnYjJS8bBwizP65pJkW2iWjtkXcz4Rc2m5u8zUoLu8MN");
+let tokenAppKey = PrivateKey.fromBase58("EKFYREfV6muKttzcJnnTS9wAsrBxXfTh1avzkUTfqXHDQUtopiL5");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 

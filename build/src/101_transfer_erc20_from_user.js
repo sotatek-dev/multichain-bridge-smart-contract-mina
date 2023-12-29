@@ -13,38 +13,26 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
 import { Token } from './erc20.js';
-import { Bridge } from "./Bridge.js";
 // check command line arg
 let deployAlias = process.argv[2];
-let targetAlias = process.argv[3];
 if (!deployAlias)
     throw Error(`Missing <deployAlias> argument.
 
 Usage:
 node build/src/interact.js <deployAlias>
 `);
-if (!targetAlias)
-    throw Error(`Missing <targetAlias> argument.
-
-Usage:
-node build/src/interact.js <targetAlias>
-`);
 Error.stackTraceLimit = 1000;
 let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
 let config = configJson.deployAliases[deployAlias];
-let configBridge = configJson.deployAliases[targetAlias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
 let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
-let zkBridgeAppKeysBase58 = JSON.parse(await fs.readFile(configBridge.keyPath, 'utf8'));
-let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let user1 = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let feepayerKey = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
-let zkBridgeAddress = bridgeAppKey.toPublicKey();
-let bridgeApp = new Bridge(zkBridgeAddress);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -64,15 +52,16 @@ console.log('compile the contract...');
 await Token.compile();
 try {
     // call update() and send transaction
+    await fetchAccount({ publicKey: feepayerAddress });
+    // await fetchAccount({publicKey: zkAppAddress});
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
-        // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
+        zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER_USER);
     });
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey]).send();
+    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
 }
 catch (err) {
     console.log(err);
@@ -94,8 +83,8 @@ function getTxnUrl(graphQlUrl, txnHash) {
         .split('.')
         .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
     if (txnBroadcastServiceName && networkName) {
-        return `https://berkeley.minaexplorer.com/transaction/${txnHash}`;
+        return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=007_lock_bridge.js.map
+//# sourceMappingURL=101_transfer_erc20_from_user.js.map

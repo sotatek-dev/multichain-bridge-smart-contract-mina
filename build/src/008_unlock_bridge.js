@@ -85,7 +85,7 @@ try {
     console.log(feepayerAddress.toBase58());
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
-        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, feepayerAddress, UInt64.one]);
+        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one]);
         zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback);
     });
     await tx.prove();

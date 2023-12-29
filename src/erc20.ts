@@ -24,6 +24,16 @@ class Transfer extends Struct({
   }
 }
 
+class Lock extends Struct({
+  locker: PublicKey,
+  receipt: Field,
+  amount: UInt64
+}){
+  constructor(locker: PublicKey, receipt: Field, amount: UInt64) {
+    super({ locker, receipt, amount });
+  }
+}
+
 export class Token extends SmartContract {
   @state(UInt64) decimals = State<UInt64>()
   @state(UInt64) maxSupply = State<UInt64>()
@@ -31,7 +41,7 @@ export class Token extends SmartContract {
   @state(PublicKey) owner = State<PublicKey>()
 
 
-  events = {"Transfer": Transfer};
+  events = {"Transfer": Transfer, "Lock": Lock};
 
   deploy(args?: DeployArgs) {
     super.deploy(args)
@@ -82,6 +92,15 @@ export class Token extends SmartContract {
     this.emitEvent("Transfer", {
       from: sender,
       to: receiver,
+      amount,
+    })
+  }
+
+  @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
+    this.token.send({ from: this.sender, to: bridgeAddress, amount })
+    this.emitEvent("Lock", {
+      locker: this.sender,
+      receipt,
       amount,
     })
   }

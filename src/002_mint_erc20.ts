@@ -51,7 +51,6 @@ let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
 );
 
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-let user1 = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with

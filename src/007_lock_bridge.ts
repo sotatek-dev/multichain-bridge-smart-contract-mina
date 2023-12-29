@@ -13,17 +13,25 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
 import { Token } from './erc20.js';
 import {Bridge} from "./Bridge.js";
 
 // check command line arg
 let deployAlias = process.argv[2];
+let targetAlias = process.argv[3];
 if (!deployAlias)
     throw Error(`Missing <deployAlias> argument.
 
 Usage:
 node build/src/interact.js <deployAlias>
+`);
+
+if (!targetAlias)
+    throw Error(`Missing <targetAlias> argument.
+
+Usage:
+node build/src/interact.js <targetAlias>
 `);
 Error.stackTraceLimit = 1000;
 
@@ -43,6 +51,7 @@ type Config = {
 let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
 
 let config = configJson.deployAliases[deployAlias];
+let configBridge = configJson.deployAliases[targetAlias];
 let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
     await fs.readFile(config.feepayerKeyPath, 'utf8')
 );
@@ -51,10 +60,14 @@ let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
     await fs.readFile(config.keyPath, 'utf8')
 );
 
+let zkBridgeAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+    await fs.readFile(configBridge.keyPath, 'utf8')
+);
+
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
-let bridgeAppKey = PrivateKey.fromBase58("EKDnWbVYwfgTrHddixKH4ZZg1CCPGP1DoYJEpUwKS9yQnQ5amx51");
+let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 
@@ -87,12 +100,13 @@ try {
         { sender: feepayerAddress, fee },
         async () => {
             // AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.transfer(feepayerAddress, zkBridgeAddress, AMOUNT_TRANSFER);
+            zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
+            // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }
     );
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+    sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
     console.log(err);
 }
