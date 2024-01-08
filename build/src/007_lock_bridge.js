@@ -44,7 +44,8 @@ let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -52,7 +53,7 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
-const AMOUNT_TRANSFER = UInt64.from(5000000000000n);
+const AMOUNT_TRANSFER = UInt64.from(5000000000);
 const AMOUNT_TRANSFER_USER = UInt64.from(5000000000n);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();

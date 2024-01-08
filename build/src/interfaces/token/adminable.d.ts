@@ -1,28 +1,31 @@
-import { type PublicKey, type UInt64, type AccountUpdate, type State, Bool, VerificationKey } from 'snarkyjs';
+import { type PublicKey, type UInt64, type AccountUpdate, type State, Bool, VerificationKey } from 'o1js';
 declare const AdminAction_base: (new (value: {
-    type: import("snarkyjs/dist/node/lib/field").Field;
+    type: import("o1js/dist/node/lib/field").Field;
 }) => {
-    type: import("snarkyjs/dist/node/lib/field").Field;
+    type: import("o1js/dist/node/lib/field").Field;
 }) & {
     _isStruct: true;
-} & import("snarkyjs/dist/node/snarky").ProvablePure<{
-    type: import("snarkyjs/dist/node/lib/field").Field;
+} & import("o1js/dist/node/snarky").ProvablePure<{
+    type: import("o1js/dist/node/lib/field").Field;
 }> & {
     toInput: (x: {
-        type: import("snarkyjs/dist/node/lib/field").Field;
+        type: import("o1js/dist/node/lib/field").Field;
     }) => {
-        fields?: import("snarkyjs/dist/node/lib/field").Field[] | undefined;
-        packed?: [import("snarkyjs/dist/node/lib/field").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
     };
     toJSON: (x: {
-        type: import("snarkyjs/dist/node/lib/field").Field;
+        type: import("o1js/dist/node/lib/field").Field;
     }) => {
         type: string;
     };
     fromJSON: (x: {
         type: string;
     }) => {
-        type: import("snarkyjs/dist/node/lib/field").Field;
+        type: import("o1js/dist/node/lib/field").Field;
+    };
+    empty: () => {
+        type: import("o1js/dist/node/lib/field").Field;
     };
 };
 declare class AdminAction extends AdminAction_base {

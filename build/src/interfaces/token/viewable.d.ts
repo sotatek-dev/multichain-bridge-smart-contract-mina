@@ -1,4 +1,4 @@
-import { PublicKey, Account, UInt64, Bool } from 'snarkyjs';
+import { PublicKey, Account, UInt64, Bool } from 'o1js';
 interface ViewableOptions {
     preconditions: {
         shouldAssertEquals: boolean;

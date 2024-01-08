@@ -83,7 +83,7 @@ try {
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress);
+            // AccountUpdate.fundNewAccount(feepayerAddress);
             zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);
         }
     );

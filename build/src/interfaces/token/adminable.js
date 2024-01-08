@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-import { Struct, Field, isReady, } from 'snarkyjs';
+import { Struct, Field, isReady, } from 'o1js';
 await isReady;
 class AdminAction extends Struct({
     type: Field,

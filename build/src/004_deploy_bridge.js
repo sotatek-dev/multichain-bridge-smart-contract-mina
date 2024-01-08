@@ -49,7 +49,7 @@ catch (e) {
 console.log('compile the contract...');
 await Bridge.compile();
 await Token.compile();
-let tokenAppKey = PrivateKey.fromBase58("EKFYREfV6muKttzcJnnTS9wAsrBxXfTh1avzkUTfqXHDQUtopiL5");
+let tokenAppKey = PrivateKey.fromBase58("EKFcm7TsntKXLUZwJeRLavYnaSpYZo56q4G9swvijMbvDAGWsCEB");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)

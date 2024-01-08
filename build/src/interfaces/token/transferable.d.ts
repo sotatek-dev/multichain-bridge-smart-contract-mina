@@ -1,4 +1,4 @@
-import { PublicKey, UInt64, AccountUpdate } from 'snarkyjs';
+import { PublicKey, UInt64, AccountUpdate } from 'o1js';
 type MayUseToken = typeof AccountUpdate.MayUseToken.InheritFromParent | typeof AccountUpdate.MayUseToken.ParentsOwnToken;
 interface TransferOptions {
     from?: PublicKey;
@@ -16,7 +16,7 @@ declare const TransferFromToOptions_base: (new (value: {
     amount: UInt64;
 }) & {
     _isStruct: true;
-} & import("snarkyjs/dist/node/snarky").ProvablePure<{
+} & import("o1js/dist/node/snarky").ProvablePure<{
     from: PublicKey;
     to: PublicKey;
     amount: UInt64;
@@ -26,8 +26,8 @@ declare const TransferFromToOptions_base: (new (value: {
         to: PublicKey;
         amount: UInt64;
     }) => {
-        fields?: import("snarkyjs/dist/node/lib/field").Field[] | undefined;
-        packed?: [import("snarkyjs/dist/node/lib/field").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
     };
     toJSON: (x: {
         from: PublicKey;
@@ -43,6 +43,11 @@ declare const TransferFromToOptions_base: (new (value: {
         to: string;
         amount: string;
     }) => {
+        from: PublicKey;
+        to: PublicKey;
+        amount: UInt64;
+    };
+    empty: () => {
         from: PublicKey;
         to: PublicKey;
         amount: UInt64;
