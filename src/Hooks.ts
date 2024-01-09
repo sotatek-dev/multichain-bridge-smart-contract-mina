@@ -10,10 +10,10 @@ import {
   AccountUpdate,
 } from 'o1js';
 
-import type _Hooks from './interfaces/hookHandler/hooks';
-import { AdminAction } from './interfaces/token/adminable';
-import type { ViewableOptions } from './interfaces/token/viewable';
-import { TransferFromToOptions } from './interfaces/token/transferable';
+import type _Hooks from './interfaces/hookHandler/hooks.js';
+import { AdminAction } from './interfaces/token/adminable.js';
+import type { ViewableOptions } from './interfaces/token/viewable.js';
+import { TransferFromToOptions } from './interfaces/token/transferable.js';
 
 class Hooks extends SmartContract implements _Hooks {
   public static defaultViewableOptions: ViewableOptions = {

@@ -14,7 +14,7 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey } from 'o1js';
-import Token from './token.js';
+import Hook from './Hooks.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -66,37 +66,37 @@ Mina.setActiveInstance(network);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Token(zkAppAddress);
+let zkApp = new Hook(zkAppAddress);
 
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await Token.compile();
-// try {
-//   // call update() and send transaction
-//   console.log('build transaction and create proof...');
-//   let tx = await Mina.transaction(
-//     { sender: feepayerAddress, fee },
-//     async () => {
-//       AccountUpdate.fundNewAccount(feepayerAddress);
-//       zkApp.deploy();
-//     }
-//   );
-//   await tx.prove();
-//   console.log('send transaction...');
-//   sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-// } catch (err) {
-//   console.log(err);
-// }
-// if (sentTx?.hash() !== undefined) {
-//   console.log(`
-// Success! Update transaction sent.
-//
-// Your smart contract state will be updated
-// as soon as the transaction is included in a block:
-// ${getTxnUrl(config.url, sentTx.hash())}
-// `);
-// }
+await Hook.compile();
+try {
+  // call update() and send transaction
+  console.log('build transaction and create proof...');
+  let tx = await Mina.transaction(
+    { sender: feepayerAddress, fee },
+    async () => {
+      // AccountUpdate.fundNewAccount(feepayerAddress);
+      zkApp.initialize(feepayerAddress);
+    }
+  );
+  await tx.prove();
+  console.log('send transaction...');
+  sentTx = await tx.sign([feepayerKey, feepayerKey]).send();
+} catch (err) {
+  console.log(err);
+}
+if (sentTx?.hash() !== undefined) {
+  console.log(`
+Success! Update transaction sent.
+
+Your smart contract state will be updated
+as soon as the transaction is included in a block:
+${getTxnUrl(config.url, sentTx.hash())}
+`);
+}
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname

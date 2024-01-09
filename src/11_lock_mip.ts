@@ -14,8 +14,9 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
-import { Token } from './erc20.js';
+import Token from './token.js';
 import {Bridge} from "./Bridge.js";
+import Hook from './Hooks.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -72,8 +73,8 @@ let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 
 // set up Mina instance and contract we interact with
-// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
@@ -94,13 +95,20 @@ let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await Token.compile();
+await Hook.compile();
 try {
+
+    try {
+        const accounts = await fetchAccount({publicKey: feepayerAddress});
+    } catch (e) {
+        console.log(e);
+    }
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress);
+            // AccountUpdate.fundNewAccount(feepayerAddress);
             zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }

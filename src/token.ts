@@ -14,11 +14,15 @@ import {
   state,
   State,
   VerificationKey,
+  Field,
+  Experimental,
+  Int64,
+  Struct
 } from 'o1js';
 
-import type Approvable from './interfaces/token/approvable';
+import type Approvable from './interfaces/token/approvable.js';
 // eslint-disable-next-line putout/putout
-import type Transferable from './interfaces/token/transferable';
+import type Transferable from './interfaces/token/transferable.js';
 // eslint-disable-next-line max-len
 // eslint-disable-next-line no-duplicate-imports, @typescript-eslint/consistent-type-imports
 import {
@@ -29,21 +33,41 @@ import {
   TransferFromToOptions,
   TransferOptions,
   TransferReturn,
-} from './interfaces/token/transferable';
-import errors from './errors';
+} from './interfaces/token/transferable.js';
+import errors from './errors.js';
 import {
   AdminAction,
   type Pausable,
   type Burnable,
   type Mintable,
   type Upgradable,
-} from './interfaces/token/adminable';
+} from './interfaces/token/adminable.js';
 // eslint-disable-next-line putout/putout
-import type Viewable from './interfaces/token/viewable';
+import type Viewable from './interfaces/token/viewable.js';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewableOptions } from './interfaces/token/viewable';
-import Hooks from './Hooks';
-import type Hookable from './interfaces/token/hookable';
+import type { ViewableOptions } from './interfaces/token/viewable.js';
+import Hooks from './Hooks.js';
+import type Hookable from './interfaces/token/hookable.js';
+
+class Transfer extends Struct({
+  from: PublicKey,
+  to: PublicKey,
+  amount: UInt64
+}){
+  constructor(from: PublicKey, to: PublicKey, amount: UInt64) {
+    super({ from, to, amount });
+  }
+}
+
+class Lock extends Struct({
+  locker: PublicKey,
+  receipt: Field,
+  amount: UInt64
+}){
+  constructor(locker: PublicKey, receipt: Field, amount: UInt64) {
+    super({ locker, receipt, amount });
+  }
+}
 
 class Token
   extends SmartContract
@@ -74,6 +98,9 @@ class Token
   @state(Bool) public paused = State<Bool>();
 
   public decimals: UInt64 = UInt64.from(Token.defaultDecimals);
+
+  events = {"Transfer": Transfer, "Lock": Lock};
+
 
   public getHooksContract(): Hooks {
     const admin = this.getHooks();
@@ -190,6 +217,104 @@ class Token
   public approveDeploy(deploy: AccountUpdate): void {
     this.assertHasNoBalanceChange([deploy]);
     this.approve(deploy, AccountUpdate.Layout.NoChildren);
+  }
+
+
+  @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
+    this.token.send({ from: this.sender, to: bridgeAddress, amount })
+    // this.burn(this.sender, amount);
+    this.emitEvent("Lock", {
+      locker: this.sender,
+      receipt,
+      amount,
+    })
+  }
+
+  @method approveCallbackAndTransfer(
+      sender: PublicKey,
+      receiver: PublicKey,
+      amount: UInt64,
+      callback: Experimental.Callback<any>
+  ) {
+    const tokenId = this.token.id
+
+    const senderAccountUpdate = this.approve(callback, AccountUpdate.Layout.AnyChildren)
+
+    senderAccountUpdate.body.tokenId.assertEquals(tokenId)
+    senderAccountUpdate.body.publicKey.assertEquals(sender)
+
+    const negativeAmount = Int64.fromObject(senderAccountUpdate.body.balanceChange)
+    negativeAmount.assertEquals(Int64.from(amount).neg())
+
+    const receiverAccountUpdate = Experimental.createChildAccountUpdate(this.self, receiver, tokenId)
+    receiverAccountUpdate.balance.addInPlace(amount)
+  }
+
+  @method approveUpdateAndTransfer(zkappUpdate: AccountUpdate, receiver: PublicKey, amount: UInt64) {
+    // TODO: THIS IS INSECURE. The proper version has a prover error (compile != prove) that must be fixed
+    this.approve(zkappUpdate, AccountUpdate.Layout.AnyChildren)
+
+    // THIS IS HOW IT SHOULD BE DONE:
+    // // approve a layout of two grandchildren, both of which can't inherit the token permission
+    // let { StaticChildren, AnyChildren } = AccountUpdate.Layout;
+    // this.approve(zkappUpdate, StaticChildren(AnyChildren, AnyChildren));
+    // zkappUpdate.body.mayUseToken.parentsOwnToken.assertTrue();
+    // let [grandchild1, grandchild2] = zkappUpdate.children.accountUpdates;
+    // grandchild1.body.mayUseToken.inheritFromParent.assertFalse();
+    // grandchild2.body.mayUseToken.inheritFromParent.assertFalse();
+
+    // see if balance change cancels the amount sent
+    const balanceChange = Int64.fromObject(zkappUpdate.body.balanceChange)
+    balanceChange.assertEquals(Int64.from(amount).neg())
+
+    const receiverAccountUpdate = Experimental.createChildAccountUpdate(this.self, receiver, this.token.id)
+    receiverAccountUpdate.balance.addInPlace(amount)
+  }
+
+  @method approveUpdate(zkappUpdate: AccountUpdate) {
+    this.approve(zkappUpdate)
+    const balanceChange = Int64.fromObject(zkappUpdate.body.balanceChange)
+    balanceChange.assertEquals(Int64.from(0))
+  }
+
+  // Instead, use `approveUpdate` method.
+  // @method deployZkapp(address: PublicKey, verificationKey: VerificationKey) {
+  //     let tokenId = this.token.id
+  //     let zkapp = AccountUpdate.create(address, tokenId)
+  //     zkapp.account.permissions.set(Permissions.default())
+  //     zkapp.account.verificationKey.set(verificationKey)
+  //     zkapp.requireSignature()
+  // }
+
+  /**
+   * 'sendTokens()' sends tokens from `senderAddress` to `receiverAddress`.
+   *
+   * It does so by deducting the amount of tokens from `senderAddress` by
+   * authorizing the deduction with a proof. It then creates the receiver
+   * from `receiverAddress` and sends the amount.
+   */
+  @method sendTokensFromZkApp(
+      receiverAddress: PublicKey,
+      amount: UInt64,
+      callback: Experimental.Callback<any>
+  ) {
+    // approves the callback which deductes the amount of tokens from the sender
+    let senderAccountUpdate = this.approve(callback);
+
+    // Create constraints for the sender account update and amount
+    let negativeAmount = Int64.fromObject(
+        senderAccountUpdate.body.balanceChange
+    );
+    negativeAmount.assertEquals(Int64.from(amount).neg());
+    let tokenId = this.token.id;
+
+    // Create receiver accountUpdate
+    let receiverAccountUpdate = Experimental.createChildAccountUpdate(
+        this.self,
+        receiverAddress,
+        tokenId
+    );
+    receiverAccountUpdate.balance.addInPlace(amount);
   }
 
   /**

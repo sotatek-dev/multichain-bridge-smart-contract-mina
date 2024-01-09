@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, UInt64, Field } from 'o1js';
 import { Token } from './erc20.js';
 import { Bridge } from "./Bridge.js";
 // check command line arg
@@ -67,7 +67,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // AccountUpdate.fundNewAccount(feepayerAddress);
+        AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
     });
