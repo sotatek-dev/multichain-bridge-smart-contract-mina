@@ -83,8 +83,8 @@ try {
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            // AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.transfer(feepayerAddress, user1.toPublicKey(), AMOUNT_TRANSFER);
+            AccountUpdate.fundNewAccount(feepayerAddress);
+            zkApp.transfer(feepayerAddress, PublicKey.fromBase58("B62qopc6jQa5vbogncGCKhAa6s3kCXTxKpj71Ad55y3852G8XGciQRK"), AMOUNT_TRANSFER);
         }
     );
     await tx.prove();

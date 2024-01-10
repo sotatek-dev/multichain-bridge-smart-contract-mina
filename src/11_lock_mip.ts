@@ -99,7 +99,7 @@ await Hook.compile();
 try {
 
     try {
-        const accounts = await fetchAccount({publicKey: feepayerAddress});
+        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjw28HKUVsuk3fvzmK9dcPUvRwCCcGAjs77k9zdNDiF9sukTrYrF")});
     } catch (e) {
         console.log(e);
     }

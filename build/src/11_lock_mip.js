@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
 import Token from './token.js';
 import { Bridge } from "./Bridge.js";
 import Hook from './Hooks.js';
@@ -67,7 +67,7 @@ await Token.compile();
 await Hook.compile();
 try {
     try {
-        const accounts = await fetchAccount({ publicKey: feepayerAddress });
+        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qjw28HKUVsuk3fvzmK9dcPUvRwCCcGAjs77k9zdNDiF9sukTrYrF") });
     }
     catch (e) {
         console.log(e);

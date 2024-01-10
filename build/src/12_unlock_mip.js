@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64, Experimental } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
 import { Bridge } from './Bridge.js';
 import Token from './token.js';
 import Hook from './Hooks.js';
@@ -77,7 +77,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     try {
-        const accounts = await fetchAccount({ publicKey: feepayerAddress });
+        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qqFuBUbdPvF4YwNb9GZ93m8D5d9p3ihvhRyMSPbuw9p31q7EJV8k") });
     }
     catch (e) {
         console.log(e);
@@ -85,10 +85,15 @@ try {
     console.log(zkAppAddress.toBase58());
     console.log(zkBridgeAddress.toBase58());
     console.log(feepayerAddress.toBase58());
+    const totalSupply = await zkApp.totalSupply.get();
+    console.log("🚀 ~ file: 12_unlock_mip.ts:120 ~ totalSupply:", totalSupply.toString());
+    const circulatingSupply = await zkApp.circulatingSupply.get();
+    console.log("🚀 ~ file: 12_unlock_mip.ts:122 ~ circulatingSupply:", circulatingSupply.toString());
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // AccountUpdate.fundNewAccount(feepayerAddress);
-        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one]);
-        zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback);
+        AccountUpdate.fundNewAccount(feepayerAddress);
+        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, AMOUNT_TRANSFER_USER, feepayerAddress, UInt64.one]);
+        zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, callback);
+        // bridgeApp.unlock(zkAppAddress, UInt64.one, feepayerAddress, UInt64.one);
     });
     await tx.prove();
     console.log('send transaction...');
@@ -97,15 +102,14 @@ try {
 catch (err) {
     console.log(err);
 }
-if (sentTx?.hash() !== undefined) {
-    console.log(`
-Success! Update transaction sent.
-
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.url, sentTx.hash())}
-`);
-}
+// if (sentTx?.hash() !== undefined) {
+//   console.log(`
+// Success! Update transaction sent.
+// Your smart contract state will be updated
+// as soon as the transaction is included in a block:
+// ${getTxnUrl(config.url, sentTx.hash())}
+// `);
+// }
 function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')

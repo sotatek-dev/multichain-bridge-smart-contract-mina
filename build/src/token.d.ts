@@ -157,6 +157,7 @@ declare class Token extends SmartContract implements Hookable, Mintable, Burnabl
      * from `receiverAddress` and sends the amount.
      */
     sendTokensFromZkApp(receiverAddress: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
+    mintToken(receiverAddress: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
     /**
      * Transferable
      */

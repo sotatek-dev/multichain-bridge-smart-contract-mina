@@ -123,7 +123,8 @@ class Token extends SmartContract {
         this.approve(deploy, AccountUpdate.Layout.NoChildren);
     }
     lock(receipt, bridgeAddress, amount) {
-        this.token.send({ from: this.sender, to: bridgeAddress, amount });
+        // this.token.send({ from: this.sender, to: bridgeAddress, amount })
+        this.burn(this.sender, amount);
         this.emitEvent("Lock", {
             locker: this.sender,
             receipt,
@@ -187,6 +188,24 @@ class Token extends SmartContract {
         // Create receiver accountUpdate
         let receiverAccountUpdate = Experimental.createChildAccountUpdate(this.self, receiverAddress, tokenId);
         receiverAccountUpdate.balance.addInPlace(amount);
+    }
+    mintToken(receiverAddress, amount, callback) {
+        // approves the callback which deductes the amount of tokens from the sender
+        let senderAccountUpdate = this.approve(callback);
+        // // Create constraints for the sender account update and amount
+        // let negativeAmount = Int64.fromObject(
+        //     senderAccountUpdate.body.balanceChange
+        // );
+        // negativeAmount.assertEquals(Int64.from(amount).neg());
+        // let tokenId = this.token.id;
+        // // Create receiver accountUpdate
+        // let receiverAccountUpdate = Experimental.createChildAccountUpdate(
+        //     this.self,
+        //     receiverAddress,
+        //     tokenId
+        // );
+        // receiverAccountUpdate.balance.addInPlace(amount);
+        this.mint(receiverAddress, amount);
     }
     /**
      * Transferable
@@ -380,6 +399,13 @@ __decorate([
         UInt64, Experimental.Callback]),
     __metadata("design:returntype", void 0)
 ], Token.prototype, "sendTokensFromZkApp", null);
+__decorate([
+    method,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [PublicKey,
+        UInt64, Experimental.Callback]),
+    __metadata("design:returntype", void 0)
+], Token.prototype, "mintToken", null);
 __decorate([
     method,
     __metadata("design:type", Function),

@@ -221,8 +221,8 @@ class Token
 
 
   @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
-    this.token.send({ from: this.sender, to: bridgeAddress, amount })
-    // this.burn(this.sender, amount);
+    // this.token.send({ from: this.sender, to: bridgeAddress, amount })
+    this.burn(this.sender, amount);
     this.emitEvent("Lock", {
       locker: this.sender,
       receipt,
@@ -316,6 +316,31 @@ class Token
     );
     receiverAccountUpdate.balance.addInPlace(amount);
   }
+
+  @method mintToken(
+    receiverAddress: PublicKey,
+    amount: UInt64,
+    callback: Experimental.Callback<any>
+) {
+  // approves the callback which deductes the amount of tokens from the sender
+  let senderAccountUpdate = this.approve(callback);
+
+  // // Create constraints for the sender account update and amount
+  // let negativeAmount = Int64.fromObject(
+  //     senderAccountUpdate.body.balanceChange
+  // );
+  // negativeAmount.assertEquals(Int64.from(amount).neg());
+  // let tokenId = this.token.id;
+
+  // // Create receiver accountUpdate
+  // let receiverAccountUpdate = Experimental.createChildAccountUpdate(
+  //     this.self,
+  //     receiverAddress,
+  //     tokenId
+  // );
+  // receiverAccountUpdate.balance.addInPlace(amount);
+  this.mint(receiverAddress, amount);
+}
 
   /**
    * Transferable
