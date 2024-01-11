@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64, Experimental } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import Token from '../token.js';
 import Hook from '../Hooks.js';
@@ -77,7 +77,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     try {
-        const accounts = await fetchAccount({ publicKey: feepayerAddress });
+        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb") });
     }
     catch (e) {
         console.log(e);
@@ -88,7 +88,9 @@ try {
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one]);
-        zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback);
+        zkApp.mintToken(feepayerAddress, UInt64.one, callback);
+        // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
+        // zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
     });
     await tx.prove();
     console.log('send transaction...');

@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
 import { Bridge } from './Bridge.js';
 import Token from './token.js';
 import Hook from './Hooks.js';
@@ -90,9 +90,11 @@ try {
     const circulatingSupply = await zkApp.circulatingSupply.get();
     console.log("🚀 ~ file: 12_unlock_mip.ts:122 ~ circulatingSupply:", circulatingSupply.toString());
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
+        // AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, AMOUNT_TRANSFER_USER, feepayerAddress, UInt64.one]);
         zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, callback);
+        // const callback1 = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, AMOUNT_TRANSFER_USER, feepayerAddress, UInt64.one])
+        // zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, callback1)
         // bridgeApp.unlock(zkAppAddress, UInt64.one, feepayerAddress, UInt64.one);
     });
     await tx.prove();
@@ -102,14 +104,15 @@ try {
 catch (err) {
     console.log(err);
 }
-// if (sentTx?.hash() !== undefined) {
-//   console.log(`
-// Success! Update transaction sent.
-// Your smart contract state will be updated
-// as soon as the transaction is included in a block:
-// ${getTxnUrl(config.url, sentTx.hash())}
-// `);
-// }
+if (sentTx?.hash() !== undefined) {
+    console.log(`
+Success! Update transaction sent.
+
+Your smart contract state will be updated
+as soon as the transaction is included in a block:
+${getTxnUrl(config.url, sentTx.hash())}
+`);
+}
 function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')

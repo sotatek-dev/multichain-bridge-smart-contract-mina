@@ -99,7 +99,7 @@ await Hook.compile();
 try {
 
     try {
-        const accounts = await fetchAccount({publicKey: feepayerAddress});
+        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
     } catch (e) {
         console.log(e);
     }
@@ -108,7 +108,7 @@ try {
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            // AccountUpdate.fundNewAccount(feepayerAddress);
+            AccountUpdate.fundNewAccount(feepayerAddress);
             zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }

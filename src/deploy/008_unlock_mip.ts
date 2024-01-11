@@ -108,7 +108,7 @@ try {
   console.log('build transaction and create proof...');
 
     try {
-        const accounts = await fetchAccount({publicKey: feepayerAddress});
+        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
     } catch (e) {
         console.log(e);
     }
@@ -121,7 +121,9 @@ try {
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
-        zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
+        zkApp.mintToken(feepayerAddress, UInt64.one, callback)
+        // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
+        // zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
     }
   );
   await tx.prove();

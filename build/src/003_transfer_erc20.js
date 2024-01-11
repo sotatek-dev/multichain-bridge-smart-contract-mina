@@ -14,7 +14,8 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
-import { Token } from './erc20.js';
+import Token from './token.js';
+import Hook from './Hooks.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -32,7 +33,8 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let user1 = PrivateKey.fromBase58("EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD");
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -49,14 +51,15 @@ let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await Token.compile();
+await Hook.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     await fetchAccount({ publicKey: feepayerAddress });
-    await fetchAccount({ publicKey: zkAppAddress });
+    await fetchAccount({ publicKey: PublicKey.fromBase58("B62qonwbuuG1gEvc3j7CsEKKRvCxvyPEDkZF69qXkPD2B91aaaf5WEH") });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.transfer(feepayerAddress, PublicKey.fromBase58("B62qopc6jQa5vbogncGCKhAa6s3kCXTxKpj71Ad55y3852G8XGciQRK"), AMOUNT_TRANSFER);
+        zkApp.transferTo(PublicKey.fromBase58("B62qqkBRuiFYVMNqUTBdM36egQEjm4fYfyBbtTpjyRXyaWfCrtmZs4L"), AMOUNT_TRANSFER, AccountUpdate.MayUseToken.ParentsOwnToken);
     });
     await tx.prove();
     console.log('send transaction...');

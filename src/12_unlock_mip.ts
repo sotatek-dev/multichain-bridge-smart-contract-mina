@@ -124,9 +124,12 @@ try {
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress);
+      // AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, AMOUNT_TRANSFER_USER, feepayerAddress, UInt64.one])
         zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, callback)
+
+        // const callback1 = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, AMOUNT_TRANSFER_USER, feepayerAddress, UInt64.one])
+        // zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, callback1)
         // bridgeApp.unlock(zkAppAddress, UInt64.one, feepayerAddress, UInt64.one);
     }
   );
@@ -136,15 +139,15 @@ try {
 } catch (err) {
   console.log(err);
 }
-// if (sentTx?.hash() !== undefined) {
-//   console.log(`
-// Success! Update transaction sent.
+if (sentTx?.hash() !== undefined) {
+  console.log(`
+Success! Update transaction sent.
 
-// Your smart contract state will be updated
-// as soon as the transaction is included in a block:
-// ${getTxnUrl(config.url, sentTx.hash())}
-// `);
-// }
+Your smart contract state will be updated
+as soon as the transaction is included in a block:
+${getTxnUrl(config.url, sentTx.hash())}
+`);
+}
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname

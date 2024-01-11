@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -67,7 +67,7 @@ await Token.compile();
 await Hook.compile();
 try {
     try {
-        const accounts = await fetchAccount({ publicKey: feepayerAddress });
+        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb") });
     }
     catch (e) {
         console.log(e);
@@ -75,7 +75,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // AccountUpdate.fundNewAccount(feepayerAddress);
+        AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
     });
