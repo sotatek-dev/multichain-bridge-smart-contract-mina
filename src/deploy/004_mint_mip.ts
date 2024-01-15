@@ -85,7 +85,8 @@ try {
         { sender: feepayerAddress, fee },
         async () => {
             AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.mint(PublicKey.fromBase58("B62qqkBRuiFYVMNqUTBdM36egQEjm4fYfyBbtTpjyRXyaWfCrtmZs4L"), AMOUNT_DEPOSIT);
+            zkApp.mint(PublicKey.fromBase58("B62qjWwgHupW7k7fcTbb2Kszp4RPYBWYdL4KMmoqfkMH3iRN2FN8u5n"), AMOUNT_DEPOSIT);
+            // zkApp.mint(PublicKey.fromBase58("B62qqgt5ERz77Sum8vJzqfyN5qhe6q4eKdBgv8oGJJQHjYUvaq7qWtL"), AMOUNT_DEPOSIT);
         }
     );
     await tx.prove();

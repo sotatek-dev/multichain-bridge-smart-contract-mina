@@ -17,7 +17,9 @@ import {
   Field,
   Experimental,
   Int64,
-  Struct
+  Struct,
+  DeployArgs,
+  Permissions
 } from 'o1js';
 
 import type Approvable from './interfaces/token/approvable.js';
@@ -107,6 +109,16 @@ class Token
     return new Hooks(admin);
   }
 
+  deploy(args?: DeployArgs) {
+    super.deploy(args)
+
+    this.account.permissions.set({
+      ...Permissions.default(),
+      access: Permissions.proofOrSignature()
+    })
+    this.account.tokenSymbol.set('WETH');
+  }
+
   @method
   public initialize(hooks: PublicKey, totalSupply: UInt64) {
     super.init();
@@ -116,6 +128,7 @@ class Token
     this.totalSupply.set(totalSupply);
     this.circulatingSupply.set(UInt64.from(0));
     this.paused.set(Bool(false));
+    // this.account.tokenSymbol.set('WETH');
   }
 
   /**
@@ -162,7 +175,7 @@ class Token
     hooksContract.canAdmin(AdminAction.fromType(AdminAction.types.burn));
 
     // eslint-disable-next-line putout/putout
-    return this.token.mint({ address: from, amount });
+    return this.token.burn({ address: from, amount });
   }
 
   /**
@@ -222,7 +235,8 @@ class Token
 
   @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
     // this.token.send({ from: this.sender, to: bridgeAddress, amount })
-    this.burn(this.sender, amount);
+    // this.burn(this.sender, amount);
+    this.token.burn({ address: this.sender, amount });
     this.emitEvent("Lock", {
       locker: this.sender,
       receipt,

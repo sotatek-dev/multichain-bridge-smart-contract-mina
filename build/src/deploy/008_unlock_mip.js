@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import Token from '../token.js';
 import Hook from '../Hooks.js';
@@ -86,7 +86,7 @@ try {
     console.log(zkBridgeAddress.toBase58());
     console.log(feepayerAddress.toBase58());
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // AccountUpdate.fundNewAccount(feepayerAddress);
+        AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one]);
         zkApp.mintToken(feepayerAddress, UInt64.one, callback);
         // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
