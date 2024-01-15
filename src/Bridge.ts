@@ -45,11 +45,13 @@ export class Bridge extends SmartContract {
   }
 
   @method setMinAmount(_min: UInt64) {
+    this.minter.getAndRequireEquals().assertEquals(this.sender);
     this.minAmount.assertEquals(this.minAmount.get());
     this.minAmount.set(_min);
   }
 
   @method setMaxAmount(_max: UInt64) {
+    this.minter.getAndRequireEquals().assertEquals(this.sender);
     this.maxAmount.assertEquals(this.maxAmount.get());
     this.maxAmount.set(_max);
   }
