@@ -233,9 +233,12 @@ class Token
   }
 
 
-  @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
+  @method lock(receipt: Field, bridgeAddress: PublicKey, callback: Experimental.Callback<any>) {
     // this.token.send({ from: this.sender, to: bridgeAddress, amount })
     // this.burn(this.sender, amount);
+    const callbackAmount = callback.args.toString();
+    const amount = UInt64.from(callbackAmount);
+    const senderAccountUpdate = this.approve(callback, AccountUpdate.Layout.AnyChildren)
     this.token.burn({ address: this.sender, amount });
     this.emitEvent("Lock", {
       locker: this.sender,
