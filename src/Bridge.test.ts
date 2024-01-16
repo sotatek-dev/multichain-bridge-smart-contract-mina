@@ -40,6 +40,9 @@ describe('token bridge test', () => {
     const totalSupply = UInt64.from(5_000_000_000_000_000n)
 
     beforeAll(async () => {
+            await Hook.compile()
+            await Token.compile()
+            await Bridge.compile()
         if (proofsEnabled) {
             await Hook.compile()
             await Token.compile()
@@ -149,7 +152,7 @@ describe('token bridge test', () => {
 
 
         const unlockAmount = UInt64.from(103)
-        const unlockAmount1 = UInt64.from(13)
+        const unlockAmount1 = UInt64.from(103)
 
         // await fetchAccount({publicKey: tokenPubkey});
         // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmypM55BBhSpDQdKiUwXN1QFHCVjNBdMQygTu11Dxi4GZtXngY6L")});

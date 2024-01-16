@@ -236,7 +236,8 @@ class Token
   @method lock(receipt: Field, bridgeAddress: PublicKey, callback: Experimental.Callback<any>) {
     // this.token.send({ from: this.sender, to: bridgeAddress, amount })
     // this.burn(this.sender, amount);
-    const callbackAmount = callback.args.toString();
+    // eslint-disable-next-line
+    const callbackAmount = callback?.args?.toString() ?? "0";
     const amount = UInt64.from(callbackAmount);
     const senderAccountUpdate = this.approve(callback, AccountUpdate.Layout.AnyChildren)
     this.token.burn({ address: this.sender, amount });

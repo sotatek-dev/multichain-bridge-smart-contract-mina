@@ -109,7 +109,7 @@ try {
         { sender: feepayerAddress, fee },
         async () => {
             // AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.lock(Field.from(100), zkBridgeAddress, UInt64.from(1000000000));
+            // zkApp.lock(Field.from(100), zkBridgeAddress, UInt64.from(1000000000));
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }
     );

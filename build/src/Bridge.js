@@ -51,6 +51,12 @@ export class Bridge extends SmartContract {
         this.maxAmount.assertEquals(this.maxAmount.get());
         this.maxAmount.set(_max);
     }
+    checkMinMax(amount) {
+        this.maxAmount.assertEquals(this.maxAmount.get());
+        this.minAmount.assertEquals(this.minAmount.get());
+        this.minAmount.get().assertLessThan(amount);
+        this.maxAmount.get().assertGreaterThan(amount);
+    }
     unlock(tokenAddress, amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender);
         this.maxAmount.assertEquals(this.maxAmount.get());
@@ -96,6 +102,12 @@ __decorate([
     __metadata("design:paramtypes", [UInt64]),
     __metadata("design:returntype", void 0)
 ], Bridge.prototype, "setMaxAmount", null);
+__decorate([
+    method,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [UInt64]),
+    __metadata("design:returntype", void 0)
+], Bridge.prototype, "checkMinMax", null);
 __decorate([
     method,
     __metadata("design:type", Function),

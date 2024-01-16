@@ -146,7 +146,7 @@ declare class Token extends SmartContract implements Hookable, Mintable, Burnabl
     assertHasNoBalanceChange(accountUpdates: AccountUpdate[]): void;
     approveTransfer(from: AccountUpdate, to: AccountUpdate): void;
     approveDeploy(deploy: AccountUpdate): void;
-    lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64): void;
+    lock(receipt: Field, bridgeAddress: PublicKey, callback: Experimental.Callback<any>): void;
     approveCallbackAndTransfer(sender: PublicKey, receiver: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
     approveUpdateAndTransfer(zkappUpdate: AccountUpdate, receiver: PublicKey, amount: UInt64): void;
     approveUpdate(zkappUpdate: AccountUpdate): void;

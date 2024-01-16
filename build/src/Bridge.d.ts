@@ -111,6 +111,7 @@ export declare class Bridge extends SmartContract {
     setMinter(_minter: PublicKey): void;
     setMinAmount(_min: UInt64): void;
     setMaxAmount(_max: UInt64): void;
+    checkMinMax(amount: UInt64): void;
     unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64): void;
 }
 export {};

@@ -1,46 +1,25 @@
 {
   "version": 1,
   "deployAliases": {
-    "token": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "fee": "0.5"
-    },
     "hook": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/hook.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
+      "fee": "0.5"
+    },
+    "token": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/token.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
       "fee": "0.5"
     },
     "bridge": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/bridge.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "fee": "0.5"
-    },
-    "hook_test": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook_test.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "fee": "0.5"
-    },
-    "token_test": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token_test.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
-      "fee": "0.5"
-    },
-    "bridge_test": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge_test.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
-      "feepayerAlias": "deployeraccount",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
       "fee": "0.5"
     }
   }

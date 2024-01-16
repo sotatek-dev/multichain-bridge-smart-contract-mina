@@ -30,6 +30,9 @@ describe('token bridge test', () => {
     const AMOUNT_WITHDRAW = UInt64.from(3000000000000000n);
     const totalSupply = UInt64.from(5000000000000000n);
     beforeAll(async () => {
+        await Hook.compile();
+        await Token.compile();
+        await Bridge.compile();
         if (proofsEnabled) {
             await Hook.compile();
             await Token.compile();
@@ -73,20 +76,20 @@ describe('token bridge test', () => {
         await tx.prove();
         tx.sign([userPrivkey, tokenPrivkey]);
         await tx.send();
-        tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(userPubkey);
-            tokenZkapp.lock(Field.from(100), bridgePubkey, UInt64.one);
-        });
-        await tx.prove();
-        tx.sign([userPrivkey, tokenPrivkey]);
-        await tx.send();
-        tx = await Mina.transaction(normalUserPubkey, () => {
-            // AccountUpdate.fundNewAccount(normalUserPubkey);
-            tokenZkapp.lock(Field.from(100), bridgePubkey, UInt64.one);
-        });
-        await tx.prove();
-        tx.sign([normalUserPrivkey, tokenPrivkey]);
-        await tx.send();
+        // tx = await Mina.transaction(userPubkey, () => {
+        //     // AccountUpdate.fundNewAccount(userPubkey);
+        //     tokenZkapp.lock(Field.from(100), bridgePubkey, UInt64.one);
+        // })
+        // await tx.prove()
+        // tx.sign([userPrivkey, tokenPrivkey])
+        // await tx.send()
+        // tx = await Mina.transaction(normalUserPubkey, () => {
+        //     // AccountUpdate.fundNewAccount(normalUserPubkey);
+        //     tokenZkapp.lock(Field.from(100), bridgePubkey, UInt64.one);
+        // })
+        // await tx.prove()
+        // tx.sign([normalUserPrivkey, tokenPrivkey])
+        // await tx.send()
         tx = await Mina.transaction(userPubkey, () => {
             // AccountUpdate.fundNewAccount(normalUserPubkey);
             AccountUpdate.fundNewAccount(userPubkey, 1);
@@ -108,7 +111,7 @@ describe('token bridge test', () => {
         tx = await Mina.transaction(userPubkey, () => {
             // AccountUpdate.fundNewAccount(normalUserPubkey);
             // AccountUpdate.fundNewAccount(userPubkey, 1);
-            bridgeZkapp.setMaxAmount(UInt64.from(10000));
+            bridgeZkapp.setMaxAmount(UInt64.from(100000));
             tokenZkapp.approveUpdate(bridgeZkapp.self);
         });
         await tx.prove();
@@ -124,14 +127,25 @@ describe('token bridge test', () => {
         tx.sign([userPrivkey, bridgePrivkey]);
         await tx.send();
         const unlockAmount = UInt64.from(103);
+        const unlockAmount1 = UInt64.from(103);
+        // await fetchAccount({publicKey: tokenPubkey});
+        // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmypM55BBhSpDQdKiUwXN1QFHCVjNBdMQygTu11Dxi4GZtXngY6L")});
         tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount]);
-            tokenZkapp.mintToken(userPubkey, unlockAmount, callback);
+            const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [unlockAmount1]);
+            tokenZkapp.lock(Field.from(100), bridgePubkey, callback);
         });
         await tx.prove();
-        tx.sign([userPrivkey]);
+        tx.sign([userPrivkey, bridgePrivkey]);
         await tx.send();
+        // const unlockAmount = UInt64.from(103)
+        // tx = await Mina.transaction(userPubkey, () => {
+        //     // AccountUpdate.fundNewAccount(userPubkey, 1);
+        //     const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
+        //     tokenZkapp.mintToken(userPubkey, unlockAmount, callback)
+        // })
+        // await tx.prove()
+        // tx.sign([userPrivkey])
+        // await tx.send()
     });
 });
 //# sourceMappingURL=Bridge.test.js.map

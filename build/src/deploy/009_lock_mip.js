@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -76,7 +76,7 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.lock(Field.from(100), zkBridgeAddress, UInt64.from(1000000000));
+        // zkApp.lock(Field.from(100), zkBridgeAddress, UInt64.from(1000000000));
         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
     });
     await tx.prove();
