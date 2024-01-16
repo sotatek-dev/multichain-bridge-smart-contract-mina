@@ -13,8 +13,10 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import {Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Experimental, CircuitString} from 'o1js';
+import { Bridge } from '../Bridge.js';
 import Token from '../token.js';
+import Hook from '../Hooks.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -55,40 +57,79 @@ let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
-
+//
 const network = Mina.Network({
   mina: MINAURL,
   archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
 
+const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
+const AMOUNT_TRANSFER = UInt64.from(5_000_000_000_000n)
+const AMOUNT_TRANSFER_USER = UInt64.from(5_000_000_000n)
+
+try {
+    const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
+} catch (e) {
+    console.log(e);
+}
+
+let targetAlias = process.argv[3];
+if (!targetAlias)
+    throw Error(`Missing <targetAlias> argument.
+
+Usage:
+node build/src/interact.js <targetAlias>
+`);
+let configTarget = configJson.deployAliases[targetAlias];
+let zkBridgeKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+    await fs.readFile(configTarget.keyPath, 'utf8')
+);
+
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
 
-const hookAddress = PublicKey.fromBase58("B62qnDpubm9J4EwPWyXVNC3245yv9EHrCGf343zdNSGyefF891DBn5f");
-const totalSupply = UInt64.from(5_000_000_000_000_000n)
+let bridgeAppKey = PrivateKey.fromBase58(zkBridgeKeysBase58.privateKey);
+let zkBridgeAddress = bridgeAppKey.toPublicKey();
+let bridgeApp = new Bridge(zkBridgeAddress, zkApp.token.id);
 
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await Token.compile();
+await Bridge.compile();
+await Hook.compile();
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
-  let tx = await Mina.transaction(
+
+    try {
+        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
+    } catch (e) {
+        console.log(e);
+    }
+    console.log(zkAppAddress.toBase58());
+    console.log(zkBridgeAddress.toBase58());
+    console.log(feepayerAddress.toBase58());
+    const unlockAmount = UInt64.from(1000000000)
+
+    let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress);
-      zkApp.deploy();
-      zkApp.initialize(hookAddress, totalSupply);
+        AccountUpdate.fundNewAccount(feepayerAddress);
+        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, unlockAmount, feepayerAddress, unlockAmount])
+        zkApp.mintToken(feepayerAddress, unlockAmount, callback)
+        // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
+        // zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
     }
   );
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+  sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
   console.log(err);
 }

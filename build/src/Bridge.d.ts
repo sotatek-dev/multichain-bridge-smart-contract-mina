@@ -101,12 +101,16 @@ declare class LockEvent extends LockEvent_base {
 }
 export declare class Bridge extends SmartContract {
     minter: State<PublicKey>;
+    minAmount: State<UInt64>;
+    maxAmount: State<UInt64>;
     events: {
         Unlock: typeof UnlockEvent;
         Lock: typeof LockEvent;
     };
     decrementBalance(amount: UInt64): void;
     setMinter(_minter: PublicKey): void;
+    setMinAmount(_min: UInt64): void;
+    setMaxAmount(_max: UInt64): void;
     unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64): void;
 }
 export {};

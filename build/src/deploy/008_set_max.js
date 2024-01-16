@@ -13,8 +13,10 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, PublicKey, UInt64 } from 'o1js';
-import Token from '../token.js';
+import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
+import { Bridge } from '../Bridge.js';
+import Token from "../token.js";
+import Hook from '../Hooks.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -31,30 +33,46 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql/';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
+//
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
+try {
+    const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
+}
+catch (e) {
+    console.log(e);
+}
+console.log('compile the contract...');
+await Bridge.compile();
+await Token.compile();
+await Hook.compile();
+let tokenAppKey = PrivateKey.fromBase58("EKEG1rqS6HXkNDUBU1pw4SQCKVfLjtz3qEPdo13wnjcUxRHHBHdd");
+let tokenAppAddress = tokenAppKey.toPublicKey();
+let tokenApp = new Token(tokenAppAddress);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Token(zkAppAddress);
-const hookAddress = PublicKey.fromBase58("B62qnDpubm9J4EwPWyXVNC3245yv9EHrCGf343zdNSGyefF891DBn5f");
-const totalSupply = UInt64.from(5000000000000000n);
+console.log({ tokenId: tokenApp.token.id.toString() });
+let zkApp = new Bridge(zkAppAddress, tokenApp.token.id);
 let sentTx;
 // compile the contract to create prover keys
-console.log('compile the contract...');
-await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
+    // try {
+    //     const accounts = await fetchAccount({publicKey: feepayerAddress});
+    // } catch (e) {
+    //     console.log(e);
+    // }
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.deploy();
-        zkApp.initialize(hookAddress, totalSupply);
+        // AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        zkApp.setMaxAmount(UInt64.from(1000000000000000));
+        tokenApp.approveUpdate(zkApp.self);
     });
     await tx.prove();
     console.log('send transaction...');
@@ -84,4 +102,4 @@ function getTxnUrl(graphQlUrl, txnHash) {
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=003_deploy_mip.js.map
+//# sourceMappingURL=008_set_max.js.map

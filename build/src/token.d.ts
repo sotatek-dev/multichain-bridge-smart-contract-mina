@@ -1,4 +1,4 @@
-import { AccountUpdate, Bool, SmartContract, PublicKey, UInt64, Account, State, VerificationKey, Field, Experimental } from 'o1js';
+import { AccountUpdate, Bool, SmartContract, PublicKey, UInt64, Account, State, VerificationKey, Field, Experimental, DeployArgs } from 'o1js';
 import type Approvable from './interfaces/token/approvable.js';
 import type Transferable from './interfaces/token/transferable.js';
 import { type FromToTransferReturn, FromTransferReturn, MayUseToken, ToTransferReturn, TransferFromToOptions, TransferOptions, TransferReturn } from './interfaces/token/transferable.js';
@@ -120,6 +120,7 @@ declare class Token extends SmartContract implements Hookable, Mintable, Burnabl
         Lock: typeof Lock;
     };
     getHooksContract(): Hooks;
+    deploy(args?: DeployArgs): void;
     initialize(hooks: PublicKey, totalSupply: UInt64): void;
     /**
      * Mintable

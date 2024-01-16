@@ -21,6 +21,27 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
       "feepayerAlias": "deployeraccount",
       "fee": "0.5"
+    },
+    "hook_test": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/hook_test.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
+      "feepayerAlias": "deployeraccount",
+      "fee": "0.5"
+    },
+    "token_test": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/token_test.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
+      "feepayerAlias": "deployeraccount",
+      "fee": "0.5"
+    },
+    "bridge_test": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/bridge_test.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
+      "feepayerAlias": "deployeraccount",
+      "fee": "0.5"
     }
   }
 }

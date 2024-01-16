@@ -75,7 +75,7 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKEEGWQozyirFQayQMMgz12KsTBSjCUcfYpkGFFfCqzKpofYGxbn");
+let tokenAppKey = PrivateKey.fromBase58("EKEG1rqS6HXkNDUBU1pw4SQCKVfLjtz3qEPdo13wnjcUxRHHBHdd");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 
