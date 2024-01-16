@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field, Experimental } from 'o1js';
 import Token from '../token.js';
 import {Bridge} from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -96,6 +96,7 @@ let sentTx;
 console.log('compile the contract...');
 await Token.compile();
 await Hook.compile();
+const unlockAmount1 = UInt64.from(10000003);
 try {
 
     try {
@@ -105,17 +106,17 @@ try {
     }
     // call update() and send transaction
     console.log('build transaction and create proof...');
+
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            // AccountUpdate.fundNewAccount(feepayerAddress);
-            // zkApp.lock(Field.from(100), zkBridgeAddress, UInt64.from(1000000000));
-            // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
+            const callback = Experimental.Callback.create(bridgeApp, "checkMinMax", [unlockAmount1])
+            zkApp.lock(Field.from(100), zkBridgeAddress, callback)
         }
     );
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey]).send();
+    sentTx = await tx.sign([feepayerKey, bridgeAppKey]).send();
 } catch (err) {
     console.log(err);
 }
