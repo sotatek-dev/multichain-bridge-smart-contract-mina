@@ -1,4 +1,4 @@
-import { AccountUpdate, Encoding, Experimental, Field, Mina, PrivateKey, UInt64 } from 'o1js';
+import { AccountUpdate, Encoding, Mina, PrivateKey, PublicKey, UInt64 } from 'o1js';
 import { Bridge } from './Bridge';
 import Token from './token';
 import Hook from "./Hooks";
@@ -30,16 +30,11 @@ describe('token bridge test', () => {
     const AMOUNT_WITHDRAW = UInt64.from(3000000000000000n);
     const totalSupply = UInt64.from(5000000000000000n);
     beforeAll(async () => {
-        await Hook.compile();
-        await Token.compile();
-        await Bridge.compile();
         if (proofsEnabled) {
             await Hook.compile();
             await Token.compile();
             await Bridge.compile();
         }
-    });
-    it('test', async () => {
         let tx = await Mina.transaction(userPubkey, () => {
             AccountUpdate.fundNewAccount(userPubkey);
             hookZkapp.deploy();
@@ -101,42 +96,66 @@ describe('token bridge test', () => {
         await tx.send();
         tx = await Mina.transaction(userPubkey, () => {
             // AccountUpdate.fundNewAccount(normalUserPubkey);
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            bridgeZkapp.setMinter(userPubkey);
+            bridgeZkapp.firstInitialize(userPubkey);
             tokenZkapp.approveUpdate(bridgeZkapp.self);
         });
         await tx.prove();
         tx.sign([userPrivkey, bridgePrivkey]);
         await tx.send();
-        tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(normalUserPubkey);
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            bridgeZkapp.setMaxAmount(UInt64.from(100000));
+    });
+    // it('set minter success', async () => {
+    //
+    //     console.log(userPubkey.toBase58());
+    //     const minterr = await bridgeZkapp.minter.get();
+    //     console.log(minterr.toBase58());
+    //     let tx = await Mina.transaction(userPubkey, () => {
+    //         bridgeZkapp.setMinter(PublicKey.fromBase58("B62qqFaVvWMT1RLuBUPjdSNcyiaicLR5nKE7pDbHAMpmeVPW3E5LQbH"));
+    //         tokenZkapp.approveUpdate(bridgeZkapp.self);
+    //     })
+    //     await tx.prove()
+    //     tx.sign([userPrivkey, bridgePrivkey])
+    //     await tx.send()
+    //
+    //
+    // })
+    it('set minter failed', async () => {
+        let tx = await Mina.transaction(normalUserPubkey, () => {
+            bridgeZkapp.setMinter(PublicKey.fromBase58("B62qqFaVvWMT1RLuBUPjdSNcyiaicLR5nKE7pDbHAMpmeVPW3E5LQbH"));
             tokenZkapp.approveUpdate(bridgeZkapp.self);
         });
         await tx.prove();
-        tx.sign([userPrivkey, bridgePrivkey]);
+        tx.sign([normalUserPrivkey, bridgePrivkey]);
         await tx.send();
-        tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(normalUserPubkey);
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            bridgeZkapp.setMinAmount(UInt64.from(100));
-            tokenZkapp.approveUpdate(bridgeZkapp.self);
-        });
-        await tx.prove();
-        tx.sign([userPrivkey, bridgePrivkey]);
-        await tx.send();
-        const unlockAmount = UInt64.from(103);
-        const unlockAmount1 = UInt64.from(103);
+        const minter = await bridgeZkapp.minter.get();
+        console.log(minter.toBase58());
+        // tx = await Mina.transaction(userPubkey, () => {
+        //     bridgeZkapp.setMaxAmount(UInt64.from(100000));
+        //     tokenZkapp.approveUpdate(bridgeZkapp.self);
+        // })
+        // await tx.prove()
+        // tx.sign([userPrivkey, bridgePrivkey])
+        // await tx.send()
+        //
+        // tx = await Mina.transaction(userPubkey, () => {
+        //     bridgeZkapp.setMinAmount(UInt64.from(100));
+        //     tokenZkapp.approveUpdate(bridgeZkapp.self);
+        // })
+        // await tx.prove()
+        // tx.sign([userPrivkey, bridgePrivkey])
+        // await tx.send()
+        //
+        //
+        // const unlockAmount = UInt64.from(103)
+        // const unlockAmount1 = UInt64.from(103)
         // await fetchAccount({publicKey: tokenPubkey});
         // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmypM55BBhSpDQdKiUwXN1QFHCVjNBdMQygTu11Dxi4GZtXngY6L")});
-        tx = await Mina.transaction(userPubkey, () => {
-            const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [unlockAmount1]);
-            tokenZkapp.lock(Field.from(100), bridgePubkey, callback);
-        });
-        await tx.prove();
-        tx.sign([userPrivkey, bridgePrivkey]);
-        await tx.send();
+        // tx = await Mina.transaction(userPubkey, () => {
+        //     const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [unlockAmount1])
+        //     tokenZkapp.lock(Field.from(100), bridgePubkey, callback)
+        // })
+        // await tx.prove()
+        // tx.sign([userPrivkey, bridgePrivkey])
+        // await tx.send()
         // const unlockAmount = UInt64.from(103)
         // tx = await Mina.transaction(userPubkey, () => {
         //     // AccountUpdate.fundNewAccount(userPubkey, 1);
@@ -146,6 +165,28 @@ describe('token bridge test', () => {
         // await tx.prove()
         // tx.sign([userPrivkey])
         // await tx.send()
+    });
+    it('set minAmount', async () => {
+        let tx = await Mina.transaction(normalUserPubkey, () => {
+            bridgeZkapp.setMinAmount(UInt64.from(1000));
+            tokenZkapp.approveUpdate(bridgeZkapp.self);
+        });
+        await tx.prove();
+        tx.sign([normalUserPrivkey, bridgePrivkey]);
+        await tx.send();
+        const min = await bridgeZkapp.minAmount.get();
+        console.log(min.toString());
+    });
+    it('set maxAmount', async () => {
+        let tx = await Mina.transaction(normalUserPubkey, () => {
+            bridgeZkapp.setMaxAmount(UInt64.from(100000000000));
+            tokenZkapp.approveUpdate(bridgeZkapp.self);
+        });
+        await tx.prove();
+        tx.sign([normalUserPrivkey, bridgePrivkey]);
+        await tx.send();
+        const max = await bridgeZkapp.maxAmount.get();
+        console.log(max.toString());
     });
 });
 //# sourceMappingURL=Bridge.test.js.map

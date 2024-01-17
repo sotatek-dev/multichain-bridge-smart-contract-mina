@@ -107,6 +107,7 @@ export declare class Bridge extends SmartContract {
         Unlock: typeof UnlockEvent;
         Lock: typeof LockEvent;
     };
+    firstInitialize(_minter: PublicKey): void;
     decrementBalance(amount: UInt64): void;
     setMinter(_minter: PublicKey): void;
     setMinAmount(_min: UInt64): void;

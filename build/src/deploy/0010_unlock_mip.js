@@ -86,6 +86,7 @@ try {
     console.log(zkBridgeAddress.toBase58());
     console.log(feepayerAddress.toBase58());
     const unlockAmount = UInt64.from(1000000000);
+    await fetchAccount({ publicKey: PublicKey.fromBase58(("B62qqFaVvWMT1RLuBUPjdSNcyiaicLR5nKE7pDbHAMpmeVPW3E5LQbH")) });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
         const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, unlockAmount, feepayerAddress, unlockAmount]);

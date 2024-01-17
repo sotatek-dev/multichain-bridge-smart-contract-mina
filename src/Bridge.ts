@@ -1,4 +1,16 @@
-import {PublicKey, SmartContract, State, UInt64, method, state, Struct, CircuitString} from 'o1js'
+import {
+  PublicKey,
+  SmartContract,
+  State,
+  UInt64,
+  method,
+  state,
+  Struct,
+  CircuitString,
+  Bool,
+  DeployArgs,
+  Permissions
+} from 'o1js'
 import { Token } from './erc20.js'
 
 class UnlockEvent extends Struct({
@@ -35,12 +47,18 @@ export class Bridge extends SmartContract {
   @state(UInt64) maxAmount = State<UInt64>()
 
   events = {"Unlock": UnlockEvent, "Lock": LockEvent};
+
+  @method firstInitialize(_minter: PublicKey) {
+    this.minter.set(_minter);
+  }
+
   @method decrementBalance(amount: UInt64) {
     this.balance.subInPlace(amount)
     this.minter.set(this.sender)
   }
 
   @method setMinter(_minter: PublicKey) {
+    this.minter.getAndRequireEquals().assertEquals(this.sender);
     this.minter.set(_minter);
   }
 

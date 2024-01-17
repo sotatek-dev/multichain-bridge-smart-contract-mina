@@ -57,7 +57,7 @@ try {
     await fetchAccount({ publicKey: zkAppAddress });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.mint(PublicKey.fromBase58("B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"), AMOUNT_DEPOSIT);
+        zkApp.mint(PublicKey.fromBase58("B62qopc6jQa5vbogncGCKhAa6s3kCXTxKpj71Ad55y3852G8XGciQRK"), AMOUNT_DEPOSIT);
         // zkApp.mint(PublicKey.fromBase58("B62qqgt5ERz77Sum8vJzqfyN5qhe6q4eKdBgv8oGJJQHjYUvaq7qWtL"), AMOUNT_DEPOSIT);
     });
     await tx.prove();
