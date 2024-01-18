@@ -1,4 +1,4 @@
-import { PublicKey, SmartContract, State, UInt64 } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, DeployArgs } from 'o1js';
 declare const UnlockEvent_base: (new (value: {
     receiver: PublicKey;
     tokenAddress: PublicKey;
@@ -101,15 +101,17 @@ declare class LockEvent extends LockEvent_base {
 }
 export declare class Bridge extends SmartContract {
     minter: State<PublicKey>;
+    configurator: State<PublicKey>;
     minAmount: State<UInt64>;
     maxAmount: State<UInt64>;
     events: {
         Unlock: typeof UnlockEvent;
         Lock: typeof LockEvent;
     };
-    firstInitialize(_minter: PublicKey): void;
     decrementBalance(amount: UInt64): void;
-    setMinter(_minter: PublicKey): void;
+    deploy(args?: DeployArgs): void;
+    config(_configurator: PublicKey, _min: UInt64, _max: UInt64): void;
+    setConfigurator(_configurator: PublicKey): void;
     setMinAmount(_min: UInt64): void;
     setMaxAmount(_max: UInt64): void;
     checkMinMax(amount: UInt64): void;

@@ -102,7 +102,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkApp.setMinter(feepayerAddress);
+      // zkApp.setMinter(feepayerAddress);
       tokenApp.approveUpdate(zkApp.self);
     }
   );
