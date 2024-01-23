@@ -241,6 +241,7 @@ class Token
     const amount = UInt64.from(callbackAmount);
     const senderAccountUpdate = this.approve(callback, AccountUpdate.Layout.AnyChildren)
     this.token.burn({ address: this.sender, amount });
+    // this.burn(this.sender, amount);
     this.emitEvent("Lock", {
       locker: this.sender,
       receipt,

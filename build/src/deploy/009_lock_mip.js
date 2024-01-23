@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Field, Experimental } from 'o1js';
+import { Mina, PrivateKey, UInt64, Field, Experimental } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -67,14 +67,9 @@ await Token.compile();
 await Hook.compile();
 const unlockAmount1 = UInt64.from(10000003);
 try {
-    try {
-        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb") });
-    }
-    catch (e) {
-        console.log(e);
-    }
     // call update() and send transaction
     console.log('build transaction and create proof...');
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmoyCYvDimQe7xLdQKjKohNVidsojpxQXLcRndZm19rawT4TjGqm")});
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         const callback = Experimental.Callback.create(bridgeApp, "checkMinMax", [unlockAmount1]);
         zkApp.lock(Field.from(100), zkBridgeAddress, callback);

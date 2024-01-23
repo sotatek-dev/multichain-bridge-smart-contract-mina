@@ -76,14 +76,15 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
+let tokenAppKey = PrivateKey.fromBase58("EKFKpRd2yDzndRyXxEL7PcACgRYt3PJQnRYaG7uDCxtM8rF8tXmv");
+// let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let newMinter = PublicKey.fromBase58("B62qjWwgHupW7k7fcTbb2Kszp4RPYBWYdL4KMmoqfkMH3iRN2FN8u5n");
+let newMinter = PublicKey.fromBase58("B62qpyQfLvZFD1tEPXi1UiCV37f3igsQ536VEqen36rxasrVNhEYWdg");
 console.log({tokenId: tokenApp.token.id.toString()})
 let zkApp = new Bridge(zkAppAddress, tokenApp.token.id);
 

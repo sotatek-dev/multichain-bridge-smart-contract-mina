@@ -9,7 +9,8 @@ import {
   CircuitString,
   Bool,
   DeployArgs,
-  Permissions
+  Permissions,
+  Provable
 } from 'o1js'
 import { Token } from './erc20.js'
 
@@ -72,6 +73,8 @@ export class Bridge extends SmartContract {
     this.configurator.set(_configurator);
     this.minAmount.set(_min);
     this.maxAmount.set(_max);
+    _max.assertGreaterThanOrEqual(_min);
+
   }
 
   @method setConfigurator(_configurator: PublicKey) {
@@ -80,31 +83,41 @@ export class Bridge extends SmartContract {
     this.configurator.set(_configurator);
   }
 
-  @method setMinAmount(_min: UInt64) {
-    this.configurator.getAndRequireEquals().assertEquals(this.sender);
-    this.minAmount.assertEquals(this.minAmount.get());
-    this.minAmount.set(_min);
-  }
-
-  @method setMaxAmount(_max: UInt64) {
-    this.configurator.getAndRequireEquals().assertEquals(this.sender);
-    this.maxAmount.assertEquals(this.maxAmount.get());
-    this.maxAmount.set(_max);
-  }
+  // @method setMinAmount(_min: UInt64) {
+  //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
+  //   this.minAmount.assertEquals(this.minAmount.get());
+  //   this.maxAmount.assertEquals(this.maxAmount.get());
+  //   const max = this.maxAmount.get();
+  //
+  //   if (max.equals(UInt64.from(0)).not()) {
+  //     this.maxAmount.get().assertGreaterThanOrEqual(_min);
+  //   }
+  //   this.minAmount.set(_min);
+  // }
+  //
+  // @method setMaxAmount(_max: UInt64) {
+  //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
+  //   this.maxAmount.assertEquals(this.maxAmount.get());
+  //   this.minAmount.assertEquals(this.minAmount.get());
+  //   // if (this.minAmount.get() != UInt64.from(0)) {
+  //   this.minAmount.get().assertLessThanOrEqual(_max);
+  //   // }
+  //   this.maxAmount.set(_max);
+  // }
 
   @method checkMinMax(amount: UInt64) {
     this.maxAmount.assertEquals(this.maxAmount.get());
     this.minAmount.assertEquals(this.minAmount.get());
-    this.minAmount.get().assertLessThan(amount);
-    this.maxAmount.get().assertGreaterThan(amount);
+    this.minAmount.get().assertLessThanOrEqual(amount);
+    this.maxAmount.get().assertGreaterThanOrEqual(amount);
   }
 
   @method unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64) {
     this.minter.getAndRequireEquals().assertEquals(this.sender);
     this.maxAmount.assertEquals(this.maxAmount.get());
     this.minAmount.assertEquals(this.minAmount.get());
-    this.minAmount.get().assertLessThan(amount);
-    this.maxAmount.get().assertGreaterThan(amount);
+    this.minAmount.get().assertLessThanOrEqual(amount);
+    this.maxAmount.get().assertGreaterThanOrEqual(amount);
     this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
   }
 }

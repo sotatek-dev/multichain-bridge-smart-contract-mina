@@ -4,43 +4,29 @@
     "hook": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/hook.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
+      "feepayerAlias": "owner",
       "fee": "0.5"
     },
     "token": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/token.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
+      "feepayerAlias": "owner",
       "fee": "0.5"
     },
     "bridge": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/bridge.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
+      "feepayerAlias": "owner",
       "fee": "0.5"
     },
-    "token1": {
+    "minter": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
-      "feepayerAlias": "dpl",
-      "fee": "0.5"
-    },
-    "hook1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
-      "feepayerAlias": "dpl",
-      "fee": "0.5"
-    },
-    "bridge1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
-      "feepayerAlias": "dpl",
+      "keyPath": "keys/minter.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/minter.json",
+      "feepayerAlias": "minter",
       "fee": "0.5"
     }
   }

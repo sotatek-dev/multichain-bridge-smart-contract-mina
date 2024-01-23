@@ -45,6 +45,8 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
+// console.log(zkApp.token.id.toBase58());
+// console.log("id ò token:    ", zkApp.token.id);
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
@@ -57,8 +59,8 @@ try {
     await fetchAccount({ publicKey: zkAppAddress });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.mint(PublicKey.fromBase58("B62qopc6jQa5vbogncGCKhAa6s3kCXTxKpj71Ad55y3852G8XGciQRK"), AMOUNT_DEPOSIT);
-        // zkApp.mint(PublicKey.fromBase58("B62qqgt5ERz77Sum8vJzqfyN5qhe6q4eKdBgv8oGJJQHjYUvaq7qWtL"), AMOUNT_DEPOSIT);
+        // zkApp.mint(PublicKey.fromBase58(feepayerAddress.toBase58()), AMOUNT_DEPOSIT);
+        zkApp.mint(PublicKey.fromBase58("B62qqkBRuiFYVMNqUTBdM36egQEjm4fYfyBbtTpjyRXyaWfCrtmZs4L"), AMOUNT_DEPOSIT);
     });
     await tx.prove();
     console.log('send transaction...');

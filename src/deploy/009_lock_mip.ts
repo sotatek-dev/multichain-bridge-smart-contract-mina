@@ -99,13 +99,10 @@ await Hook.compile();
 const unlockAmount1 = UInt64.from(10000003);
 try {
 
-    try {
-        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
-    } catch (e) {
-        console.log(e);
-    }
     // call update() and send transaction
     console.log('build transaction and create proof...');
+
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmoyCYvDimQe7xLdQKjKohNVidsojpxQXLcRndZm19rawT4TjGqm")});
 
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },

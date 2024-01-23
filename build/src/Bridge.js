@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { PublicKey, SmartContract, State, UInt64, method, state, Struct } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Provable } from 'o1js';
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -64,25 +64,36 @@ export class Bridge extends SmartContract {
     setMinAmount(_min) {
         this.configurator.getAndRequireEquals().assertEquals(this.sender);
         this.minAmount.assertEquals(this.minAmount.get());
+        this.maxAmount.assertEquals(this.maxAmount.get());
+        const max = this.maxAmount.get();
+        Provable.log(max);
+        Provable.log(!max.equals(UInt64.from(0)));
+        if (!max.equals(UInt64.from(0))) {
+            this.maxAmount.get().assertGreaterThanOrEqual(_min);
+        }
         this.minAmount.set(_min);
     }
     setMaxAmount(_max) {
         this.configurator.getAndRequireEquals().assertEquals(this.sender);
         this.maxAmount.assertEquals(this.maxAmount.get());
+        this.minAmount.assertEquals(this.minAmount.get());
+        // if (this.minAmount.get() != UInt64.from(0)) {
+        this.minAmount.get().assertLessThanOrEqual(_max);
+        // }
         this.maxAmount.set(_max);
     }
     checkMinMax(amount) {
         this.maxAmount.assertEquals(this.maxAmount.get());
         this.minAmount.assertEquals(this.minAmount.get());
-        this.minAmount.get().assertLessThan(amount);
-        this.maxAmount.get().assertGreaterThan(amount);
+        this.minAmount.get().assertLessThanOrEqual(amount);
+        this.maxAmount.get().assertGreaterThanOrEqual(amount);
     }
     unlock(tokenAddress, amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender);
         this.maxAmount.assertEquals(this.maxAmount.get());
         this.minAmount.assertEquals(this.minAmount.get());
-        this.minAmount.get().assertLessThan(amount);
-        this.maxAmount.get().assertGreaterThan(amount);
+        this.minAmount.get().assertLessThanOrEqual(amount);
+        this.maxAmount.get().assertGreaterThanOrEqual(amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
     }
 }

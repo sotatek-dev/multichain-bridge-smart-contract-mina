@@ -68,7 +68,7 @@ let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
 
-const hookAddress = PublicKey.fromBase58("B62qj8oiQzRDzvGWS89mNkpKvufyYWMP9Uombsy73sLWBzHi9swY4a2");
+const hookAddress = PublicKey.fromBase58("B62qqgczEoD3xHqXWTo9GVng11e8HYRwU1HiCQPtti4EUNBxqA8wbGR");
 const totalSupply = UInt64.from(5_000_000_000_000_000n)
 
 let sentTx;
