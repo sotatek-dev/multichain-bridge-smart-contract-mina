@@ -68,10 +68,6 @@ let zkBridgeAppKeysBase58: { privateKey: string; publicKey: string } = JSON.pars
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
-let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
-let zkBridgeAddress = bridgeAppKey.toPublicKey();
-let bridgeApp = new Bridge(zkBridgeAddress);
-
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 // const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
@@ -91,18 +87,32 @@ let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
 
+let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
+let zkBridgeAddress = bridgeAppKey.toPublicKey();
+let bridgeApp = new Bridge(zkBridgeAddress);
+
 let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await Token.compile();
 await Hook.compile();
-const unlockAmount1 = UInt64.from(10000003);
+await Bridge.compile();
+const unlockAmount1 = UInt64.from(100005);
+await fetchAccount({publicKey: zkBridgeAddress});
+
+try {
+    const accounts = await fetchAccount({publicKey: feepayerAddress});
+    const accounts1 = await fetchAccount({publicKey: zkBridgeAddress});
+    const accounts2 = await fetchAccount({publicKey: zkAppAddress});
+    const accounts3 = await fetchAccount({publicKey: PublicKey.fromBase58("B62qr2MAJ9ZkytmdxTttgc1Vn28Yf2icYnNZC62yawKTZd3QBjCFBY7")});
+} catch (e) {
+    console.log(e);
+}
 try {
 
     // call update() and send transaction
     console.log('build transaction and create proof...');
 
-    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmoyCYvDimQe7xLdQKjKohNVidsojpxQXLcRndZm19rawT4TjGqm")});
 
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },

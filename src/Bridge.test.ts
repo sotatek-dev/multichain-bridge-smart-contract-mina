@@ -97,16 +97,6 @@ describe('token bridge test', () => {
         await tx.prove()
         tx.sign([userPrivkey, bridgePrivkey])
         await tx.send()
-
-        // tx = await Mina.transaction(userPubkey, () => {
-        //     // AccountUpdate.fundNewAccount(normalUserPubkey);
-        //     bridgeZkapp.firstInitialize(userPubkey);
-        //     tokenZkapp.approveUpdate(bridgeZkapp.self);
-        // })
-        // await tx.prove()
-        // tx.sign([userPrivkey, bridgePrivkey])
-        // await tx.send()
-
     })
 
     it('set configurator success', async () => {
@@ -136,30 +126,38 @@ describe('token bridge test', () => {
     })
 
     it('lock from normal user ', async () => {
-        const lockAmount = UInt64.from(10000);
+        console.log("=================================locklock");
+        const min = await bridgeZkapp.minAmount.get();
+        console.log("🚀 ~ it ~ min:", min.toBigInt())
+        const max = await bridgeZkapp.maxAmount.get();
+        console.log("🚀 ~ it ~ max:", max.toBigInt())
+        const lockAmount = UInt64.from(100001);
         const tx = await Mina.transaction(normalUserPubkey, () => {
             const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [lockAmount])
             tokenZkapp.lock(Field.from(100), bridgePubkey, callback)
         })
         await tx.prove()
         tx.sign([normalUserPrivkey])
-        await tx.send()
+        const rs = await tx.send()
+        console.log("🚀 ~ rs ~ rs:", rs)
+
+        
 
     })
 
 
-    // it('unlock from owner ', async () => {
-    //     const unlockAmount = UInt64.from(1000001);
-    //     const tx = await Mina.transaction(userPubkey, () => {
-    //         // AccountUpdate.fundNewAccount(userPubkey, 1);
-    //         const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
-    //         tokenZkapp.mintToken(userPubkey, unlockAmount, callback)
-    //     })
-    //     await tx.prove()
-    //     tx.sign([userPrivkey])
-    //     await tx.send()
-    //
-    // })
+    it('unlock from owner ', async () => {
+        const unlockAmount = UInt64.from(1000001);
+        const tx = await Mina.transaction(userPubkey, () => {
+            // AccountUpdate.fundNewAccount(userPubkey, 1);
+            const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
+            tokenZkapp.mintToken(userPubkey, unlockAmount, callback)
+        })
+        await tx.prove()
+        tx.sign([userPrivkey])
+        await tx.send()
+    
+    })
     //
     // it('unlock from normal user ', async () => {
     //     const unlockAmount = UInt64.from(1000001);

@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
+import { Mina, PrivateKey, fetchAccount } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import Token from "../token.js";
 import Hook from '../Hooks.js';
@@ -71,8 +71,8 @@ try {
     // }
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        zkApp.setMinAmount(UInt64.from(100000));
-        tokenApp.approveUpdate(zkApp.self);
+        // zkApp.setMinAmount(UInt64.from(100000));
+        // tokenApp.approveUpdate(zkApp.self);
     });
     await tx.prove();
     console.log('send transaction...');

@@ -80,14 +80,6 @@ describe('token bridge test', () => {
         await tx.prove();
         tx.sign([userPrivkey, bridgePrivkey]);
         await tx.send();
-        // tx = await Mina.transaction(userPubkey, () => {
-        //     // AccountUpdate.fundNewAccount(normalUserPubkey);
-        //     bridgeZkapp.firstInitialize(userPubkey);
-        //     tokenZkapp.approveUpdate(bridgeZkapp.self);
-        // })
-        // await tx.prove()
-        // tx.sign([userPrivkey, bridgePrivkey])
-        // await tx.send()
     });
     it('set configurator success', async () => {
         console.log(userPubkey.toBase58());
@@ -101,65 +93,42 @@ describe('token bridge test', () => {
         tx.sign([userPrivkey, bridgePrivkey]);
         await tx.send();
     });
-    it('set minAmount', async () => {
-        const maxAMount = bridgeZkapp.maxAmount.get();
-        console.log(maxAMount.toString());
-        let tx = await Mina.transaction(configuratorPubkey, async () => {
-            bridgeZkapp.setMinAmount(UInt64.from(1000));
-            tokenZkapp.approveUpdate(bridgeZkapp.self);
-        });
-        await tx.prove();
-        tx.sign([configuratorPrivkey, bridgePrivkey]);
-        await tx.send();
-        const min = await bridgeZkapp.minAmount.get();
-        console.log(min.toString());
-    });
-    it('set maxAmount', async () => {
-        let tx = await Mina.transaction(configuratorPubkey, async () => {
-            bridgeZkapp.setMaxAmount(UInt64.from(100000000000));
-            tokenZkapp.approveUpdate(bridgeZkapp.self);
-        });
-        await tx.prove();
-        tx.sign([configuratorPrivkey, bridgePrivkey]);
-        await tx.send();
-        const max = await bridgeZkapp.maxAmount.get();
-        console.log(max.toString());
-    });
-    it('set minAmount failed', async () => {
-        const maxAMount = bridgeZkapp.maxAmount.get();
-        console.log(maxAMount.toString());
+    it('set config', async () => {
         let tx = await Mina.transaction(configuratorPubkey, () => {
-            bridgeZkapp.setMinAmount(UInt64.from(1000000000001));
+            bridgeZkapp.config(configuratorPubkey, UInt64.from(1000), UInt64.from(100000000));
             tokenZkapp.approveUpdate(bridgeZkapp.self);
         });
         await tx.prove();
         tx.sign([configuratorPrivkey, bridgePrivkey]);
         await tx.send();
-        const min = await bridgeZkapp.minAmount.get();
-        console.log(min.toString());
     });
     it('lock from normal user ', async () => {
-        const lockAmount = UInt64.from(100);
+        console.log("=================================locklock");
+        const min = await bridgeZkapp.minAmount.get();
+        console.log("🚀 ~ it ~ min:", min.toBigInt());
+        const max = await bridgeZkapp.maxAmount.get();
+        console.log("🚀 ~ it ~ max:", max.toBigInt());
+        const lockAmount = UInt64.from(100001);
         const tx = await Mina.transaction(normalUserPubkey, () => {
             const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [lockAmount]);
             tokenZkapp.lock(Field.from(100), bridgePubkey, callback);
         });
         await tx.prove();
         tx.sign([normalUserPrivkey]);
+        const rs = await tx.send();
+        console.log("🚀 ~ rs ~ rs:", rs);
+    });
+    it('unlock from owner ', async () => {
+        const unlockAmount = UInt64.from(1000001);
+        const tx = await Mina.transaction(userPubkey, () => {
+            // AccountUpdate.fundNewAccount(userPubkey, 1);
+            const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount]);
+            tokenZkapp.mintToken(userPubkey, unlockAmount, callback);
+        });
+        await tx.prove();
+        tx.sign([userPrivkey]);
         await tx.send();
     });
-    // it('unlock from owner ', async () => {
-    //     const unlockAmount = UInt64.from(1000001);
-    //     const tx = await Mina.transaction(userPubkey, () => {
-    //         // AccountUpdate.fundNewAccount(userPubkey, 1);
-    //         const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
-    //         tokenZkapp.mintToken(userPubkey, unlockAmount, callback)
-    //     })
-    //     await tx.prove()
-    //     tx.sign([userPrivkey])
-    //     await tx.send()
-    //
-    // })
     //
     // it('unlock from normal user ', async () => {
     //     const unlockAmount = UInt64.from(1000001);

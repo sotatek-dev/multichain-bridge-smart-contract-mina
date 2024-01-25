@@ -112,8 +112,6 @@ export declare class Bridge extends SmartContract {
     deploy(args?: DeployArgs): void;
     config(_configurator: PublicKey, _min: UInt64, _max: UInt64): void;
     setConfigurator(_configurator: PublicKey): void;
-    setMinAmount(_min: UInt64): void;
-    setMaxAmount(_max: UInt64): void;
     checkMinMax(amount: UInt64): void;
     unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64): void;
 }

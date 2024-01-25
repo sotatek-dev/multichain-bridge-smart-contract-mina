@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Provable } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, method, state, Struct } from 'o1js';
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -55,33 +55,34 @@ export class Bridge extends SmartContract {
         this.configurator.set(_configurator);
         this.minAmount.set(_min);
         this.maxAmount.set(_max);
+        _max.assertGreaterThanOrEqual(_min);
     }
     setConfigurator(_configurator) {
         this.configurator.getAndRequireEquals().assertEquals(this.sender);
         this.configurator.assertEquals(this.configurator.get());
         this.configurator.set(_configurator);
     }
-    setMinAmount(_min) {
-        this.configurator.getAndRequireEquals().assertEquals(this.sender);
-        this.minAmount.assertEquals(this.minAmount.get());
-        this.maxAmount.assertEquals(this.maxAmount.get());
-        const max = this.maxAmount.get();
-        Provable.log(max);
-        Provable.log(!max.equals(UInt64.from(0)));
-        if (!max.equals(UInt64.from(0))) {
-            this.maxAmount.get().assertGreaterThanOrEqual(_min);
-        }
-        this.minAmount.set(_min);
-    }
-    setMaxAmount(_max) {
-        this.configurator.getAndRequireEquals().assertEquals(this.sender);
-        this.maxAmount.assertEquals(this.maxAmount.get());
-        this.minAmount.assertEquals(this.minAmount.get());
-        // if (this.minAmount.get() != UInt64.from(0)) {
-        this.minAmount.get().assertLessThanOrEqual(_max);
-        // }
-        this.maxAmount.set(_max);
-    }
+    // @method setMinAmount(_min: UInt64) {
+    //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
+    //   this.minAmount.assertEquals(this.minAmount.get());
+    //   this.maxAmount.assertEquals(this.maxAmount.get());
+    //   const max = this.maxAmount.get();
+    //
+    //   if (max.equals(UInt64.from(0)).not()) {
+    //     this.maxAmount.get().assertGreaterThanOrEqual(_min);
+    //   }
+    //   this.minAmount.set(_min);
+    // }
+    //
+    // @method setMaxAmount(_max: UInt64) {
+    //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
+    //   this.maxAmount.assertEquals(this.maxAmount.get());
+    //   this.minAmount.assertEquals(this.minAmount.get());
+    //   // if (this.minAmount.get() != UInt64.from(0)) {
+    //   this.minAmount.get().assertLessThanOrEqual(_max);
+    //   // }
+    //   this.maxAmount.set(_max);
+    // }
     checkMinMax(amount) {
         this.maxAmount.assertEquals(this.maxAmount.get());
         this.minAmount.assertEquals(this.minAmount.get());
@@ -131,18 +132,6 @@ __decorate([
     __metadata("design:paramtypes", [PublicKey]),
     __metadata("design:returntype", void 0)
 ], Bridge.prototype, "setConfigurator", null);
-__decorate([
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64]),
-    __metadata("design:returntype", void 0)
-], Bridge.prototype, "setMinAmount", null);
-__decorate([
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64]),
-    __metadata("design:returntype", void 0)
-], Bridge.prototype, "setMaxAmount", null);
 __decorate([
     method,
     __metadata("design:type", Function),
