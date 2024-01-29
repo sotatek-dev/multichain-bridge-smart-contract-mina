@@ -108,8 +108,8 @@ try {
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.lock(Field.from(100), zkBridgeAddress, AMOUNT_TRANSFER);
+            // AccountUpdate.fundNewAccount(feepayerAddress);
+            zkApp.lock(Field.from(100), AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }
     );

@@ -85,7 +85,7 @@ try {
         { sender: feepayerAddress, fee },
         async () => {
             AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.mint(PublicKey.fromBase58("B62qqkBRuiFYVMNqUTBdM36egQEjm4fYfyBbtTpjyRXyaWfCrtmZs4L"), AMOUNT_DEPOSIT);
+            zkApp.mint(feepayerAddress, AMOUNT_DEPOSIT);
         }
     );
     await tx.prove();

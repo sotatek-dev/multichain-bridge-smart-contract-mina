@@ -220,9 +220,9 @@ class Token
   }
 
 
-  @method lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64) {
+  @method lock(receipt: Field, amount: UInt64) {
     // this.token.send({ from: this.sender, to: bridgeAddress, amount })
-    this.burn(this.sender, amount);
+    this.token.burn({address: this.sender, amount});
     this.emitEvent("Lock", {
       locker: this.sender,
       receipt,

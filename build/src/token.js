@@ -125,9 +125,9 @@ class Token extends SmartContract {
         this.assertHasNoBalanceChange([deploy]);
         this.approve(deploy, AccountUpdate.Layout.NoChildren);
     }
-    lock(receipt, bridgeAddress, amount) {
+    lock(receipt, amount) {
         // this.token.send({ from: this.sender, to: bridgeAddress, amount })
-        this.burn(this.sender, amount);
+        this.token.burn({ address: this.sender, amount });
         this.emitEvent("Lock", {
             locker: this.sender,
             receipt,
@@ -372,7 +372,7 @@ __decorate([
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Field, PublicKey, UInt64]),
+    __metadata("design:paramtypes", [Field, UInt64]),
     __metadata("design:returntype", void 0)
 ], Token.prototype, "lock", null);
 __decorate([

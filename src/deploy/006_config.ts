@@ -13,10 +13,11 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey } from 'o1js';
-import { Bridge } from './Bridge.js';
-import Token from "./token.js";
-import Hook from './Hooks.js';
+import {Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64} from 'o1js';
+import { Bridge } from '../Bridge.js';
+import Token from "../token.js";
+import Hook from '../Hooks.js';
+
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -75,13 +76,15 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKFVidUDFG26SANKPcR6ywi9vsNmFyMei5xb85wMb3a42EJqKPbP");
+let tokenAppKey = PrivateKey.fromBase58("EKFTBnStXmhiTdFw238k3udbaNCYQKmbR6RtSt379tBzUCfNNHAV");
+// let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
+let newMinter = PublicKey.fromBase58("B62qpyQfLvZFD1tEPXi1UiCV37f3igsQ536VEqen36rxasrVNhEYWdg");
 console.log({tokenId: tokenApp.token.id.toString()})
 let zkApp = new Bridge(zkAppAddress, tokenApp.token.id);
 
@@ -100,8 +103,8 @@ try {
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkApp.deploy();
+      // AccountUpdate.fundNewAccount(feepayerAddress, 1);
+      zkApp.config(newMinter, UInt64.from(100000), UInt64.from(1000000000000000));
       tokenApp.approveUpdate(zkApp.self);
     }
   );

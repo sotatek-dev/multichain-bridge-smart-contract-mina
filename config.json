@@ -140,6 +140,27 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/deployeraccount.json",
       "feepayerAlias": "deployeraccount",
       "fee": "0.5"
+    },
+    "thook": {
+      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
+      "keyPath": "keys/thook.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
+    },
+    "ttoken": {
+      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
+      "keyPath": "keys/ttoken.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
+    },
+    "tbridge": {
+      "url": "https://api.minascan.io/node/berkeley/v1/graphql",
+      "keyPath": "keys/tbridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
     }
   }
 }

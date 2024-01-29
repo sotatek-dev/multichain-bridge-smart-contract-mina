@@ -13,9 +13,10 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
-import { Token } from './erc20.js';
-
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import { Bridge } from '../Bridge.js';
+import Token from "../token.js";
+import Hook from '../Hooks.js';
 // check command line arg
 let deployAlias = process.argv[2];
 if (!deployAlias)
@@ -25,71 +26,61 @@ Usage:
 node build/src/interact.js <deployAlias>
 `);
 Error.stackTraceLimit = 1000;
-
-// parse config and private key from file
-type Config = {
-    deployAliases: Record<
-        string,
-        {
-            url: string;
-            keyPath: string;
-            fee: string;
-            feepayerKeyPath: string;
-            feepayerAlias: string;
-        }
-        >;
-};
-let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
-
+let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
 let config = configJson.deployAliases[deployAlias];
-let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-    await fs.readFile(config.feepayerKeyPath, 'utf8')
-);
-
-let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-    await fs.readFile(config.keyPath, 'utf8')
-);
-
+let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
+let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql/';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
-
+//
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
-const AMOUNT_TRANSFER = UInt64.from(5_000_000_000_000n)
-
+try {
+    const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
+}
+catch (e) {
+    console.log(e);
+}
+console.log('compile the contract...');
+await Bridge.compile();
+await Token.compile();
+await Hook.compile();
+let tokenAppKey = PrivateKey.fromBase58("EKFTBnStXmhiTdFw238k3udbaNCYQKmbR6RtSt379tBzUCfNNHAV");
+// let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
+let tokenAppAddress = tokenAppKey.toPublicKey();
+let tokenApp = new Token(tokenAppAddress);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new Token(zkAppAddress);
-
+let newMinter = PublicKey.fromBase58("B62qpyQfLvZFD1tEPXi1UiCV37f3igsQ536VEqen36rxasrVNhEYWdg");
+console.log({ tokenId: tokenApp.token.id.toString() });
+let zkApp = new Bridge(zkAppAddress, tokenApp.token.id);
 let sentTx;
 // compile the contract to create prover keys
-console.log('compile the contract...');
-await Token.compile();
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
-    await fetchAccount({publicKey: feepayerAddress});
-    await fetchAccount({publicKey: zkAppAddress});
-    let tx = await Mina.transaction(
-        { sender: feepayerAddress, fee },
-        async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.mint(feepayerAddress, AMOUNT_DEPOSIT);
-        }
-    );
+    // try {
+    //     const accounts = await fetchAccount({publicKey: feepayerAddress});
+    // } catch (e) {
+    //     console.log(e);
+    // }
+    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
+        // AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        zkApp.config(newMinter, UInt64.from(100000), UInt64.from(1000000000000000));
+        tokenApp.approveUpdate(zkApp.self);
+    });
     await tx.prove();
     console.log('send transaction...');
     sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-} catch (err) {
+}
+catch (err) {
     console.log(err);
 }
 if (sentTx?.hash() !== undefined) {
@@ -101,8 +92,7 @@ as soon as the transaction is included in a block:
 ${getTxnUrl(config.url, sentTx.hash())}
 `);
 }
-
-function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
+function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')
         .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
@@ -114,3 +104,4 @@ function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     }
     return `Transaction hash: ${txnHash}`;
 }
+//# sourceMappingURL=006_config.js.map

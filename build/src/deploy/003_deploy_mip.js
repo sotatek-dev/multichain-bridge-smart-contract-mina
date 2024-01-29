@@ -42,7 +42,7 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
-const hookAddress = PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb");
+const hookAddress = PublicKey.fromBase58("B62qrfzq3XWb97qokKVjkqHyiQpaBwm5akhG45BXu4sSiRam7xSS3iY");
 const totalSupply = UInt64.from(5000000000000000n);
 let sentTx;
 // compile the contract to create prover keys
