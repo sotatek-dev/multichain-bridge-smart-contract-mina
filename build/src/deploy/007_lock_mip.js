@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -54,7 +54,7 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
-const AMOUNT_TRANSFER = UInt64.from(5000000000);
+const AMOUNT_TRANSFER = UInt64.from(1000000000n);
 const AMOUNT_TRANSFER_USER = UInt64.from(5000000000n);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
@@ -76,25 +76,25 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.lock(Field.from(100), AMOUNT_TRANSFER);
+        // zkApp.lock(Field.from('0x64797030263Fa2f3be3Fb4d9b7c16FDf11e6d8E1'), AMOUNT_TRANSFER);
         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
     });
+    console.log(tx.toJSON());
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey]).send();
+    // sentTx = await tx.sign([feepayerKey]).send();
 }
 catch (err) {
     console.log(err);
 }
-if (sentTx?.hash() !== undefined) {
-    console.log(`
-Success! Update transaction sent.
-
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.url, sentTx.hash())}
-`);
-}
+// if (sentTx?.hash() !== undefined) {
+//     console.log(`
+// Success! Update transaction sent.
+// Your smart contract state will be updated
+// as soon as the transaction is included in a block:
+// ${getTxnUrl(config.url, sentTx.hash())}
+// `);
+// }
 function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')

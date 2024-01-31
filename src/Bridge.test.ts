@@ -121,7 +121,7 @@ describe('token bridge test', () => {
             tokenZkapp.approveUpdate(bridgeZkapp.self);
         })
         await tx.prove()
-        tx.sign([configuratorPrivkey, bridgePrivkey])
+        tx.sign([configuratorPrivkey])
         await tx.send()
     })
 
@@ -134,7 +134,7 @@ describe('token bridge test', () => {
         const lockAmount = UInt64.from(100001);
         const tx = await Mina.transaction(normalUserPubkey, () => {
             // const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [lockAmount])
-            tokenZkapp.lock(Field.from(100), lockAmount)
+            tokenZkapp.lock(Field.from(100), bridgePubkey, lockAmount)
         })
         await tx.prove()
         tx.sign([normalUserPrivkey])

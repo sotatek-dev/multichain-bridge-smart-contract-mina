@@ -83,7 +83,7 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
-const AMOUNT_TRANSFER = UInt64.from(5_000_000_000)
+const AMOUNT_TRANSFER = UInt64.from(1_000_000_000n)
 const AMOUNT_TRANSFER_USER = UInt64.from(5_000_000_000n)
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
@@ -109,25 +109,28 @@ try {
         { sender: feepayerAddress, fee },
         async () => {
             // AccountUpdate.fundNewAccount(feepayerAddress);
-            zkApp.lock(Field.from(100), AMOUNT_TRANSFER);
+            // zkApp.lock(Field.from('0x64797030263Fa2f3be3Fb4d9b7c16FDf11e6d8E1'), AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }
     );
+    console.log(tx.toJSON());
+    
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey]).send();
+    
+    // sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
     console.log(err);
 }
-if (sentTx?.hash() !== undefined) {
-    console.log(`
-Success! Update transaction sent.
+// if (sentTx?.hash() !== undefined) {
+//     console.log(`
+// Success! Update transaction sent.
 
-Your smart contract state will be updated
-as soon as the transaction is included in a block:
-${getTxnUrl(config.url, sentTx.hash())}
-`);
-}
+// Your smart contract state will be updated
+// as soon as the transaction is included in a block:
+// ${getTxnUrl(config.url, sentTx.hash())}
+// `);
+// }
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname

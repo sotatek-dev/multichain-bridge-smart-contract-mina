@@ -158,9 +158,72 @@
     "tbridge": {
       "url": "https://api.minascan.io/node/berkeley/v1/graphql",
       "keyPath": "keys/tbridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/minter.json",
+      "feepayerAlias": "minter",
+      "fee": "0.5"
+    },
+    "tthook": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/tthook.json",
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
       "feepayerAlias": "brd",
-      "fee": "0.5"
+      "fee": "1"
+    },
+    "tttoken": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/tttoken.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "1"
+    },
+    "ttbridge": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/ttbridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "1"
+    },
+    "hhook": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/hhook.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd1.json",
+      "feepayerAlias": "brd1",
+      "fee": "1"
+    },
+    "htoken": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/htoken.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd1.json",
+      "feepayerAlias": "brd1",
+      "fee": "1"
+    },
+    "hbridge": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/hbridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd1.json",
+      "feepayerAlias": "brd1",
+      "fee": "1"
+    },
+    "fhook": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/fhook.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
+      "feepayerAlias": "dpl",
+      "fee": "1"
+    },
+    "ftoken": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/ftoken.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
+      "feepayerAlias": "dpl",
+      "fee": "1"
+    },
+    "fbridge": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/fbridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/minter.json",
+      "feepayerAlias": "minter",
+      "fee": "1"
     }
   }
 }

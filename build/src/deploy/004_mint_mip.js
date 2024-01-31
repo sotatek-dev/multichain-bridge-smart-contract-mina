@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import Token from '../token.js';
 import Hook from '../Hooks.js';
 // check command line arg
@@ -57,7 +57,7 @@ try {
     await fetchAccount({ publicKey: zkAppAddress });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.mint(feepayerAddress, AMOUNT_DEPOSIT);
+        zkApp.mint(PublicKey.fromBase58(feepayerAddress.toBase58()), AMOUNT_DEPOSIT);
     });
     await tx.prove();
     console.log('send transaction...');
