@@ -83,7 +83,7 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
-const AMOUNT_TRANSFER = UInt64.from(1_000_000_000n)
+const AMOUNT_TRANSFER = UInt64.from(10_000_000_000n)
 const AMOUNT_TRANSFER_USER = UInt64.from(5_000_000_000n)
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
@@ -96,27 +96,32 @@ let sentTx;
 console.log('compile the contract...');
 await Token.compile();
 await Hook.compile();
+await Bridge.compile();
+
 try {
 
-    try {
-        const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
-    } catch (e) {
-        console.log(e);
-    }
+    const accounts = await fetchAccount({publicKey: zkBridgeAddress});
+    await fetchAccount({publicKey: zkAppAddress});
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf")});
+
+    const min = bridgeApp.minAmount.get();
+    console.log("🚀 ~ min:", min.toString());
+    const max = bridgeApp.maxAmount.get();
+    console.log("🚀 ~ max:", max.toString())
     // call update() and send transaction
-    console.log('build transaction and create proof...');
-    let tx = await Mina.transaction(
-        { sender: feepayerAddress, fee },
-        async () => {
-            // AccountUpdate.fundNewAccount(feepayerAddress);
-            // zkApp.lock(Field.from('0x64797030263Fa2f3be3Fb4d9b7c16FDf11e6d8E1'), AMOUNT_TRANSFER);
-            // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
-        }
-    );
-    console.log(tx.toJSON());
+    // console.log('build transaction and create proof...');
+    // let tx = await Mina.transaction(
+    //     { sender: feepayerAddress, fee },
+    //     async () => {
+    //         // AccountUpdate.fundNewAccount(feepayerAddress);
+    //         zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
+    //         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
+    //     }
+    // );
+    // console.log(tx.toJSON());
     
-    await tx.prove();
-    console.log('send transaction...');
+    // await tx.prove();
+    // console.log('send transaction...');
     
     // sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {

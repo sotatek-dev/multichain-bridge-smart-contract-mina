@@ -104,12 +104,15 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkApp.config(newMinter, UInt64.from(100000), UInt64.from(1000000000000000));
+      zkApp.config(newMinter, UInt64.from(1), UInt64.from(100000000000000000));
       tokenApp.approveUpdate(zkApp.self);
     }
   );
-  await tx.prove();
+  console.log("=+++++++++++++++++++++++++++++++++++++ before  prove", tx.toJSON());
+  
+  const proveTx = await tx.prove();
   console.log('send transaction...');
+  
   sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
 } catch (err) {
   console.log(err);

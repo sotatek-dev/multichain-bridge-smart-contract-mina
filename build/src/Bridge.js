@@ -91,10 +91,6 @@ export class Bridge extends SmartContract {
     }
     unlock(tokenAddress, amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender);
-        this.maxAmount.assertEquals(this.maxAmount.get());
-        this.minAmount.assertEquals(this.minAmount.get());
-        this.minAmount.get().assertLessThanOrEqual(amount);
-        this.maxAmount.get().assertGreaterThanOrEqual(amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
     }
 }
