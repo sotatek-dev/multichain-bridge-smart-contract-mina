@@ -17,7 +17,9 @@ import {
   Field,
   Experimental,
   Int64,
-  Struct
+  Struct,
+  Permissions,
+  DeployArgs
 } from 'o1js';
 
 import type Approvable from './interfaces/token/approvable.js';
@@ -106,6 +108,17 @@ class Token
   public getHooksContract(): Hooks {
     const admin = this.getHooks();
     return new Hooks(admin);
+  }
+
+  deploy(args?: DeployArgs) {
+    super.deploy(args)
+
+    this.account.permissions.set({
+      ...Permissions.default(),
+      access: Permissions.proofOrSignature(),
+    })
+
+    this.account.tokenSymbol.set('WETH');
   }
 
   @method
@@ -236,8 +249,8 @@ class Token
     // this.burn(this.sender, amount);
     // eslint-disable-next-line
   
-    const bridge = new Bridge(bridgeAddress, this.token.id);
-    bridge.checkMinMax(amount);
+    // const bridge = new Bridge(bridgeAddress, this.token.id);
+    // bridge.checkMinMax(amount);
     this.token.burn({ address: this.sender, amount });
     // this.burn(this.sender, amount);
     this.emitEvent("Lock", {

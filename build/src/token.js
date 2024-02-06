@@ -11,14 +11,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { AccountUpdate, Bool, SmartContract, method, PublicKey, UInt64, Account, state, State, VerificationKey, Field, Experimental, Int64, Struct } from 'o1js';
+import { AccountUpdate, Bool, SmartContract, method, PublicKey, UInt64, Account, state, State, VerificationKey, Field, Experimental, Int64, Struct, Permissions } from 'o1js';
 // eslint-disable-next-line max-len
 // eslint-disable-next-line no-duplicate-imports, @typescript-eslint/consistent-type-imports
 import { TransferFromToOptions, } from './interfaces/token/transferable.js';
 import errors from './errors.js';
 import { AdminAction, } from './interfaces/token/adminable.js';
 import Hooks from './Hooks.js';
-import { Bridge } from './Bridge.js';
 class Transfer extends Struct({
     from: PublicKey,
     to: PublicKey,
@@ -50,6 +49,14 @@ class Token extends SmartContract {
     getHooksContract() {
         const admin = this.getHooks();
         return new Hooks(admin);
+    }
+    deploy(args) {
+        super.deploy(args);
+        this.account.permissions.set({
+            ...Permissions.default(),
+            access: Permissions.proofOrSignature(),
+        });
+        this.account.tokenSymbol.set('WETH');
     }
     initialize(hooks, totalSupply) {
         super.init();
@@ -139,8 +146,8 @@ class Token extends SmartContract {
         // this.token.send({ from: this.sender, to: bridgeAddress, amount })
         // this.burn(this.sender, amount);
         // eslint-disable-next-line
-        const bridge = new Bridge(bridgeAddress, this.token.id);
-        bridge.checkMinMax(amount);
+        // const bridge = new Bridge(bridgeAddress, this.token.id);
+        // bridge.checkMinMax(amount);
         this.token.burn({ address: this.sender, amount });
         // this.burn(this.sender, amount);
         this.emitEvent("Lock", {

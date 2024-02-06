@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey } from 'o1js';
+import { Mina, PrivateKey, fetchAccount } from 'o1js';
 import Hook from '../Hooks.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -31,7 +31,7 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -47,6 +47,7 @@ let sentTx;
 console.log('compile the contract...');
 await Hook.compile();
 try {
+    await fetchAccount({ publicKey: zkAppAddress });
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {

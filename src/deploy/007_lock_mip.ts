@@ -73,8 +73,8 @@ let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
@@ -102,7 +102,7 @@ try {
 
     const accounts = await fetchAccount({publicKey: zkBridgeAddress});
     await fetchAccount({publicKey: zkAppAddress});
-    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf")});
+    await fetchAccount({publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf")});
 
     const min = bridgeApp.minAmount.get();
     console.log("🚀 ~ min:", min.toString());

@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -45,8 +45,8 @@ let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
 let bridgeApp = new Bridge(zkBridgeAddress);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -69,7 +69,7 @@ await Bridge.compile();
 try {
     const accounts = await fetchAccount({ publicKey: zkBridgeAddress });
     await fetchAccount({ publicKey: zkAppAddress });
-    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf")});
+    await fetchAccount({ publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf") });
     const min = bridgeApp.minAmount.get();
     console.log("🚀 ~ min:", min.toString());
     const max = bridgeApp.maxAmount.get();
