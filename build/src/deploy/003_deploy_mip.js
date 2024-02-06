@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, PublicKey, UInt64 } from 'o1js';
+import { Mina, PrivateKey, PublicKey, UInt64 } from 'o1js';
 import Token from '../token.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -31,7 +31,7 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
@@ -42,7 +42,7 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
-const hookAddress = PublicKey.fromBase58("B62qkcWDm4UsYYcwAkdiW32DDo6U224RQtK1nvJ9vace3nKukdT3a79");
+const hookAddress = PublicKey.fromBase58("B62qnQ4z7HHM89ZJTnLP3XkTfsmai5YqygxHV8DLEPHtfLb2TyVKvUB");
 const totalSupply = UInt64.from(5000000000000000n);
 let sentTx;
 // compile the contract to create prover keys
@@ -52,7 +52,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
+        // AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.deploy();
         zkApp.initialize(hookAddress, totalSupply);
     });

@@ -33,7 +33,7 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql/';
+const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -51,7 +51,7 @@ console.log('compile the contract...');
 await Bridge.compile();
 await Token.compile();
 await Hook.compile();
-let tokenAppKey = PrivateKey.fromBase58("EKE5MdMEgbQUAEDCu4j7LEHGLBY5QX5FTnJzPFxZphtZyTKQCArX");
+let tokenAppKey = PrivateKey.fromBase58("EKEeixtsiTUP7r9UEv1ZnAMTHjpYT2Y3FQsNkVHxCEUiZR1KrnKo");
 // let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);

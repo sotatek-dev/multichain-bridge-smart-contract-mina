@@ -109,33 +109,33 @@ try {
     const max = bridgeApp.maxAmount.get();
     console.log("🚀 ~ max:", max.toString())
     // call update() and send transaction
-    // console.log('build transaction and create proof...');
-    // let tx = await Mina.transaction(
-    //     { sender: feepayerAddress, fee },
-    //     async () => {
-    //         // AccountUpdate.fundNewAccount(feepayerAddress);
-    //         zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
-    //         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
-    //     }
-    // );
-    // console.log(tx.toJSON());
+    console.log('build transaction and create proof...');
+    let tx = await Mina.transaction(
+        { sender: feepayerAddress, fee },
+        async () => {
+            // AccountUpdate.fundNewAccount(feepayerAddress);
+            zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
+            // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
+        }
+    );
+    console.log(tx.toJSON());
     
-    // await tx.prove();
-    // console.log('send transaction...');
+    await tx.prove();
+    console.log('send transaction...');
     
-    // sentTx = await tx.sign([feepayerKey]).send();
+    sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
     console.log(err);
 }
-// if (sentTx?.hash() !== undefined) {
-//     console.log(`
-// Success! Update transaction sent.
+if (sentTx?.hash() !== undefined) {
+    console.log(`
+Success! Update transaction sent.
 
-// Your smart contract state will be updated
-// as soon as the transaction is included in a block:
-// ${getTxnUrl(config.url, sentTx.hash())}
-// `);
-// }
+Your smart contract state will be updated
+as soon as the transaction is included in a block:
+${getTxnUrl(config.url, sentTx.hash())}
+`);
+}
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
