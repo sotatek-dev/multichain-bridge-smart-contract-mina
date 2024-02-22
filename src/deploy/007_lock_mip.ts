@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field, Provable } from 'o1js';
 import Token from '../token.js';
 import {Bridge} from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -70,11 +70,12 @@ let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 let bridgeAppKey = PrivateKey.fromBase58(zkBridgeAppKeysBase58.privateKey);
 let zkBridgeAddress = bridgeAppKey.toPublicKey();
+console.log("🚀 ~ zkBridgeAddress:", zkBridgeAddress.toBase58())
 let bridgeApp = new Bridge(zkBridgeAddress);
 
 // set up Mina instance and contract we interact with
-// const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
+// const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 
 const network = Mina.Network({
@@ -83,8 +84,8 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5_000_000_000_000_000n)
-const AMOUNT_TRANSFER = UInt64.from(10_000_000_000n)
-const AMOUNT_TRANSFER_USER = UInt64.from(5_000_000_000n)
+const AMOUNT_TRANSFER = UInt64.from(100_000n)
+const AMOUNT_TRANSFER_USER = UInt64.from(5_000_000n)
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
@@ -102,18 +103,19 @@ try {
 
     const accounts = await fetchAccount({publicKey: zkBridgeAddress});
     await fetchAccount({publicKey: zkAppAddress});
-    await fetchAccount({publicKey: PublicKey.fromBase58("B62qnJA9S4xrRuUhRsjoQHXHATfHwgSnt4v339asZQAWAUcKCh867Zf")});
+    await fetchAccount({publicKey: zkAppAddress});
+    await fetchAccount({publicKey: PublicKey.fromBase58("B62qmqPVWbL7eMvuKYaCFkuSHhCm1t9cDW1CJfmQbjwb6UstdPJrt6W")});
 
     const min = bridgeApp.minAmount.get();
-    console.log("🚀 ~ min:", min.toString());
+    Provable.log("🚀 ~ min:", min.toString());
     const max = bridgeApp.maxAmount.get();
-    console.log("🚀 ~ max:", max.toString())
+    Provable.log("🚀 ~ max:", max.toString())
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            // AccountUpdate.fundNewAccount(feepayerAddress);
+            AccountUpdate.fundNewAccount(feepayerAddress);
             zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }

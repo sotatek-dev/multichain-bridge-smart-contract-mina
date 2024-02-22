@@ -18,6 +18,7 @@ import { TransferFromToOptions, } from './interfaces/token/transferable.js';
 import errors from './errors.js';
 import { AdminAction, } from './interfaces/token/adminable.js';
 import Hooks from './Hooks.js';
+import { Bridge } from './Bridge.js';
 class Transfer extends Struct({
     from: PublicKey,
     to: PublicKey,
@@ -146,8 +147,8 @@ class Token extends SmartContract {
         // this.token.send({ from: this.sender, to: bridgeAddress, amount })
         // this.burn(this.sender, amount);
         // eslint-disable-next-line
-        // const bridge = new Bridge(bridgeAddress, this.token.id);
-        // bridge.checkMinMax(amount);
+        const bridge = new Bridge(bridgeAddress, this.token.id);
+        bridge.checkMinMax(amount);
         this.token.burn({ address: this.sender, amount });
         // this.burn(this.sender, amount);
         this.emitEvent("Lock", {

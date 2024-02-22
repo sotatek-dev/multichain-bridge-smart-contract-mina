@@ -75,7 +75,7 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKEeixtsiTUP7r9UEv1ZnAMTHjpYT2Y3FQsNkVHxCEUiZR1KrnKo");
+let tokenAppKey = PrivateKey.fromBase58("EKFVTq3MN5fumLgXbXmoXWVjMVDF7FVqihNzKmFfFWbZws91ReVR");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
 
@@ -96,7 +96,7 @@ try {
     // } catch (e) {
     //     console.log(e);
     // }
-    await fetchAccount({publicKey: PublicKey.fromBase58("B62qkQFErtCoVX6R4NnyUJV2PgaqGwZ592kNoCZXjasTTGagQo9BWcJ")})
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qkQFErtCoVX6R4NnyUJV2PgaqGwZ592kNoCZXjasTTGagQo9BWcJ")})
 
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },

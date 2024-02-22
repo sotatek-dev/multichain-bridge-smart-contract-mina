@@ -249,8 +249,8 @@ class Token
     // this.burn(this.sender, amount);
     // eslint-disable-next-line
   
-    // const bridge = new Bridge(bridgeAddress, this.token.id);
-    // bridge.checkMinMax(amount);
+    const bridge = new Bridge(bridgeAddress, this.token.id);
+    bridge.checkMinMax(amount);
     this.token.burn({ address: this.sender, amount });
     // this.burn(this.sender, amount);
     this.emitEvent("Lock", {

@@ -56,7 +56,7 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -76,7 +76,7 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKEeixtsiTUP7r9UEv1ZnAMTHjpYT2Y3FQsNkVHxCEUiZR1KrnKo");
+let tokenAppKey = PrivateKey.fromBase58("EKFVTq3MN5fumLgXbXmoXWVjMVDF7FVqihNzKmFfFWbZws91ReVR");
 // let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
@@ -104,7 +104,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkApp.config(newMinter, UInt64.from(1), UInt64.from(100000000000000000));
+      zkApp.config(feepayerAddress, UInt64.from(1), UInt64.from(100000000000000000));
       tokenApp.approveUpdate(zkApp.self);
     }
   );
