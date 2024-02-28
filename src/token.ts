@@ -223,14 +223,14 @@ class Token
   @method
   public approveTransfer(from: AccountUpdate, to: AccountUpdate): void {
     this.assertHasNoBalanceChange([from, to]);
-    this.approve(from, AccountUpdate.Layout.NoChildren);
-    this.approve(to, AccountUpdate.Layout.NoChildren);
+    this.approve(from);
+    this.approve(to);
   }
 
   @method
   public approveDeploy(deploy: AccountUpdate): void {
     this.assertHasNoBalanceChange([deploy]);
-    this.approve(deploy, AccountUpdate.Layout.NoChildren);
+    this.approve(deploy);
   }
 
 
@@ -260,47 +260,6 @@ class Token
     })
   }
 
-  @method approveCallbackAndTransfer(
-      sender: PublicKey,
-      receiver: PublicKey,
-      amount: UInt64,
-      callback: Experimental.Callback<any>
-  ) {
-    const tokenId = this.token.id
-
-    const senderAccountUpdate = this.approve(callback, AccountUpdate.Layout.AnyChildren)
-
-    senderAccountUpdate.body.tokenId.assertEquals(tokenId)
-    senderAccountUpdate.body.publicKey.assertEquals(sender)
-
-    const negativeAmount = Int64.fromObject(senderAccountUpdate.body.balanceChange)
-    negativeAmount.assertEquals(Int64.from(amount).neg())
-
-    const receiverAccountUpdate = Experimental.createChildAccountUpdate(this.self, receiver, tokenId)
-    receiverAccountUpdate.balance.addInPlace(amount)
-  }
-
-  @method approveUpdateAndTransfer(zkappUpdate: AccountUpdate, receiver: PublicKey, amount: UInt64) {
-    // TODO: THIS IS INSECURE. The proper version has a prover error (compile != prove) that must be fixed
-    this.approve(zkappUpdate, AccountUpdate.Layout.AnyChildren)
-
-    // THIS IS HOW IT SHOULD BE DONE:
-    // // approve a layout of two grandchildren, both of which can't inherit the token permission
-    // let { StaticChildren, AnyChildren } = AccountUpdate.Layout;
-    // this.approve(zkappUpdate, StaticChildren(AnyChildren, AnyChildren));
-    // zkappUpdate.body.mayUseToken.parentsOwnToken.assertTrue();
-    // let [grandchild1, grandchild2] = zkappUpdate.children.accountUpdates;
-    // grandchild1.body.mayUseToken.inheritFromParent.assertFalse();
-    // grandchild2.body.mayUseToken.inheritFromParent.assertFalse();
-
-    // see if balance change cancels the amount sent
-    const balanceChange = Int64.fromObject(zkappUpdate.body.balanceChange)
-    balanceChange.assertEquals(Int64.from(amount).neg())
-
-    const receiverAccountUpdate = Experimental.createChildAccountUpdate(this.self, receiver, this.token.id)
-    receiverAccountUpdate.balance.addInPlace(amount)
-  }
-
   @method approveUpdate(zkappUpdate: AccountUpdate) {
     this.approve(zkappUpdate)
     const balanceChange = Int64.fromObject(zkappUpdate.body.balanceChange)
@@ -322,53 +281,16 @@ class Token
    * It does so by deducting the amount of tokens from `senderAddress` by
    * authorizing the deduction with a proof. It then creates the receiver
    * from `receiverAddress` and sends the amount.
-   */
-  @method sendTokensFromZkApp(
-      receiverAddress: PublicKey,
-      amount: UInt64,
-      callback: Experimental.Callback<any>
-  ) {
-    // approves the callback which deductes the amount of tokens from the sender
-    let senderAccountUpdate = this.approve(callback);
-
-    // Create constraints for the sender account update and amount
-    let negativeAmount = Int64.fromObject(
-        senderAccountUpdate.body.balanceChange
-    );
-    negativeAmount.assertEquals(Int64.from(amount).neg());
-    let tokenId = this.token.id;
-
-    // Create receiver accountUpdate
-    let receiverAccountUpdate = Experimental.createChildAccountUpdate(
-        this.self,
-        receiverAddress,
-        tokenId
-    );
-    receiverAccountUpdate.balance.addInPlace(amount);
-  }
+  */
 
   @method mintToken(
     receiverAddress: PublicKey,
     amount: UInt64,
-    callback: Experimental.Callback<any>
+    bridgeAddress: PublicKey,
+    id: UInt64
 ) {
-  // approves the callback which deductes the amount of tokens from the sender
-  let senderAccountUpdate = this.approve(callback);
-
-  // // Create constraints for the sender account update and amount
-  // let negativeAmount = Int64.fromObject(
-  //     senderAccountUpdate.body.balanceChange
-  // );
-  // negativeAmount.assertEquals(Int64.from(amount).neg());
-  // let tokenId = this.token.id;
-
-  // // Create receiver accountUpdate
-  // let receiverAccountUpdate = Experimental.createChildAccountUpdate(
-  //     this.self,
-  //     receiverAddress,
-  //     tokenId
-  // );
-  // receiverAccountUpdate.balance.addInPlace(amount);
+  const bridge = new Bridge(bridgeAddress, this.token.id);
+  bridge.unlock(this.address, amount, receiverAddress, id);
   this.mint(receiverAddress, amount);
 }
 

@@ -1,4 +1,4 @@
-import { AccountUpdate, Bool, SmartContract, PublicKey, UInt64, Account, State, VerificationKey, Field, Experimental, DeployArgs } from 'o1js';
+import { AccountUpdate, Bool, SmartContract, PublicKey, UInt64, Account, State, VerificationKey, Field, DeployArgs } from 'o1js';
 import type Approvable from './interfaces/token/approvable.js';
 import type Transferable from './interfaces/token/transferable.js';
 import { type FromToTransferReturn, FromTransferReturn, MayUseToken, ToTransferReturn, TransferFromToOptions, TransferOptions, TransferReturn } from './interfaces/token/transferable.js';
@@ -147,8 +147,6 @@ declare class Token extends SmartContract implements Hookable, Mintable, Burnabl
     approveTransfer(from: AccountUpdate, to: AccountUpdate): void;
     approveDeploy(deploy: AccountUpdate): void;
     lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64): void;
-    approveCallbackAndTransfer(sender: PublicKey, receiver: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
-    approveUpdateAndTransfer(zkappUpdate: AccountUpdate, receiver: PublicKey, amount: UInt64): void;
     approveUpdate(zkappUpdate: AccountUpdate): void;
     /**
      * 'sendTokens()' sends tokens from `senderAddress` to `receiverAddress`.
@@ -156,9 +154,8 @@ declare class Token extends SmartContract implements Hookable, Mintable, Burnabl
      * It does so by deducting the amount of tokens from `senderAddress` by
      * authorizing the deduction with a proof. It then creates the receiver
      * from `receiverAddress` and sends the amount.
-     */
-    sendTokensFromZkApp(receiverAddress: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
-    mintToken(receiverAddress: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
+    */
+    mintToken(receiverAddress: PublicKey, amount: UInt64, bridgeAddress: PublicKey, id: UInt64): void;
     /**
      * Transferable
      */

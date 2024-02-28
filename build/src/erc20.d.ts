@@ -1,4 +1,4 @@
-import { AccountUpdate, DeployArgs, Experimental, Field, PublicKey, SmartContract, State, UInt64 } from 'o1js';
+import { DeployArgs, Field, PublicKey, SmartContract, State, UInt64 } from 'o1js';
 declare const Transfer_base: (new (value: {
     from: PublicKey;
     to: PublicKey;
@@ -113,16 +113,5 @@ export declare class Token extends SmartContract {
     burn(burner: PublicKey, amount: UInt64): void;
     transfer(sender: PublicKey, receiver: PublicKey, amount: UInt64): void;
     lock(receipt: Field, bridgeAddress: PublicKey, amount: UInt64): void;
-    approveCallbackAndTransfer(sender: PublicKey, receiver: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
-    approveUpdateAndTransfer(zkappUpdate: AccountUpdate, receiver: PublicKey, amount: UInt64): void;
-    approveUpdate(zkappUpdate: AccountUpdate): void;
-    /**
-     * 'sendTokens()' sends tokens from `senderAddress` to `receiverAddress`.
-     *
-     * It does so by deducting the amount of tokens from `senderAddress` by
-     * authorizing the deduction with a proof. It then creates the receiver
-     * from `receiverAddress` and sends the amount.
-     */
-    sendTokensFromZkApp(receiverAddress: PublicKey, amount: UInt64, callback: Experimental.Callback<any>): void;
 }
 export {};

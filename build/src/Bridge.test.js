@@ -1,4 +1,4 @@
-import { AccountUpdate, Encoding, Experimental, Field, Mina, PrivateKey, UInt64 } from 'o1js';
+import { AccountUpdate, Encoding, Field, Mina, PrivateKey, UInt64 } from 'o1js';
 import { Bridge } from './Bridge';
 import Token from './token';
 import Hook from "./Hooks";
@@ -110,7 +110,6 @@ describe('token bridge test', () => {
         console.log("🚀 ~ it ~ max:", max.toBigInt());
         const lockAmount = UInt64.from(100001);
         const tx = await Mina.transaction(normalUserPubkey, () => {
-            // const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [lockAmount])
             tokenZkapp.lock(Field.from(100), bridgePubkey, lockAmount);
         });
         await tx.prove();
@@ -121,9 +120,7 @@ describe('token bridge test', () => {
     it('unlock from owner ', async () => {
         const unlockAmount = UInt64.from(1000001);
         const tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount]);
-            tokenZkapp.mintToken(userPubkey, unlockAmount, callback);
+            tokenZkapp.mintToken(userPubkey, unlockAmount, bridgePubkey, UInt64.from(1));
         });
         await tx.prove();
         tx.sign([userPrivkey]);
@@ -134,13 +131,12 @@ describe('token bridge test', () => {
     //     const unlockAmount = UInt64.from(1000001);
     //     const tx = await Mina.transaction(normalUserPubkey, () => {
     //         // AccountUpdate.fundNewAccount(userPubkey, 1);
-    //         const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
-    //         tokenZkapp.mintToken(normalUserPubkey, unlockAmount, callback)
+    //         // const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
+    //         tokenZkapp.mintToken(userPubkey, unlockAmount, bridgePubkey, UInt64.from(1))
     //     })
     //     await tx.prove()
     //     tx.sign([normalUserPrivkey])
     //     await tx.send()
-    //
     // })
 });
 //# sourceMappingURL=Bridge.test.js.map

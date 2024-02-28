@@ -133,7 +133,6 @@ describe('token bridge test', () => {
         console.log("🚀 ~ it ~ max:", max.toBigInt())
         const lockAmount = UInt64.from(100001);
         const tx = await Mina.transaction(normalUserPubkey, () => {
-            // const callback = Experimental.Callback.create(bridgeZkapp, "checkMinMax", [lockAmount])
             tokenZkapp.lock(Field.from(100), bridgePubkey, lockAmount)
         })
         await tx.prove()
@@ -141,7 +140,6 @@ describe('token bridge test', () => {
         const rs = await tx.send()
         console.log("🚀 ~ rs ~ rs:", rs)
 
-        
 
     })
 
@@ -149,26 +147,24 @@ describe('token bridge test', () => {
     it('unlock from owner ', async () => {
         const unlockAmount = UInt64.from(1000001);
         const tx = await Mina.transaction(userPubkey, () => {
-            // AccountUpdate.fundNewAccount(userPubkey, 1);
-            const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
-            tokenZkapp.mintToken(userPubkey, unlockAmount, callback)
+            tokenZkapp.mintToken(userPubkey, unlockAmount, bridgePubkey, UInt64.from(1))
         })
         await tx.prove()
         tx.sign([userPrivkey])
         await tx.send()
-    
+
     })
     //
     // it('unlock from normal user ', async () => {
     //     const unlockAmount = UInt64.from(1000001);
     //     const tx = await Mina.transaction(normalUserPubkey, () => {
     //         // AccountUpdate.fundNewAccount(userPubkey, 1);
-    //         const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
-    //         tokenZkapp.mintToken(normalUserPubkey, unlockAmount, callback)
+    //         // const callback = Experimental.Callback.create(bridgeZkapp, "unlock", [tokenPubkey, unlockAmount, userPubkey, unlockAmount])
+    //         tokenZkapp.mintToken(userPubkey, unlockAmount, bridgePubkey, UInt64.from(1))
     //     })
     //     await tx.prove()
     //     tx.sign([normalUserPrivkey])
     //     await tx.send()
-    //
+    
     // })
 })

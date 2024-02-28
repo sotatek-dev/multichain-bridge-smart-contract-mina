@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "experimental-zkapp-offchain-storage": "^0.2.0",
-    "o1js": "^0.16.0",
+    "o1js": "0.16.2",
     "xmlhttprequest-ts": "^1.0.1"
   }
 }

@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Experimental } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, UInt64 } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import Token from '../token.js';
 import Hook from '../Hooks.js';
@@ -33,7 +33,7 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://api.minascan.io/node/berkeley/v1/graphql';
+const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
 //
 const network = Mina.Network({
@@ -43,7 +43,7 @@ const network = Mina.Network({
 Mina.setActiveInstance(network);
 const AMOUNT_DEPOSIT = UInt64.from(5000000000000000n);
 const AMOUNT_TRANSFER = UInt64.from(5000000000000n);
-const AMOUNT_TRANSFER_USER = UInt64.from(5000000000n);
+const AMOUNT_TRANSFER_USER = UInt64.from(500000000n);
 try {
     const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
 }
@@ -76,18 +76,24 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     try {
-        const accounts = await fetchAccount({ publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb") });
+        // const accounts = await fetchAccount({publicKey: PublicKey.fromBase58("B62qjdNm8sDd9S2Zj2pfD3i85tuCk7SNjuF7J6UpPvT6pu1EqPv8Dqb")});
     }
     catch (e) {
         console.log(e);
     }
+    await fetchAccount({ publicKey: zkBridgeAddress, tokenId: zkApp.token.id });
+    // await fetchAccount({publicKey: zkBridgeAddress, tokenId: zkApp.token.id});
+    await fetchAccount({ publicKey: zkBridgeAddress });
+    await fetchAccount({ publicKey: zkAppAddress });
     console.log(zkAppAddress.toBase58());
     console.log(zkBridgeAddress.toBase58());
     console.log(feepayerAddress.toBase58());
+    const minterr = bridgeApp.minter.get();
+    console.log("🚀 ~ minterr:", minterr.toBase58());
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress);
-        const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one]);
-        zkApp.mintToken(feepayerAddress, UInt64.one, callback);
+        // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
+        zkApp.mintToken(feepayerAddress, AMOUNT_TRANSFER_USER, zkBridgeAddress, UInt64.one);
         // const callback = Experimental.Callback.create(bridgeApp, "unlock", [zkAppAddress, UInt64.one, feepayerAddress, UInt64.one])
         // zkApp.sendTokensFromZkApp(feepayerAddress, UInt64.one, callback)
     });

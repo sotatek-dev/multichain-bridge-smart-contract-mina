@@ -99,12 +99,16 @@ await Token.compile();
 await Hook.compile();
 await Bridge.compile();
 
-try {
+console.log("==============================>");
 
-    const accounts = await fetchAccount({publicKey: zkBridgeAddress});
-    await fetchAccount({publicKey: zkAppAddress});
-    await fetchAccount({publicKey: zkAppAddress});
-    await fetchAccount({publicKey: PublicKey.fromBase58("B62qmqPVWbL7eMvuKYaCFkuSHhCm1t9cDW1CJfmQbjwb6UstdPJrt6W")});
+
+try {
+    await fetchAccount({publicKey: zkBridgeAddress, tokenId: zkApp.token.id});
+
+    // await fetchAccount({publicKey: zkBridgeAddress, tokenId: zkApp.token.id});
+    await fetchAccount({publicKey: zkBridgeAddress});
+    // await fetchAccount({publicKey: zkAppAddress});
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmqPVWbL7eMvuKYaCFkuSHhCm1t9cDW1CJfmQbjwb6UstdPJrt6W")});
 
     const min = bridgeApp.minAmount.get();
     Provable.log("🚀 ~ min:", min.toString());
@@ -115,7 +119,7 @@ try {
     let tx = await Mina.transaction(
         { sender: feepayerAddress, fee },
         async () => {
-            AccountUpdate.fundNewAccount(feepayerAddress);
+            // AccountUpdate.fundNewAccount(feepayerAddress);
             zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
             // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
         }

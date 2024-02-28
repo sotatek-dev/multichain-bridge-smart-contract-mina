@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Field, Provable } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, UInt64, Field, Provable } from 'o1js';
 import Token from '../token.js';
 import { Bridge } from "../Bridge.js";
 import Hook from '../Hooks.js';
@@ -67,11 +67,13 @@ console.log('compile the contract...');
 await Token.compile();
 await Hook.compile();
 await Bridge.compile();
+console.log("==============================>");
 try {
-    const accounts = await fetchAccount({ publicKey: zkBridgeAddress });
-    await fetchAccount({ publicKey: zkAppAddress });
-    await fetchAccount({ publicKey: zkAppAddress });
-    await fetchAccount({ publicKey: PublicKey.fromBase58("B62qmqPVWbL7eMvuKYaCFkuSHhCm1t9cDW1CJfmQbjwb6UstdPJrt6W") });
+    await fetchAccount({ publicKey: zkBridgeAddress, tokenId: zkApp.token.id });
+    // await fetchAccount({publicKey: zkBridgeAddress, tokenId: zkApp.token.id});
+    await fetchAccount({ publicKey: zkBridgeAddress });
+    // await fetchAccount({publicKey: zkAppAddress});
+    // await fetchAccount({publicKey: PublicKey.fromBase58("B62qmqPVWbL7eMvuKYaCFkuSHhCm1t9cDW1CJfmQbjwb6UstdPJrt6W")});
     const min = bridgeApp.minAmount.get();
     Provable.log("🚀 ~ min:", min.toString());
     const max = bridgeApp.maxAmount.get();
@@ -79,7 +81,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress);
+        // AccountUpdate.fundNewAccount(feepayerAddress);
         zkApp.lock(Field.from(0), zkBridgeAddress, AMOUNT_TRANSFER);
         // bridgeApp.lock(zkAppAddress, AMOUNT_TRANSFER)
     });
