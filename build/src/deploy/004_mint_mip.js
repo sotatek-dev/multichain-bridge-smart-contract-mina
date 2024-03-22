@@ -57,7 +57,7 @@ try {
     await fetchAccount({ publicKey: zkAppAddress });
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress);
-        zkApp.mint(PublicKey.fromBase58(feepayerAddress.toBase58()), AMOUNT_DEPOSIT);
+        zkApp.mint(PublicKey.fromBase58("B62qityFBEwZes7ssxrub146VjF4uCFmzEosarHHY3W7jAaFmh1z185"), AMOUNT_DEPOSIT);
     });
     await tx.prove();
     console.log('send transaction...');

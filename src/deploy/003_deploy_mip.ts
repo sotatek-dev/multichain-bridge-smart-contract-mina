@@ -69,7 +69,7 @@ let zkAppAddress = zkAppKey.toPublicKey();
 let zkApp = new Token(zkAppAddress);
 
 
-const hookAddress = PublicKey.fromBase58("B62qkhfPixXXqatVWzNwugqrcs9M51mJ5CEf59QFtgJh9yRAQDKYCv9");
+const hookAddress = PublicKey.fromBase58("B62qrX3NpWwkt1cHwjxNXySxmxPgAZ36325FPgtS7ATUa7uJiQkNV4Z");
 const totalSupply = UInt64.from(5_000_000_000_000_000n)
 
 let sentTx;

@@ -76,7 +76,7 @@ await Bridge.compile();
 await Token.compile();
 await Hook.compile();
 
-let tokenAppKey = PrivateKey.fromBase58("EKFJdDaQ6triDpuWZAQeSafv9zk5UBYjX6ePfsLhW7nmxHZ346fc");
+let tokenAppKey = PrivateKey.fromBase58("EKEBrk4ZZ7xxP7iVhzT3Aj94nLfQ3UyRk3cK9UZgKtZGGm5q5x9B");
 // let tokenAppKey = PrivateKey.fromBase58("EKFL7fRjN2uWdtoBnz3XPo8nHMbuy7QJHe5EVmGC4rQMpf7JdkDJ");
 let tokenAppAddress = tokenAppKey.toPublicKey();
 let tokenApp = new Token(tokenAppAddress);
@@ -104,7 +104,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkApp.config(feepayerAddress, UInt64.from(1), UInt64.from(100000000000000000));
+      zkApp.config(feepayerAddress, UInt64.from(5000), UInt64.from(50000000000));
       tokenApp.approveUpdate(zkApp.self);
     }
   );

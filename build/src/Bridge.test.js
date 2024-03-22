@@ -102,6 +102,15 @@ describe('token bridge test', () => {
         tx.sign([configuratorPrivkey]);
         await tx.send();
     });
+    it('set config from normal', async () => {
+        let tx = await Mina.transaction(normalUserPubkey, () => {
+            bridgeZkapp.config(configuratorPubkey, UInt64.from(1000), UInt64.from(100000000));
+            tokenZkapp.approveUpdate(bridgeZkapp.self);
+        });
+        await tx.prove();
+        tx.sign([normalUserPrivkey]);
+        await tx.send();
+    });
     it('lock from normal user ', async () => {
         console.log("=================================locklock");
         const min = await bridgeZkapp.minAmount.get();
