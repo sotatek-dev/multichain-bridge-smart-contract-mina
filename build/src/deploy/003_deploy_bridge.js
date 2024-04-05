@@ -15,7 +15,6 @@
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey } from 'o1js';
 import { Bridge } from '../Bridge.js';
-import { BridgeToken } from '../BridgeToken.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -50,7 +49,6 @@ catch (e) {
 console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();
-await BridgeToken.compile();
 const tokenAddress = PublicKey.fromBase58("B62qrWWy1DpCdCnuUJ38HJaBCASZqDYH63Zdj2C2fycXV2WiP5gefbP");
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
