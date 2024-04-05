@@ -13,8 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
-import { Bridge } from '../Bridge.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
 import { BridgeToken } from '../BridgeToken.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
@@ -31,47 +30,54 @@ let config = configJson.deployAliases[deployAlias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
 let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+let tokenKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
-//
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-try {
-    const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
-}
-catch (e) {
-    console.log(e);
-}
 console.log('compile the contract...');
-await Bridge.compile();
 await FungibleToken.compile();
 await BridgeToken.compile();
-const tokenAddress = PublicKey.fromBase58("B62qmXvvaQMLGotE1kHNhT8Gei5eRK8WhcidieASyPbbNY6zqbfMWk7");
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
-let zkAppAddress = zkAppKey.toPublicKey();
-let zkBridge = new Bridge(zkAppAddress);
+let tokenAddress = tokenKey.toPublicKey();
+const token = new BridgeToken(tokenAddress);
+const symbol = 'WETH';
+const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
+const supply = UInt64.from(21000000000000);
 let sentTx;
 // compile the contract to create prover keys
+await fetchAccount({ publicKey: feepayerAddress });
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        //   AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        zkBridge.config(feepayerAddress, UInt64.from(1), UInt64.from(1000));
+        AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        token.deploy({ owner: feepayerAddress, supply, symbol, src });
     });
     await tx.prove();
     console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+    sentTx = await tx.sign([feepayerKey, tokenKey]).send();
 }
 catch (err) {
     console.log(err);
 }
 console.log("=====================txhash: ", sentTx?.hash);
 await sentTx?.wait();
-//# sourceMappingURL=006_config.js.map
+function getTxnUrl(graphQlUrl, txnHash) {
+    const txnBroadcastServiceName = new URL(graphQlUrl).hostname
+        .split('.')
+        .filter((item) => item === 'minascan' || item === 'minaexplorer')?.[0];
+    const networkName = new URL(graphQlUrl).hostname
+        .split('.')
+        .filter((item) => item === 'berkeley' || item === 'testworld')?.[0];
+    if (txnBroadcastServiceName && networkName) {
+        return `https://minascan.io/${networkName}/tx/${txnHash}?type=zk-tx`;
+    }
+    return `Transaction hash: ${txnHash}`;
+}
+//# sourceMappingURL=001_deploy_token.js.map

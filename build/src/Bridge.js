@@ -7,7 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { PublicKey, SmartContract, State, UInt64, method, state, Struct } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Field } from 'o1js';
+import { BridgeToken } from "./BridgeToken.js";
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -19,11 +20,13 @@ class UnlockEvent extends Struct({
     }
 }
 class LockEvent extends Struct({
-    tokenAddress: PublicKey,
+    locker: PublicKey,
+    receipt: Field,
     amount: UInt64,
+    tokenAddress: PublicKey
 }) {
-    constructor(tokenAddress, amount) {
-        super({ tokenAddress, amount });
+    constructor(locker, receipt, amount, tokenAddress) {
+        super({ locker, receipt, amount, tokenAddress });
     }
 }
 export class Bridge extends SmartContract {
@@ -33,6 +36,8 @@ export class Bridge extends SmartContract {
         this.configurator = State();
         this.minAmount = State();
         this.maxAmount = State();
+        // @state(UInt64) total = State<UInt64>()
+        // @state(PublicKey) tokenAddress = State<PublicKey>()
         this.events = { "Unlock": UnlockEvent, "Lock": LockEvent };
     }
     decrementBalance(amount) {
@@ -40,12 +45,12 @@ export class Bridge extends SmartContract {
     }
     deploy(args) {
         super.deploy(args);
-        // this.account.permissions.set({
-        //   ...Permissions.default(),
-        //   access: Permissions.proofOrSignature()
-        // })
         this.configurator.set(this.sender);
         this.minter.set(this.sender);
+        // this.tokenAddress.set(args.tokenAddress)
+        this.minAmount.set(UInt64.from(0));
+        this.maxAmount.set(UInt64.from(0));
+        // this.total.set(UInt64.from(0));
     }
     config(_configurator, _min, _max) {
         this.configurator.getAndRequireEquals().assertEquals(this.sender);
@@ -57,40 +62,23 @@ export class Bridge extends SmartContract {
         this.maxAmount.set(_max);
         _max.assertGreaterThanOrEqual(_min);
     }
-    setConfigurator(_configurator) {
-        this.configurator.getAndRequireEquals().assertEquals(this.sender);
-        this.configurator.assertEquals(this.configurator.get());
-        this.configurator.set(_configurator);
-    }
-    // @method setMinAmount(_min: UInt64) {
-    //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
-    //   this.minAmount.assertEquals(this.minAmount.get());
-    //   this.maxAmount.assertEquals(this.maxAmount.get());
-    //   const max = this.maxAmount.get();
-    //
-    //   if (max.equals(UInt64.from(0)).not()) {
-    //     this.maxAmount.get().assertGreaterThanOrEqual(_min);
-    //   }
-    //   this.minAmount.set(_min);
-    // }
-    //
-    // @method setMaxAmount(_max: UInt64) {
-    //   this.configurator.getAndRequireEquals().assertEquals(this.sender);
-    //   this.maxAmount.assertEquals(this.maxAmount.get());
-    //   this.minAmount.assertEquals(this.minAmount.get());
-    //   // if (this.minAmount.get() != UInt64.from(0)) {
-    //   this.minAmount.get().assertLessThanOrEqual(_max);
-    //   // }
-    //   this.maxAmount.set(_max);
-    // }
     checkMinMax(amount) {
         this.maxAmount.assertEquals(this.maxAmount.get());
         this.minAmount.assertEquals(this.minAmount.get());
         this.minAmount.get().assertLessThanOrEqual(amount);
         this.maxAmount.get().assertGreaterThanOrEqual(amount);
     }
+    // 
+    lock(amount, address, tokenAddress) {
+        this.checkMinMax(amount);
+        const token = new BridgeToken(tokenAddress);
+        token.transfer(this.sender, this.address, amount);
+        this.emitEvent("Lock", new LockEvent(this.sender, address, amount, tokenAddress));
+    }
     unlock(tokenAddress, amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender);
+        const token = new BridgeToken(tokenAddress);
+        token.transfer(this.address, receiver, amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
     }
 }
@@ -125,15 +113,15 @@ __decorate([
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [PublicKey]),
-    __metadata("design:returntype", void 0)
-], Bridge.prototype, "setConfigurator", null);
-__decorate([
-    method,
-    __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64]),
     __metadata("design:returntype", void 0)
 ], Bridge.prototype, "checkMinMax", null);
+__decorate([
+    method,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [UInt64, Field, PublicKey]),
+    __metadata("design:returntype", void 0)
+], Bridge.prototype, "lock", null);
 __decorate([
     method,
     __metadata("design:type", Function),

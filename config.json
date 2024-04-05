@@ -1,13 +1,6 @@
 {
   "version": 1,
   "deployAliases": {
-    "hook": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
-      "feepayerAlias": "owner",
-      "fee": "0.5"
-    },
     "token": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/token.json",
@@ -20,76 +13,6 @@
       "keyPath": "keys/bridge.json",
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
       "feepayerAlias": "owner",
-      "fee": "0.5"
-    },
-    "hook1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "token1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "bridge1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "bridge2": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge2.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "hook2": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook2.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "token2": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token2.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "bridge3": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge3.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
-      "feepayerAlias": "brd",
-      "fee": "0.5"
-    },
-    "hook4": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/hook4.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd3.json",
-      "feepayerAlias": "brd3",
-      "fee": "0.5"
-    },
-    "token4": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/token4.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd3.json",
-      "feepayerAlias": "brd3",
-      "fee": "0.5"
-    },
-    "bridge4": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge4.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd3.json",
-      "feepayerAlias": "brd3",
       "fee": "0.5"
     }
   }

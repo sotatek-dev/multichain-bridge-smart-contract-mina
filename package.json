@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "experimental-zkapp-offchain-storage": "^0.2.0",
-    "o1js": "0.16.2",
+    "mina-fungible-token": "^0.1.0-beta.2",
+    "o1js": "^0.17.0",
     "xmlhttprequest-ts": "^1.0.1"
   }
 }

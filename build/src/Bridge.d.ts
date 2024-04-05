@@ -1,4 +1,4 @@
-import { PublicKey, SmartContract, State, UInt64, DeployArgs } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, DeployArgs, Field } from 'o1js';
 declare const UnlockEvent_base: (new (value: {
     receiver: PublicKey;
     tokenAddress: PublicKey;
@@ -11,7 +11,7 @@ declare const UnlockEvent_base: (new (value: {
     id: UInt64;
 }) & {
     _isStruct: true;
-} & import("o1js/dist/node/snarky").ProvablePure<{
+} & import("o1js/dist/node/snarky.js").ProvablePure<{
     receiver: PublicKey;
     tokenAddress: PublicKey;
     amount: UInt64;
@@ -23,8 +23,8 @@ declare const UnlockEvent_base: (new (value: {
         amount: UInt64;
         id: UInt64;
     }) => {
-        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
-        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field.js").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field.js").Field, number][] | undefined;
     };
     toJSON: (x: {
         receiver: PublicKey;
@@ -59,45 +59,63 @@ declare class UnlockEvent extends UnlockEvent_base {
     constructor(receiver: PublicKey, tokenAddress: PublicKey, amount: UInt64, id: UInt64);
 }
 declare const LockEvent_base: (new (value: {
-    tokenAddress: PublicKey;
+    locker: PublicKey;
+    receipt: import("o1js/dist/node/lib/field.js").Field;
     amount: UInt64;
+    tokenAddress: PublicKey;
 }) => {
-    tokenAddress: PublicKey;
+    locker: PublicKey;
+    receipt: import("o1js/dist/node/lib/field.js").Field;
     amount: UInt64;
+    tokenAddress: PublicKey;
 }) & {
     _isStruct: true;
-} & import("o1js/dist/node/snarky").ProvablePure<{
-    tokenAddress: PublicKey;
+} & import("o1js/dist/node/snarky.js").ProvablePure<{
+    locker: PublicKey;
+    receipt: import("o1js/dist/node/lib/field.js").Field;
     amount: UInt64;
+    tokenAddress: PublicKey;
 }> & {
     toInput: (x: {
-        tokenAddress: PublicKey;
+        locker: PublicKey;
+        receipt: import("o1js/dist/node/lib/field.js").Field;
         amount: UInt64;
+        tokenAddress: PublicKey;
     }) => {
-        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
-        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field.js").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field.js").Field, number][] | undefined;
     };
     toJSON: (x: {
-        tokenAddress: PublicKey;
+        locker: PublicKey;
+        receipt: import("o1js/dist/node/lib/field.js").Field;
         amount: UInt64;
+        tokenAddress: PublicKey;
     }) => {
-        tokenAddress: string;
+        locker: string;
+        receipt: string;
         amount: string;
+        tokenAddress: string;
     };
     fromJSON: (x: {
-        tokenAddress: string;
+        locker: string;
+        receipt: string;
         amount: string;
+        tokenAddress: string;
     }) => {
-        tokenAddress: PublicKey;
+        locker: PublicKey;
+        receipt: import("o1js/dist/node/lib/field.js").Field;
         amount: UInt64;
+        tokenAddress: PublicKey;
     };
     empty: () => {
-        tokenAddress: PublicKey;
+        locker: PublicKey;
+        receipt: import("o1js/dist/node/lib/field.js").Field;
         amount: UInt64;
+        tokenAddress: PublicKey;
     };
 };
 declare class LockEvent extends LockEvent_base {
-    constructor(tokenAddress: PublicKey, amount: UInt64);
+    constructor(locker: PublicKey, receipt: Field, amount: UInt64, tokenAddress: PublicKey);
 }
 export declare class Bridge extends SmartContract {
     minter: State<PublicKey>;
@@ -109,10 +127,12 @@ export declare class Bridge extends SmartContract {
         Lock: typeof LockEvent;
     };
     decrementBalance(amount: UInt64): void;
-    deploy(args?: DeployArgs): void;
+    deploy(args: DeployArgs & {
+        tokenAddress: PublicKey;
+    }): void;
     config(_configurator: PublicKey, _min: UInt64, _max: UInt64): void;
-    setConfigurator(_configurator: PublicKey): void;
     checkMinMax(amount: UInt64): void;
+    lock(amount: UInt64, address: Field, tokenAddress: PublicKey): void;
     unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64): void;
 }
 export {};
