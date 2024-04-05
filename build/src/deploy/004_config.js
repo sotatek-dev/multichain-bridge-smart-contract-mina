@@ -15,7 +15,6 @@
 import fs from 'fs/promises';
 import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import { Bridge } from '../Bridge.js';
-import { BridgeToken } from '../BridgeToken.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -50,8 +49,7 @@ catch (e) {
 console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();
-await BridgeToken.compile();
-const tokenAddress = PublicKey.fromBase58("B62qrWWy1DpCdCnuUJ38HJaBCASZqDYH63Zdj2C2fycXV2WiP5gefbP");
+const tokenAddress = PublicKey.fromBase58("B62qrqMX1aMKy6zQJUs41mbCE7MWDXkJBBScuwufZDJuQYDY11voCcV");
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
@@ -62,7 +60,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        //   AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        // AccountUpdate.fundNewAccount(feepayerAddress, 1);
         zkBridge.config(feepayerAddress, UInt64.from(1000000), UInt64.from(100000000000));
     });
     await tx.prove();

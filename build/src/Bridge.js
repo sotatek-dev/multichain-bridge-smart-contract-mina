@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Field } from 'o1js';
-import { BridgeToken } from "./BridgeToken.js";
+import { FungibleToken } from "mina-fungible-token";
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -37,7 +37,7 @@ export class Bridge extends SmartContract {
         this.minAmount = State();
         this.maxAmount = State();
         // @state(UInt64) total = State<UInt64>()
-        // @state(PublicKey) tokenAddress = State<PublicKey>()
+        this.tokenAddress = State();
         this.events = { "Unlock": UnlockEvent, "Lock": LockEvent };
     }
     decrementBalance(amount) {
@@ -47,7 +47,7 @@ export class Bridge extends SmartContract {
         super.deploy(args);
         this.configurator.set(this.sender);
         this.minter.set(this.sender);
-        // this.tokenAddress.set(args.tokenAddress)
+        this.tokenAddress.set(args.tokenAddress);
         this.minAmount.set(UInt64.from(0));
         this.maxAmount.set(UInt64.from(0));
         // this.total.set(UInt64.from(0));
@@ -69,15 +69,17 @@ export class Bridge extends SmartContract {
         this.maxAmount.get().assertGreaterThanOrEqual(amount);
     }
     // 
-    lock(amount, address, tokenAddress) {
+    lock(amount, address) {
         this.checkMinMax(amount);
-        const token = new BridgeToken(tokenAddress);
+        const tokenAddress = this.tokenAddress.getAndRequireEquals();
+        const token = new FungibleToken(tokenAddress);
         token.transfer(this.sender, this.address, amount);
         this.emitEvent("Lock", new LockEvent(this.sender, address, amount, tokenAddress));
     }
-    unlock(tokenAddress, amount, receiver, id) {
+    unlock(amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender);
-        const token = new BridgeToken(tokenAddress);
+        const tokenAddress = this.tokenAddress.getAndRequireEquals();
+        const token = new FungibleToken(tokenAddress);
         token.transfer(this.address, receiver, amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
     }
@@ -99,6 +101,10 @@ __decorate([
     __metadata("design:type", Object)
 ], Bridge.prototype, "maxAmount", void 0);
 __decorate([
+    state(PublicKey),
+    __metadata("design:type", Object)
+], Bridge.prototype, "tokenAddress", void 0);
+__decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64]),
@@ -119,13 +125,13 @@ __decorate([
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64, Field, PublicKey]),
+    __metadata("design:paramtypes", [UInt64, Field]),
     __metadata("design:returntype", void 0)
 ], Bridge.prototype, "lock", null);
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [PublicKey, UInt64, PublicKey, UInt64]),
+    __metadata("design:paramtypes", [UInt64, PublicKey, UInt64]),
     __metadata("design:returntype", void 0)
 ], Bridge.prototype, "unlock", null);
 //# sourceMappingURL=Bridge.js.map

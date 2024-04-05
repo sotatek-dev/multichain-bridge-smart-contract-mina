@@ -11,7 +11,7 @@ declare const UnlockEvent_base: (new (value: {
     id: UInt64;
 }) & {
     _isStruct: true;
-} & import("o1js/dist/node/snarky.js").ProvablePure<{
+} & import("o1js/dist/node/snarky").ProvablePure<{
     receiver: PublicKey;
     tokenAddress: PublicKey;
     amount: UInt64;
@@ -23,8 +23,8 @@ declare const UnlockEvent_base: (new (value: {
         amount: UInt64;
         id: UInt64;
     }) => {
-        fields?: import("o1js/dist/node/lib/field.js").Field[] | undefined;
-        packed?: [import("o1js/dist/node/lib/field.js").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
     };
     toJSON: (x: {
         receiver: PublicKey;
@@ -60,34 +60,34 @@ declare class UnlockEvent extends UnlockEvent_base {
 }
 declare const LockEvent_base: (new (value: {
     locker: PublicKey;
-    receipt: import("o1js/dist/node/lib/field.js").Field;
+    receipt: import("o1js/dist/node/lib/field").Field;
     amount: UInt64;
     tokenAddress: PublicKey;
 }) => {
     locker: PublicKey;
-    receipt: import("o1js/dist/node/lib/field.js").Field;
+    receipt: import("o1js/dist/node/lib/field").Field;
     amount: UInt64;
     tokenAddress: PublicKey;
 }) & {
     _isStruct: true;
-} & import("o1js/dist/node/snarky.js").ProvablePure<{
+} & import("o1js/dist/node/snarky").ProvablePure<{
     locker: PublicKey;
-    receipt: import("o1js/dist/node/lib/field.js").Field;
+    receipt: import("o1js/dist/node/lib/field").Field;
     amount: UInt64;
     tokenAddress: PublicKey;
 }> & {
     toInput: (x: {
         locker: PublicKey;
-        receipt: import("o1js/dist/node/lib/field.js").Field;
+        receipt: import("o1js/dist/node/lib/field").Field;
         amount: UInt64;
         tokenAddress: PublicKey;
     }) => {
-        fields?: import("o1js/dist/node/lib/field.js").Field[] | undefined;
-        packed?: [import("o1js/dist/node/lib/field.js").Field, number][] | undefined;
+        fields?: import("o1js/dist/node/lib/field").Field[] | undefined;
+        packed?: [import("o1js/dist/node/lib/field").Field, number][] | undefined;
     };
     toJSON: (x: {
         locker: PublicKey;
-        receipt: import("o1js/dist/node/lib/field.js").Field;
+        receipt: import("o1js/dist/node/lib/field").Field;
         amount: UInt64;
         tokenAddress: PublicKey;
     }) => {
@@ -103,13 +103,13 @@ declare const LockEvent_base: (new (value: {
         tokenAddress: string;
     }) => {
         locker: PublicKey;
-        receipt: import("o1js/dist/node/lib/field.js").Field;
+        receipt: import("o1js/dist/node/lib/field").Field;
         amount: UInt64;
         tokenAddress: PublicKey;
     };
     empty: () => {
         locker: PublicKey;
-        receipt: import("o1js/dist/node/lib/field.js").Field;
+        receipt: import("o1js/dist/node/lib/field").Field;
         amount: UInt64;
         tokenAddress: PublicKey;
     };
@@ -122,6 +122,7 @@ export declare class Bridge extends SmartContract {
     configurator: State<PublicKey>;
     minAmount: State<UInt64>;
     maxAmount: State<UInt64>;
+    tokenAddress: State<PublicKey>;
     events: {
         Unlock: typeof UnlockEvent;
         Lock: typeof LockEvent;
@@ -132,7 +133,7 @@ export declare class Bridge extends SmartContract {
     }): void;
     config(_configurator: PublicKey, _min: UInt64, _max: UInt64): void;
     checkMinMax(amount: UInt64): void;
-    lock(amount: UInt64, address: Field, tokenAddress: PublicKey): void;
-    unlock(tokenAddress: PublicKey, amount: UInt64, receiver: PublicKey, id: UInt64): void;
+    lock(amount: UInt64, address: Field): void;
+    unlock(amount: UInt64, receiver: PublicKey, id: UInt64): void;
 }
 export {};

@@ -14,7 +14,6 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
-import { BridgeToken } from '../BridgeToken.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -41,11 +40,10 @@ const network = Mina.Network({
 Mina.setActiveInstance(network);
 console.log('compile the contract...');
 await FungibleToken.compile();
-await BridgeToken.compile();
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let tokenAddress = tokenKey.toPublicKey();
-const token = new BridgeToken(tokenAddress);
+const token = new FungibleToken(tokenAddress);
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21000000000000);

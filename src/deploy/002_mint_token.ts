@@ -66,14 +66,13 @@ Mina.setActiveInstance(network);
 
 console.log('compile the contract...');
 await FungibleToken.compile();
-await BridgeToken.compile();
 
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let tokenAddress = tokenKey.toPublicKey();
 
-const token = new BridgeToken(tokenAddress)
+const token = new FungibleToken(tokenAddress)
 
 
 const symbol = 'WETH';
