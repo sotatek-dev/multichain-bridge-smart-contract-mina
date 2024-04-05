@@ -73,7 +73,6 @@ try {
 console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();
-await BridgeToken.compile();
 
 const tokenAddress = PublicKey.fromBase58("B62qrWWy1DpCdCnuUJ38HJaBCASZqDYH63Zdj2C2fycXV2WiP5gefbP");
 
