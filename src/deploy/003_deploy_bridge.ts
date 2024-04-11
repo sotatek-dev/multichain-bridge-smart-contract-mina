@@ -64,11 +64,11 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
-try {
-    const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
-} catch (e) {
-    console.log(e);
-}
+// try {
+//     const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
+// } catch (e) {
+//     console.log(e);
+// }
 
 console.log('compile the contract...');
 await Bridge.compile();

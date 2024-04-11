@@ -64,11 +64,6 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
-try {
-    const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
-} catch (e) {
-    console.log(e);
-}
 
 console.log('compile the contract...');
 await Bridge.compile();
@@ -81,8 +76,8 @@ let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkBridge = new Bridge(zkAppAddress);
 const accounts = await fetchAccount({publicKey: zkAppAddress});
-const maxx = await zkBridge.maxAmount.get();
-console.log("🚀 ~ maxx:", maxx)
+// const maxx = await zkBridge.maxAmount.get();
+// console.log("🚀 ~ maxx:", maxx)
 
 let sentTx;
 // compile the contract to create prover keys
@@ -93,7 +88,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkBridge.unlock(UInt64.from(200_000_000), feepayerAddress, UInt64.from(1));
+      zkBridge.unlock(UInt64.from(200_000_00), feepayerAddress, UInt64.from(1));
     }
   );
   await tx.prove();

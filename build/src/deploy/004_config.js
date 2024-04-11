@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import { Mina, PrivateKey, PublicKey, UInt64 } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
@@ -40,12 +40,11 @@ const network = Mina.Network({
     archive: ARCHIVEURL,
 });
 Mina.setActiveInstance(network);
-try {
-    const accounts = await fetchAccount({ publicKey: feepayerKey.toPublicKey() });
-}
-catch (e) {
-    console.log(e);
-}
+// try {
+//     const accounts = await fetchAccount({publicKey: feepayerKey.toPublicKey()});
+// } catch (e) {
+//     console.log(e);
+// }
 console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();

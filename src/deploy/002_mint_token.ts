@@ -91,7 +91,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1)
-      token.mint(PublicKey.fromBase58(feepayerAddress.toBase58()), mintAmount);
+      token.mint(PublicKey.fromBase58("B62qrazx1TrFruVGiQtX6fFTA4awu8eNywrkB6Q7osHo7nhrKDBQue7"), mintAmount);
     }
   );
   await tx.prove();
