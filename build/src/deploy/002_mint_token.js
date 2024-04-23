@@ -55,7 +55,7 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        token.mint(PublicKey.fromBase58("B62qrazx1TrFruVGiQtX6fFTA4awu8eNywrkB6Q7osHo7nhrKDBQue7"), mintAmount);
+        token.mint(PublicKey.fromBase58("B62qqwEQ7C61AraPjtrFKxjra3sDViC49rk95TVK5xRMFBSJX7mMeNE"), mintAmount);
     });
     await tx.prove();
     console.log('send transaction...');

@@ -42,6 +42,13 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ubrige.json",
       "feepayerAlias": "ubrige",
       "fee": "0.5"
+    },
+    "bridge5": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/bridge5.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dplo.json",
+      "feepayerAlias": "dplo",
+      "fee": "0.5"
     }
   }
 }

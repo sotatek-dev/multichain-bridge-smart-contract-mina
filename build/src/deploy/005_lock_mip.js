@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64, Field } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
@@ -52,8 +52,8 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkBridge = new Bridge(zkAppAddress);
-// console.log("🚀 ~ zkAppAddress:", zkAppAddress)
-// const accounts = await fetchAccount({publicKey: zkAppAddress});
+console.log("🚀 ~ zkAppAddress:", zkAppAddress);
+const accounts = await fetchAccount({ publicKey: zkAppAddress });
 const maxx = await zkBridge.maxAmount.get();
 console.log("🚀 ~ maxx:", maxx.toString());
 let sentTx;
@@ -62,7 +62,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        AccountUpdate.fundNewAccount(feepayerAddress, 1);
         zkBridge.lock(UInt64.from(200000000), Field.from(1));
     });
     await tx.prove();

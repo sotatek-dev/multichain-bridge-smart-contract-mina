@@ -78,8 +78,8 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkBridge = new Bridge(zkAppAddress);
-// console.log("🚀 ~ zkAppAddress:", zkAppAddress)
-// const accounts = await fetchAccount({publicKey: zkAppAddress});
+console.log("🚀 ~ zkAppAddress:", zkAppAddress)
+const accounts = await fetchAccount({publicKey: zkAppAddress});
 const maxx = await zkBridge.maxAmount.get();
 console.log("🚀 ~ maxx:", maxx.toString())
 
@@ -91,7 +91,7 @@ try {
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      // AccountUpdate.fundNewAccount(feepayerAddress, 1);
+      AccountUpdate.fundNewAccount(feepayerAddress, 1);
       zkBridge.lock(UInt64.from(200_000_000), Field.from(1));
     }
   );
