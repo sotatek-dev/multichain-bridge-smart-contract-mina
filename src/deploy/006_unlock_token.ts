@@ -75,7 +75,8 @@ const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let zkAppAddress = zkAppKey.toPublicKey();
 let zkBridge = new Bridge(zkAppAddress);
-const accounts = await fetchAccount({publicKey: zkAppAddress});
+await fetchAccount({publicKey: zkAppAddress});
+await fetchAccount({publicKey: feepayerAddress});
 // const maxx = await zkBridge.maxAmount.get();
 // console.log("🚀 ~ maxx:", maxx)
 
