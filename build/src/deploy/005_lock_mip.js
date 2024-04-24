@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, UInt64, Field } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
@@ -32,8 +32,8 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
+const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
+const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
 //
 const network = Mina.Network({
     mina: MINAURL,
@@ -62,7 +62,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        // AccountUpdate.fundNewAccount(feepayerAddress, 1);
         zkBridge.lock(UInt64.from(200000000), Field.from(1));
     });
     await tx.prove();

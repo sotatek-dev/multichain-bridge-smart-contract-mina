@@ -31,8 +31,8 @@ let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let tokenKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
+const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
+const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
 const network = Mina.Network({
     mina: MINAURL,
     archive: ARCHIVEURL,

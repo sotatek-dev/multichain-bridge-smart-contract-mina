@@ -55,8 +55,8 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.berkeley.minaexplorer.com/graphql';
-const ARCHIVEURL = 'https://api.minascan.io/archive/berkeley/v1/graphql/';
+const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
+const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
 //
 const network = Mina.Network({
   mina: MINAURL,
@@ -91,7 +91,7 @@ try {
     let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 1);
+      // AccountUpdate.fundNewAccount(feepayerAddress, 1);
       zkBridge.lock(UInt64.from(200_000_000), Field.from(1));
     }
   );

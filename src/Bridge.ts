@@ -53,50 +53,47 @@ export class Bridge extends SmartContract {
 
   events = {"Unlock": UnlockEvent, "Lock": LockEvent};
 
-  @method decrementBalance(amount: UInt64) {
+  @method async decrementBalance(amount: UInt64) {
     this.balance.subInPlace(amount)
   }
 
-  deploy(args: DeployArgs & { tokenAddress: PublicKey }) {
+  async deploy(args: DeployArgs & { tokenAddress: PublicKey }) {
     super.deploy(args)
-    this.configurator.set(this.sender);
-    this.minter.set(this.sender);
+    this.configurator.set(this.sender.getAndRequireSignature());
+    this.minter.set(this.sender.getAndRequireSignature());
     this.tokenAddress.set(args.tokenAddress)
     this.minAmount.set(UInt64.from(0));
     this.maxAmount.set(UInt64.from(0));
     // this.total.set(UInt64.from(0));
   }
 
-  @method config(_configurator: PublicKey, _min: UInt64, _max: UInt64) {
-    this.configurator.getAndRequireEquals().assertEquals(this.sender);
-    this.configurator.assertEquals(this.configurator.get());
-    this.minAmount.assertEquals(this.minAmount.get());
-    this.maxAmount.assertEquals(this.maxAmount.get());
+  @method async config(_configurator: PublicKey, _min: UInt64, _max: UInt64) {
+    this.configurator.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     this.configurator.set(_configurator);
+    // this.minAmount.requireEquals(this.minAmount.get());
+    // this.maxAmount.requireEquals(this.maxAmount.get());
     this.minAmount.set(_min);
     this.maxAmount.set(_max);
     _max.assertGreaterThanOrEqual(_min);
 
   }
 
-  @method checkMinMax(amount: UInt64) {
-    this.maxAmount.assertEquals(this.maxAmount.get());
-    this.minAmount.assertEquals(this.minAmount.get());
+  @method async checkMinMax(amount: UInt64) {
     this.minAmount.get().assertLessThanOrEqual(amount);
     this.maxAmount.get().assertGreaterThanOrEqual(amount);
   }
 // 
-  @method lock(amount: UInt64, address: Field) {
+  @method async lock(amount: UInt64, address: Field) {
     this.checkMinMax(amount);
     const tokenAddress = this.tokenAddress.getAndRequireEquals();
     const token = new FungibleToken(tokenAddress);
-    token.transfer(this.sender, this.address, amount)
-    this.emitEvent("Lock", new LockEvent(this.sender, address, amount, tokenAddress));
+    token.transfer(this.sender.getAndRequireSignature(), this.address, amount)
+    this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddress));
 
   }
 
-  @method unlock(amount: UInt64, receiver: PublicKey, id: UInt64) {
-    this.minter.getAndRequireEquals().assertEquals(this.sender);
+  @method async  unlock(amount: UInt64, receiver: PublicKey, id: UInt64) {
+    this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     const tokenAddress = this.tokenAddress.getAndRequireEquals();
     const token = new FungibleToken(tokenAddress)
     token.transfer(this.address, receiver, amount)

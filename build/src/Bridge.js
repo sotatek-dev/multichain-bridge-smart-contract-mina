@@ -40,44 +40,41 @@ export class Bridge extends SmartContract {
         this.tokenAddress = State();
         this.events = { "Unlock": UnlockEvent, "Lock": LockEvent };
     }
-    decrementBalance(amount) {
+    async decrementBalance(amount) {
         this.balance.subInPlace(amount);
     }
-    deploy(args) {
+    async deploy(args) {
         super.deploy(args);
-        this.configurator.set(this.sender);
-        this.minter.set(this.sender);
+        this.configurator.set(this.sender.getAndRequireSignature());
+        this.minter.set(this.sender.getAndRequireSignature());
         this.tokenAddress.set(args.tokenAddress);
         this.minAmount.set(UInt64.from(0));
         this.maxAmount.set(UInt64.from(0));
         // this.total.set(UInt64.from(0));
     }
-    config(_configurator, _min, _max) {
-        this.configurator.getAndRequireEquals().assertEquals(this.sender);
-        this.configurator.assertEquals(this.configurator.get());
-        this.minAmount.assertEquals(this.minAmount.get());
-        this.maxAmount.assertEquals(this.maxAmount.get());
+    async config(_configurator, _min, _max) {
+        this.configurator.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
         this.configurator.set(_configurator);
+        // this.minAmount.requireEquals(this.minAmount.get());
+        // this.maxAmount.requireEquals(this.maxAmount.get());
         this.minAmount.set(_min);
         this.maxAmount.set(_max);
         _max.assertGreaterThanOrEqual(_min);
     }
-    checkMinMax(amount) {
-        this.maxAmount.assertEquals(this.maxAmount.get());
-        this.minAmount.assertEquals(this.minAmount.get());
+    async checkMinMax(amount) {
         this.minAmount.get().assertLessThanOrEqual(amount);
         this.maxAmount.get().assertGreaterThanOrEqual(amount);
     }
     // 
-    lock(amount, address) {
+    async lock(amount, address) {
         this.checkMinMax(amount);
         const tokenAddress = this.tokenAddress.getAndRequireEquals();
         const token = new FungibleToken(tokenAddress);
-        token.transfer(this.sender, this.address, amount);
-        this.emitEvent("Lock", new LockEvent(this.sender, address, amount, tokenAddress));
+        token.transfer(this.sender.getAndRequireSignature(), this.address, amount);
+        this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddress));
     }
-    unlock(amount, receiver, id) {
-        this.minter.getAndRequireEquals().assertEquals(this.sender);
+    async unlock(amount, receiver, id) {
+        this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
         const tokenAddress = this.tokenAddress.getAndRequireEquals();
         const token = new FungibleToken(tokenAddress);
         token.transfer(this.address, receiver, amount);
@@ -108,30 +105,30 @@ __decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], Bridge.prototype, "decrementBalance", null);
 __decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [PublicKey, UInt64, UInt64]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], Bridge.prototype, "config", null);
 __decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], Bridge.prototype, "checkMinMax", null);
 __decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64, Field]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], Bridge.prototype, "lock", null);
 __decorate([
     method,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UInt64, PublicKey, UInt64]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], Bridge.prototype, "unlock", null);
 //# sourceMappingURL=Bridge.js.map

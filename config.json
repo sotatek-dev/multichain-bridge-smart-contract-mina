@@ -2,59 +2,17 @@
   "version": 1,
   "deployAliases": {
     "token": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
       "keyPath": "keys/token.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
-      "feepayerAlias": "owner",
-      "fee": "0.5"
-    },
-    "bridge": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/owner.json",
-      "feepayerAlias": "owner",
-      "fee": "0.5"
-    },
-    "bridge1": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge1.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/minter.json",
-      "feepayerAlias": "minter",
-      "fee": "0.5"
-    },
-    "bridge2": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge2.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/minter.json",
-      "feepayerAlias": "minter",
-      "fee": "0.5"
-    },
-    "bridge3": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphq",
-      "keyPath": "keys/bridge3.json",
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
       "feepayerAlias": "brd",
       "fee": "0.5"
     },
-    "bridge4": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge4.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/ubrige.json",
-      "feepayerAlias": "ubrige",
-      "fee": "0.5"
-    },
-    "bridge5": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridge5.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dplo.json",
-      "feepayerAlias": "dplo",
-      "fee": "0.5"
-    },
-    "bridgee": {
-      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
-      "keyPath": "keys/bridgee.json",
-      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
-      "feepayerAlias": "bridgedeployer",
+    "bridge": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/bridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
       "fee": "0.5"
     }
   }
