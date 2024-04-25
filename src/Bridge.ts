@@ -70,33 +70,31 @@ export class Bridge extends SmartContract {
   @method async config(_configurator: PublicKey, _min: UInt64, _max: UInt64) {
     this.configurator.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     this.configurator.set(_configurator);
-    // this.minAmount.requireEquals(this.minAmount.get());
-    // this.maxAmount.requireEquals(this.maxAmount.get());
     this.minAmount.set(_min);
     this.maxAmount.set(_max);
     _max.assertGreaterThanOrEqual(_min);
 
   }
 
-  @method async checkMinMax(amount: UInt64) {
-    this.minAmount.get().assertLessThanOrEqual(amount);
-    this.maxAmount.get().assertGreaterThanOrEqual(amount);
+  private checkMinMax(amount: UInt64) {
+    this.minAmount.getAndRequireEquals().assertLessThanOrEqual(amount);
+    this.maxAmount.getAndRequireEquals().assertGreaterThanOrEqual(amount);
   }
-// 
+
   @method async lock(amount: UInt64, address: Field) {
     this.checkMinMax(amount);
     const tokenAddress = this.tokenAddress.getAndRequireEquals();
     const token = new FungibleToken(tokenAddress);
-    token.transfer(this.sender.getAndRequireSignature(), this.address, amount)
+    await token.transfer(this.sender.getAndRequireSignature(), this.address, amount)
     this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddress));
 
   }
 
-  @method async  unlock(amount: UInt64, receiver: PublicKey, id: UInt64) {
+  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64) {
     this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     const tokenAddress = this.tokenAddress.getAndRequireEquals();
     const token = new FungibleToken(tokenAddress)
-    token.transfer(this.address, receiver, amount)
+    await token.transfer(this.address, receiver, amount)
     this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
   }
 }

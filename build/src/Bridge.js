@@ -55,29 +55,26 @@ export class Bridge extends SmartContract {
     async config(_configurator, _min, _max) {
         this.configurator.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
         this.configurator.set(_configurator);
-        // this.minAmount.requireEquals(this.minAmount.get());
-        // this.maxAmount.requireEquals(this.maxAmount.get());
         this.minAmount.set(_min);
         this.maxAmount.set(_max);
         _max.assertGreaterThanOrEqual(_min);
     }
-    async checkMinMax(amount) {
-        this.minAmount.get().assertLessThanOrEqual(amount);
-        this.maxAmount.get().assertGreaterThanOrEqual(amount);
+    checkMinMax(amount) {
+        this.minAmount.getAndRequireEquals().assertLessThanOrEqual(amount);
+        this.maxAmount.getAndRequireEquals().assertGreaterThanOrEqual(amount);
     }
-    // 
     async lock(amount, address) {
         this.checkMinMax(amount);
         const tokenAddress = this.tokenAddress.getAndRequireEquals();
         const token = new FungibleToken(tokenAddress);
-        token.transfer(this.sender.getAndRequireSignature(), this.address, amount);
+        await token.transfer(this.sender.getAndRequireSignature(), this.address, amount);
         this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddress));
     }
     async unlock(amount, receiver, id) {
         this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
         const tokenAddress = this.tokenAddress.getAndRequireEquals();
         const token = new FungibleToken(tokenAddress);
-        token.transfer(this.address, receiver, amount);
+        await token.transfer(this.address, receiver, amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
     }
 }
@@ -113,12 +110,6 @@ __decorate([
     __metadata("design:paramtypes", [PublicKey, UInt64, UInt64]),
     __metadata("design:returntype", Promise)
 ], Bridge.prototype, "config", null);
-__decorate([
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64]),
-    __metadata("design:returntype", Promise)
-], Bridge.prototype, "checkMinMax", null);
 __decorate([
     method,
     __metadata("design:type", Function),

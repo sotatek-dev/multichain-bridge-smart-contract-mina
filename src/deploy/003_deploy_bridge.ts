@@ -74,7 +74,7 @@ console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();
 
-const tokenAddress = PublicKey.fromBase58("B62qp9WdUP8xVzER9BraKx1kLyysEyY682nvKPdu7htZcwtgwYjt8yA");
+const tokenAddress = PublicKey.fromBase58("B62qqki2ZnVzaNsGaTDAP6wJYCth5UAcY6tPX2TQYHdwD8D4uBgrDKC");
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
@@ -90,7 +90,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkBridge.deploy({
+      await zkBridge.deploy({
         tokenAddress
       });
     }

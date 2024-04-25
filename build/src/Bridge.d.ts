@@ -146,7 +146,7 @@ export declare class Bridge extends SmartContract {
         tokenAddress: PublicKey;
     }): Promise<void>;
     config(_configurator: PublicKey, _min: UInt64, _max: UInt64): Promise<void>;
-    checkMinMax(amount: UInt64): Promise<void>;
+    private checkMinMax;
     lock(amount: UInt64, address: Field): Promise<void>;
     unlock(amount: UInt64, receiver: PublicKey, id: UInt64): Promise<void>;
 }

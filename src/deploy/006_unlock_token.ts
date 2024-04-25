@@ -89,7 +89,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      zkBridge.unlock(UInt64.from(200_000_00), feepayerAddress, UInt64.from(1));
+      await zkBridge.unlock(UInt64.from(200_000_00), feepayerAddress, UInt64.from(1));
     }
   );
   await tx.prove();

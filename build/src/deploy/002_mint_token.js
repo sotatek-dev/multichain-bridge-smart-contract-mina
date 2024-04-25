@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
 import { FungibleToken } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -55,7 +55,8 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        token.mint(PublicKey.fromBase58("B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"), mintAmount);
+        // token.mint(PublicKey.fromBase58("B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"), mintAmount);
+        await token.mint(feepayerAddress, mintAmount);
     });
     await tx.prove();
     console.log('send transaction...');

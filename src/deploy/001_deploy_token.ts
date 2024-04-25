@@ -91,7 +91,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1)
-      token.deploy({owner: feepayerAddress, supply, symbol, src});
+      await token.deploy({owner: feepayerAddress, supply, symbol, src});
     }
   );
   await tx.prove();

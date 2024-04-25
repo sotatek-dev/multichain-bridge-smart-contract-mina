@@ -59,7 +59,7 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         // AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        zkBridge.unlock(UInt64.from(20000000), feepayerAddress, UInt64.from(1));
+        await zkBridge.unlock(UInt64.from(20000000), feepayerAddress, UInt64.from(1));
     });
     await tx.prove();
     console.log('send transaction...');
