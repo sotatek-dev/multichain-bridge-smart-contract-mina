@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import { FungibleToken } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -46,7 +46,7 @@ let tokenAddress = tokenKey.toPublicKey();
 const token = new FungibleToken(tokenAddress);
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
-const mintAmount = UInt64.from(500000000000);
+const mintAmount = UInt64.from(50000000000);
 let sentTx;
 // compile the contract to create prover keys
 await fetchAccount({ publicKey: feepayerAddress });
@@ -56,7 +56,7 @@ try {
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         AccountUpdate.fundNewAccount(feepayerAddress, 1);
         // token.mint(PublicKey.fromBase58("B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"), mintAmount);
-        await token.mint(feepayerAddress, mintAmount);
+        await token.mint(PublicKey.fromBase58("B62qityFBEwZes7ssxrub146VjF4uCFmzEosarHHY3W7jAaFmh1z185"), mintAmount);
     });
     await tx.prove();
     console.log('send transaction...');

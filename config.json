@@ -35,6 +35,13 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
       "feepayerAlias": "brd",
       "fee": "0.5"
+    },
+    "stage_bridge": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/stage_bridge.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/dpl.json",
+      "feepayerAlias": "dpl",
+      "fee": "0.5"
     }
   }
 }

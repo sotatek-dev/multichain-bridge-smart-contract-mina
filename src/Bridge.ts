@@ -11,7 +11,11 @@ import {
   DeployArgs,
   Permissions,
   Provable,
-  Field
+  Field,
+  ZkProgram,
+  Crypto,
+  createEcdsa,
+  createForeignCurveV2
 } from 'o1js'
 
 import { FungibleToken } from "mina-fungible-token"
@@ -62,8 +66,8 @@ export class Bridge extends SmartContract {
     this.configurator.set(this.sender.getAndRequireSignature());
     this.minter.set(this.sender.getAndRequireSignature());
     this.tokenAddress.set(args.tokenAddress)
-    this.minAmount.set(UInt64.from(0));
-    this.maxAmount.set(UInt64.from(0));
+    this.minAmount.set(UInt64.from(100));
+    this.maxAmount.set(UInt64.from(1000000));
     // this.total.set(UInt64.from(0));
   }
 
@@ -96,5 +100,11 @@ export class Bridge extends SmartContract {
     const token = new FungibleToken(tokenAddress)
     await token.transfer(this.address, receiver, amount)
     this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
+  }
+
+  @method.returns(Bool)
+  async checkProof(message: String, signature: String, publicKey: PublicKey) {
+    let proof = await keccakAndEcdsa.verifyEcdsa(message, signature, publicKey);
+    return proof;
   }
 }

@@ -77,7 +77,7 @@ const token = new FungibleToken(tokenAddress)
 
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
-const mintAmount = UInt64.from(500_000_000_000)
+const mintAmount = UInt64.from(50_000_000_000)
 
 
 
@@ -92,7 +92,7 @@ try {
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1)
       // token.mint(PublicKey.fromBase58("B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"), mintAmount);
-      await token.mint(feepayerAddress, mintAmount);
+      await token.mint(PublicKey.fromBase58("B62qityFBEwZes7ssxrub146VjF4uCFmzEosarHHY3W7jAaFmh1z185"), mintAmount);
     }
   );
   await tx.prove();

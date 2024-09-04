@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64, Field } from 'o1js';
+import { Mina, PrivateKey } from 'o1js';
 import { Bridge } from '../Bridge.js';
 import { FungibleToken } from '../index.js';
 // check command line arg
@@ -48,30 +48,32 @@ Mina.setActiveInstance(network);
 console.log('compile the contract...');
 await Bridge.compile();
 await FungibleToken.compile();
-const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
-let feepayerAddress = feepayerKey.toPublicKey();
-let zkAppAddress = zkAppKey.toPublicKey();
-let zkBridge = new Bridge(zkAppAddress);
-console.log("🚀 ~ zkAppAddress:", zkAppAddress);
-const accounts = await fetchAccount({ publicKey: zkAppAddress });
-const maxx = await zkBridge.maxAmount.get();
-console.log("🚀 ~ maxx:", maxx.toString());
-let sentTx;
-// compile the contract to create prover keys
-try {
-    // call update() and send transaction
-    console.log('build transaction and create proof...');
-    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        await zkBridge.lock(UInt64.from(200000000), Field.from(1));
-    });
-    await tx.prove();
-    console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
-}
-catch (err) {
-    console.log(err);
-}
-console.log("=====================txhash: ", sentTx?.hash);
-await sentTx?.wait();
+// const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
+// let feepayerAddress = feepayerKey.toPublicKey();
+// let zkAppAddress = zkAppKey.toPublicKey();
+// let zkBridge = new Bridge(zkAppAddress);
+// console.log("🚀 ~ zkAppAddress:", zkAppAddress)
+// const accounts = await fetchAccount({publicKey: zkAppAddress});
+// const maxx = await zkBridge.maxAmount.get();
+// console.log("🚀 ~ maxx:", maxx.toString())
+// let sentTx;
+// // compile the contract to create prover keys
+// try {
+//   // call update() and send transaction
+//   console.log('build transaction and create proof...');
+//     let tx = await Mina.transaction(
+//     { sender: feepayerAddress, fee },
+//     async () => {
+//       AccountUpdate.fundNewAccount(feepayerAddress, 1);
+//       await zkBridge.lock(UInt64.from(200_000_000), Field.from(1));
+//     }
+//   );
+//   await tx.prove();
+//   console.log('send transaction...');
+//   sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
+// } catch (err) {
+//   console.log(err);
+// }
+// console.log("=====================txhash: ", sentTx?.hash);
+// await sentTx?.wait();
 //# sourceMappingURL=005_lock_mip.js.map

@@ -48,8 +48,8 @@ export class Bridge extends SmartContract {
         this.configurator.set(this.sender.getAndRequireSignature());
         this.minter.set(this.sender.getAndRequireSignature());
         this.tokenAddress.set(args.tokenAddress);
-        this.minAmount.set(UInt64.from(0));
-        this.maxAmount.set(UInt64.from(0));
+        this.minAmount.set(UInt64.from(100));
+        this.maxAmount.set(UInt64.from(1000000));
         // this.total.set(UInt64.from(0));
     }
     async config(_configurator, _min, _max) {
