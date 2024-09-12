@@ -14,11 +14,17 @@ import {
   Field,
   ZkProgram,
   Crypto,
-  createEcdsa,
-  createForeignCurveV2
+  createEcdsaV2,
+  createForeignCurveV2,
+  Poseidon,
+  MerkleMap,
+  MerkleMapWitness,
+  fetchAccount
 } from 'o1js'
 
 import { FungibleToken } from "mina-fungible-token"
+
+import { Secp256k1, Ecdsa, keccakAndEcdsa, ecdsa, Bytes32, Bytes256 } from './ecdsa/ecdsa.js';
 
 class UnlockEvent extends Struct({
   receiver: PublicKey,
@@ -48,63 +54,168 @@ class LockEvent extends Struct({
 }
 
 export class Bridge extends SmartContract {
-  @state(PublicKey) minter = State<PublicKey>()
-  @state(PublicKey) configurator = State<PublicKey>()
-  @state(UInt64) minAmount = State<UInt64>()
-  @state(UInt64) maxAmount = State<UInt64>()
-  // @state(UInt64) total = State<UInt64>()
-  @state(PublicKey) tokenAddress = State<PublicKey>()
+  @state(PublicKey) minter = State<PublicKey>();
+  @state(PublicKey) admin = State<PublicKey>()
+  // @state (Field) settingMapRoot = State<Field>()
+  // @state(Field) validatorsMapRoot = State<Field>()
 
   events = {"Unlock": UnlockEvent, "Lock": LockEvent};
+
+  // static readonly MIN_AMOUNT_KEY = Field(1);
+  // static readonly MAX_AMOUNT_KEY = Field(2);
+  // static readonly THRESHOLD_KEY = Field(3);
 
   @method async decrementBalance(amount: UInt64) {
     this.balance.subInPlace(amount)
   }
 
-  async deploy(args: DeployArgs & { tokenAddress: PublicKey }) {
-    super.deploy(args)
-    this.configurator.set(this.sender.getAndRequireSignature());
+  async deploy(args: DeployArgs & { 
+    validatorsMapRoot: Field,
+    minAmount: UInt64,
+    maxAmount: UInt64,
+    threshold: UInt64,
+  }) {
+    await super.deploy(args)
+    Provable.log("Deployed Bridge contract", this.sender.getAndRequireSignature());
+    this.admin.set(this.sender.getAndRequireSignature());
     this.minter.set(this.sender.getAndRequireSignature());
-    this.tokenAddress.set(args.tokenAddress)
-    this.minAmount.set(UInt64.from(100));
-    this.maxAmount.set(UInt64.from(1000000));
-    // this.total.set(UInt64.from(0));
+    Provable.log("Function Initialize settings and validators map");
+    Provable.log("Minter set to", this.sender.getAndRequireSignature());
+    const settingsMap = new MerkleMap();
+    // this.settingMapRoot.set(settingsMap.getRoot());
+    // this.validatorsMapRoot.set(args.validatorsMapRoot);
   }
 
-  @method async config(_configurator: PublicKey, _min: UInt64, _max: UInt64) {
-    this.configurator.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
-    this.configurator.set(_configurator);
-    this.minAmount.set(_min);
-    this.maxAmount.set(_max);
-    _max.assertGreaterThanOrEqual(_min);
+  @method async changeAdmin(_admin: PublicKey) {
+    this.admin.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
+    this.admin.set(_admin);
+  }
+
+  @method async setValidator(xKey: Field, yKey: Field, isOk: Bool) {
+    this.admin.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
+    const yKeyOrZero = Provable.if(isOk, yKey, yKey);
+    Provable.log("Set validator", xKey, yKey);
+    // this.validatorsMap.set(yKeyOrZero, yKeyOrZero);
+    // let minAmount = UInt64.from(0);
+    // this.validatorsMap.set(
+    //   Bridge.MIN_AMOUNT_KEY,
+    //   minAmount.toFields()[0]
+    // );
+  }
+
+  // @method async updateSetting(key: Field, value: UInt64, witness: MerkleMapWitness) {
+  //   this.admin.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
+    
+  //   const currentRoot = this.settingMapRoot.getAndRequireEquals();
+  //   const [newRoot, _] = witness.computeRootAndKeyV2(value.toFields()[0]);
+  //   // Verify that the provided witness is correct for the given key
+  //   witness.computeRootAndKeyV2(key)[0].assertEquals(currentRoot);
+    
+  //   // Update the root with the new value
+  //   this.settingMapRoot.set(newRoot);
+  // }
+
+  @method async lock(amount: UInt64, address: Field, tokenAddr: PublicKey) {
+    
+    // Get the current settingMapRoot
+  //  const minAmount = UInt64.fromFields([this.settingsMap.get(Bridge.MIN_AMOUNT_KEY)]);
+  //  const maxAmount = UInt64.fromFields([this.settingsMap.get(Bridge.MAX_AMOUNT_KEY)]);
+
+    // Verify that the amount is within the allowed range
+    // amount.assertGreaterThanOrEqual(minAmount, "Amount is less than minimum allowed");
+    // amount.assertLessThanOrEqual(maxAmount, "Amount is greater than maximum allowed");
+    const token = new FungibleToken(tokenAddr);
+    await token.burn(this.sender.getAndRequireSignature(), amount);
+    this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddr));
 
   }
 
-  private checkMinMax(amount: UInt64) {
-    this.minAmount.getAndRequireEquals().assertLessThanOrEqual(amount);
-    this.maxAmount.getAndRequireEquals().assertGreaterThanOrEqual(amount);
-  }
-
-  @method async lock(amount: UInt64, address: Field) {
-    this.checkMinMax(amount);
-    const tokenAddress = this.tokenAddress.getAndRequireEquals();
-    const token = new FungibleToken(tokenAddress);
-    await token.transfer(this.sender.getAndRequireSignature(), this.address, amount)
-    this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddress));
-
-  }
-
-  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64) {
+  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signatures: Ecdsa, validators: Secp256k1) {
     this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
-    const tokenAddress = this.tokenAddress.getAndRequireEquals();
-    const token = new FungibleToken(tokenAddress)
-    await token.transfer(this.address, receiver, amount)
-    this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddress, amount, id));
+    // if (signatures.length !== validators.length) {
+    //   Provable.log('Signatures length does not match validators length');
+    //   throw new Error('Signatures length does not match validators length');
+    // }
+    // let threshold = UInt64.fromFields([this.settingsMap.get(Bridge.THRESHOLD_KEY)]);
+    // if (UInt64.from(signatures.length) < threshold) {
+    //   Provable.log('Not enough signatures');
+    //   throw new Error('Not enough signatures');
+    // }
+
+    let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
+    let listValidators: { [key: string]: string } = {};
+    // this.validateValidator(validators);
+    const isOk = await this.validateMsg(msg, signatures, validators);
+    if (!isOk) {
+      throw new Error('Invalid signature');
+    }
+    // for (let i = 0; i < validators.length; i++) {
+    //   const validator = validators[i];
+    //   const xKey = validator.x.toBigInt().toString();
+    //   const yValue = validator.y.toBigInt().toString();
+
+    //   if (!listValidators[xKey]) {
+    //     listValidators[xKey] = yValue;
+    //     continue;
+    //   }
+
+    //   if (listValidators[xKey] === yValue) {
+    //     Provable.log('Duplicate validator found');
+    //     throw new Error('Duplicate validator found');
+    //   }
+
+    //   listValidators[xKey] = yValue;
+    //   this.validateValidator(validator);
+    //   const isOk = await this.validateMsg(msg, signatures[i], validator);
+    //   if (!isOk) {
+    //     throw new Error('Invalid signature');
+    //   }
+    // }
+    const token = new FungibleToken(tokenAddr)
+    await token.mint(receiver, amount)
+    this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
   }
 
-  @method.returns(Bool)
-  async checkProof(message: String, signature: String, publicKey: PublicKey) {
+  // @method.returns(Bool)
+  public async checkProof(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool> {
     let proof = await keccakAndEcdsa.verifyEcdsa(message, signature, publicKey);
+    Provable.log(proof);
+    return proof.publicOutput;
+  }
+
+
+  public async validateMsg(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool> {
+    let proof = await signature.verifyV2(message, publicKey);
+    Provable.log("proof", proof);
     return proof;
   }
+
+  public secp256k1ToPublicKey(secp256k1Key: Secp256k1) {
+    // Convert Secp256k1 key to Field array
+    const keyFields = [secp256k1Key.x.toBigInt().toString(), secp256k1Key.y.toBigInt().toString()];
+    Provable.log('x', keyFields[0]);
+    Provable.log('y', keyFields[1]);
+    // Hash the Fields to create a single Field
+    // const hashedKey = Poseidon.hash(keyFields);
+
+    // Convert the hashed Field to a PublicKey
+    // return PublicKey.fromFields([hashedKey]);
+  }
+
+  public validateValidator(validator: Secp256k1) {
+    const xKey = validator.x.toBigInt().toString();
+    const yValue = validator.y.toBigInt().toString();
+    // const check = this.settingsMap.get(Field.from(xKey)).assertEquals(Field.from(yValue));
+    // Provable.log('check', check);
+  }
+
+  public isValidator(validator: Secp256k1): Bool {
+    const xKey = validator.x.toBigInt().toString();
+    const yValue = validator.y.toBigInt().toString();
+    // const check = this.validatorsMap.get(Field.from(xKey)).equals(Field.from(yValue));
+    // Provable.log('check', check);
+    // return check;
+    return Bool(true);;
+  }
+
 }

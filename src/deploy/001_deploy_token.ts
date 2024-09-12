@@ -13,19 +13,16 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
-import { BridgeToken } from '../BridgeToken.js';
-import { FungibleToken } from '../index.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
+import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
 
 // check command line arg
-let deployAlias = process.argv[2];
-if (!deployAlias)
-  throw Error(`Missing <deployAlias> argument.
 
-Usage:
-node build/src/interact.js <deployAlias>
-`);
-Error.stackTraceLimit = 1000;
+let after_fix = "_1";
+
+const tokenAlias = "token" + after_fix;
+const adminContractAlias = "admin" + after_fix;
+const bridgeAlias = "bridge" + after_fix;
 
 // parse config and private key from file
 type Config = {
@@ -42,7 +39,9 @@ type Config = {
 };
 let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
 
-let config = configJson.deployAliases[deployAlias];
+let config = configJson.deployAliases[tokenAlias];
+let adminConfig = configJson.deployAliases[adminContractAlias];
+let bridgeConfig = configJson.deployAliases[bridgeAlias];
 let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
   await fs.readFile(config.feepayerKeyPath, 'utf8')
 );
@@ -51,8 +50,18 @@ let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
   await fs.readFile(config.keyPath, 'utf8')
 );
 
+
+let adminZkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+  await fs.readFile(adminConfig.keyPath, 'utf8')
+);
+let bridgeZkappKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+  await fs.readFile(bridgeConfig.keyPath, 'utf8')
+)
+
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let tokenKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+let adminContractKey = PrivateKey.fromBase58(adminZkAppKeysBase58.privateKey);
+let bridgeContractKey = PrivateKey.fromBase58(bridgeZkappKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -66,13 +75,19 @@ Mina.setActiveInstance(network);
 
 console.log('compile the contract...');
 await FungibleToken.compile();
+await FungibleTokenAdmin.compile();
+await Bridge.compile();
 
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let tokenAddress = tokenKey.toPublicKey();
+let adminContractAddress = adminContractKey.toPublicKey();
+let bridgeAddress = bridgeContractKey.toPublicKey();
 
 const token = new FungibleToken(tokenAddress)
+const adminContract = new FungibleTokenAdmin(adminContractAddress)
+let bridgeContract = new Bridge(bridgeAddress)
 
 
 const symbol = 'WETH';
@@ -90,13 +105,29 @@ try {
   let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 1)
-      await token.deploy({owner: feepayerAddress, supply, symbol, src});
+      AccountUpdate.fundNewAccount(feepayerAddress, 4)
+            await adminContract.deploy({ adminPublicKey: bridgeAddress })
+            await token.deploy({
+                symbol: symbol,
+                src: src,
+            })
+            await token.initialize(
+                adminContractAddress,
+                UInt8.from(9),
+                Bool(false),
+            )
+
+            await bridgeContract.deploy({
+              threshold: UInt64.from(1),
+              validatorsMapRoot: new Field(0),
+              minAmount: UInt64.from(1),
+              maxAmount: UInt64.from(1_000_000_000_000_000),
+          });
     }
   );
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, tokenKey]).send();
+  sentTx = await tx.sign([feepayerKey, adminContractKey, tokenKey, bridgeContractKey]).send();
 } catch (err) {
   console.log(err);
 }
