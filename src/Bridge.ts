@@ -130,7 +130,11 @@ export class Bridge extends SmartContract {
 
   }
 
-  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signatures: Ecdsa, validators: Secp256k1) {
+  @method async test(value: Field[]) {
+    Provable.log("Testing", value);
+  }
+
+  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signatures: Ecdsa[], validators: Secp256k1[]) {
     this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     // if (signatures.length !== validators.length) {
     //   Provable.log('Signatures length does not match validators length');
@@ -145,7 +149,7 @@ export class Bridge extends SmartContract {
     let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
     let listValidators: { [key: string]: string } = {};
     // this.validateValidator(validators);
-    const isOk = await this.validateMsg(msg, signatures, validators);
+    const isOk = await this.validateMsg(msg, signatures[0], validators[0]);
     if (!isOk) {
       throw new Error('Invalid signature');
     }

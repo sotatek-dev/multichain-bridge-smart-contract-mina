@@ -1,4 +1,4 @@
-import { Account, AccountUpdate, Bool, Encoding, Experimental, Field, Int64, MerkleMap, Mina, PrivateKey, PublicKey, UInt64, UInt8, fetchAccount } from 'o1js'
+import { Account, AccountUpdate, Bool, EcdsaSignature, EcdsaSignatureV2, Encoding, Experimental, Field, Int64, MerkleMap, Mina, PrivateKey, Provable, PublicKey, UInt64, UInt8, fetchAccount } from 'o1js'
 import { Bridge } from './Bridge'
 import { FungibleToken, FungibleTokenAdmin } from 'mina-fungible-token';
 import { Bytes256, ecdsa, Ecdsa, keccakAndEcdsa, Secp256k1 } from './ecdsa/ecdsa';
@@ -192,10 +192,18 @@ describe("Bridge", () => {
         // await setValidator.prove()
         // await setValidator.send()
 
+        let sigs = Provable.Array(EcdsaSignature, 1);
+        let validators = Provable.Array(Secp256k1, 1);
+        sigs.fromValue([signature]);
+        validators.fromValue([publicKey]);
+        // const initializedArray = Provable.Array(Field, 3).fill(Field(0));
+        
+
         let lockTx = await Mina.transaction(userPubkey, async () => {
             // AccountUpdate.fundNewAccount(normalUserPubkey, 1);
             // await bridgeZkapp.setValidator(xKey, yKey, Bool(true));
-                await bridgeZkapp.unlock(amount, normalUserPubkey, UInt64.from(1), tokenPubkey, signature, publicKey);
+                await bridgeZkapp.unlock(amount, normalUserPubkey, UInt64.from(1), tokenPubkey, [signature], [publicKey]);
+                // await bridgeZkapp.test([Field.from(100)]);
             // await token.transfer(normalUserPubkey, bridgePubkey, UInt64.from(1));
             // await token.burn(normalUserPubkey, UInt64.from(1));
         })

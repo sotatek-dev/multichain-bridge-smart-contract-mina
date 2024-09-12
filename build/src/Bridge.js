@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Bool, Provable, Field, MerkleMap } from 'o1js';
 import { FungibleToken } from "mina-fungible-token";
-import { Secp256k1, Ecdsa, keccakAndEcdsa, Bytes256 } from './ecdsa/ecdsa.js';
+import { keccakAndEcdsa, Bytes256 } from './ecdsa/ecdsa.js';
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -204,7 +204,7 @@ __decorate([
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64, PublicKey, UInt64, PublicKey, Ecdsa, Secp256k1]),
+    __metadata("design:paramtypes", [UInt64, PublicKey, UInt64, PublicKey, Array, Array]),
     __metadata("design:returntype", Promise)
 ], Bridge.prototype, "unlock", null);
 //# sourceMappingURL=Bridge.js.map
