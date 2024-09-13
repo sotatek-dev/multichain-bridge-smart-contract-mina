@@ -18,7 +18,7 @@ import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
 
 // check command line arg
 
-let after_fix = "_1";
+let after_fix = "_2";
 
 const tokenAlias = "token" + after_fix;
 const adminContractAlias = "admin" + after_fix;
@@ -73,10 +73,13 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
-console.log('compile the contract...');
+console.log('compile the token contract...');
 await FungibleToken.compile();
+console.log('compile the token admin contract...');
 await FungibleTokenAdmin.compile();
+console.log('compile the bridge contract...');
 await Bridge.compile();
+console.log('compile the bridge contract DONE...');
 
 
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
@@ -87,7 +90,7 @@ let bridgeAddress = bridgeContractKey.toPublicKey();
 
 const token = new FungibleToken(tokenAddress)
 const adminContract = new FungibleTokenAdmin(adminContractAddress)
-let bridgeContract = new Bridge(bridgeAddress)
+const bridgeContract = new Bridge(bridgeAddress)
 
 
 const symbol = 'WETH';
@@ -98,7 +101,7 @@ const supply = UInt64.from(21_000_000_000_000)
 
 let sentTx;
 // compile the contract to create prover keys
-await fetchAccount({publicKey: feepayerAddress});
+// await fetchAccount({publicKey: feepayerAddress});
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
@@ -125,6 +128,7 @@ try {
           });
     }
   );
+  console.log('prove transaction...');
   await tx.prove();
   console.log('send transaction...');
   sentTx = await tx.sign([feepayerKey, adminContractKey, tokenKey, bridgeContractKey]).send();

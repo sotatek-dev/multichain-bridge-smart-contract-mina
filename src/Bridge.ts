@@ -130,11 +130,26 @@ export class Bridge extends SmartContract {
 
   }
 
-  @method async test(value: Field[]) {
-    Provable.log("Testing", value);
-  }
+  // @method async test(value: Field[]) {
+  //   Provable.log("Testing", value);
+  // }
 
-  @method async unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signatures: Ecdsa[], validators: Secp256k1[]) {
+  @method async unlock(
+    amount: UInt64,
+    receiver: PublicKey,
+    id: UInt64,
+    tokenAddr: PublicKey,
+    signature_1: Ecdsa,
+    validator_1: Secp256k1,
+    signature_2: Ecdsa,
+    validator_2: Secp256k1,
+    signature_3: Ecdsa,
+    validator_3: Secp256k1,
+    signature_4: Ecdsa,
+    validator_4: Secp256k1,
+    signature_5: Ecdsa,
+    validator_5: Secp256k1
+  ) {
     this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
     // if (signatures.length !== validators.length) {
     //   Provable.log('Signatures length does not match validators length');
@@ -149,10 +164,19 @@ export class Bridge extends SmartContract {
     let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
     let listValidators: { [key: string]: string } = {};
     // this.validateValidator(validators);
-    const isOk = await this.validateMsg(msg, signatures[0], validators[0]);
-    if (!isOk) {
-      throw new Error('Invalid signature');
-    }
+    let isOk = await this.validateMsg(msg, signature_1, validator_1);
+    isOk.assertTrue("Invalid signature 1");
+    // isOk = await this.validateMsg(msg, signature_2, validator_2);
+    // isOk.assertTrue("Invalid signature 2");
+    // isOk = await this.validateMsg(msg, signature_3, validator_3);
+    // isOk.assertTrue("Invalid signature 3");
+    // isOk = await this.validateMsg(msg, signature_4, validator_4);
+    // isOk.assertTrue("Invalid signature 3");
+    // isOk = await this.validateMsg(msg, signature_5, validator_5);
+    // isOk.assertTrue("Invalid signature 3");
+
+    // let count = UInt64.from(0);
+
     // for (let i = 0; i < validators.length; i++) {
     //   const validator = validators[i];
     //   const xKey = validator.x.toBigInt().toString();

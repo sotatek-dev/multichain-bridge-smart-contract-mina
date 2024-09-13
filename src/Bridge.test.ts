@@ -2,7 +2,7 @@ import { Account, AccountUpdate, Bool, EcdsaSignature, EcdsaSignatureV2, Encodin
 import { Bridge } from './Bridge'
 import { FungibleToken, FungibleTokenAdmin } from 'mina-fungible-token';
 import { Bytes256, ecdsa, Ecdsa, keccakAndEcdsa, Secp256k1 } from './ecdsa/ecdsa';
-const proofsEnabled = false
+const proofsEnabled = true
 
 const Local = await Mina.LocalBlockchain({ proofsEnabled })
 Mina.setActiveInstance(Local)
@@ -56,6 +56,7 @@ describe("Bridge", () => {
 
         if (proofsEnabled) {
             await FungibleToken.compile()
+            await FungibleTokenAdmin.compile()
             await Bridge.compile()
         }
         
@@ -177,13 +178,14 @@ describe("Bridge", () => {
         let privateKey = Secp256k1.Scalar.random();
         let publicKey = Secp256k1.generator.scale(privateKey);
 
+        let privateKey_1 = Secp256k1.Scalar.random();
+        let publicKey_1 = Secp256k1.generator.scale(privateKey_1);
+
         let amount = UInt64.from(3);
 
         let msg = Bytes256.fromString(`unlock receiver = ${normalUserPubkey.toFields} amount = ${amount.toFields} tokenAddr = ${tokenPubkey.toFields}`);
 
         let signature = Ecdsa.sign(msg.toBytes(), privateKey.toBigInt());
-        let xKey = await Field.from(publicKey.x.toBigInt());
-        let yKey = await Field.from(publicKey.y.toBigInt());
 
         // let setValidator = await Mina.transaction(userPubkey, async () => {
         //     await bridgeZkapp.setValidator(xKey, yKey, Bool(true));
@@ -192,18 +194,25 @@ describe("Bridge", () => {
         // await setValidator.prove()
         // await setValidator.send()
 
-        let sigs = Provable.Array(EcdsaSignature, 1);
-        let validators = Provable.Array(Secp256k1, 1);
-        sigs.fromValue([signature]);
-        validators.fromValue([publicKey]);
-        // const initializedArray = Provable.Array(Field, 3).fill(Field(0));
-        
-
         let lockTx = await Mina.transaction(userPubkey, async () => {
             // AccountUpdate.fundNewAccount(normalUserPubkey, 1);
             // await bridgeZkapp.setValidator(xKey, yKey, Bool(true));
-                await bridgeZkapp.unlock(amount, normalUserPubkey, UInt64.from(1), tokenPubkey, [signature], [publicKey]);
-                // await bridgeZkapp.test([Field.from(100)]);
+                // await bridgeZkapp.unlock(
+                //     amount,
+                //     normalUserPubkey,
+                //     UInt64.from(1),
+                //     tokenPubkey,
+                //     signature,
+                //     publicKey,
+                //     signature,
+                //     publicKey,
+                //     signature,
+                //     publicKey,
+                //     signature,
+                //     publicKey,
+                //     signature,
+                //     publicKey,
+                // );
             // await token.transfer(normalUserPubkey, bridgePubkey, UInt64.from(1));
             // await token.burn(normalUserPubkey, UInt64.from(1));
         })

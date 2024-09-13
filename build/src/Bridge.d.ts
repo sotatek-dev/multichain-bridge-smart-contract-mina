@@ -205,7 +205,7 @@ export declare class Bridge extends SmartContract {
     changeAdmin(_admin: PublicKey): Promise<void>;
     setValidator(xKey: Field, yKey: Field, isOk: Bool): Promise<void>;
     lock(amount: UInt64, address: Field, tokenAddr: PublicKey): Promise<void>;
-    unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signatures: Ecdsa[], validators: Secp256k1[]): Promise<void>;
+    unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signature_1: Ecdsa, validator_1: Secp256k1, signature_2: Ecdsa, validator_2: Secp256k1, signature_3: Ecdsa, validator_3: Secp256k1, signature_4: Ecdsa, validator_4: Secp256k1, signature_5: Ecdsa, validator_5: Secp256k1): Promise<void>;
     checkProof(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool>;
     validateMsg(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool>;
     secp256k1ToPublicKey(secp256k1Key: Secp256k1): void;

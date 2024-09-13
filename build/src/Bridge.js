@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Bool, Provable, Field, MerkleMap } from 'o1js';
 import { FungibleToken } from "mina-fungible-token";
-import { keccakAndEcdsa, Bytes256 } from './ecdsa/ecdsa.js';
+import { Secp256k1, Ecdsa, keccakAndEcdsa, Bytes256 } from './ecdsa/ecdsa.js';
 class UnlockEvent extends Struct({
     receiver: PublicKey,
     tokenAddress: PublicKey,
@@ -91,7 +91,10 @@ export class Bridge extends SmartContract {
         await token.burn(this.sender.getAndRequireSignature(), amount);
         this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddr));
     }
-    async unlock(amount, receiver, id, tokenAddr, signatures, validators) {
+    // @method async test(value: Field[]) {
+    //   Provable.log("Testing", value);
+    // }
+    async unlock(amount, receiver, id, tokenAddr, signature_1, validator_1, signature_2, validator_2, signature_3, validator_3, signature_4, validator_4, signature_5, validator_5) {
         this.minter.getAndRequireEquals().assertEquals(this.sender.getAndRequireSignature());
         // if (signatures.length !== validators.length) {
         //   Provable.log('Signatures length does not match validators length');
@@ -105,10 +108,17 @@ export class Bridge extends SmartContract {
         let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
         let listValidators = {};
         // this.validateValidator(validators);
-        const isOk = await this.validateMsg(msg, signatures, validators);
-        if (!isOk) {
-            throw new Error('Invalid signature');
-        }
+        let isOk = await this.validateMsg(msg, signature_1, validator_1);
+        isOk.assertTrue("Invalid signature 1");
+        // isOk = await this.validateMsg(msg, signature_2, validator_2);
+        // isOk.assertTrue("Invalid signature 2");
+        // isOk = await this.validateMsg(msg, signature_3, validator_3);
+        // isOk.assertTrue("Invalid signature 3");
+        // isOk = await this.validateMsg(msg, signature_4, validator_4);
+        // isOk.assertTrue("Invalid signature 3");
+        // isOk = await this.validateMsg(msg, signature_5, validator_5);
+        // isOk.assertTrue("Invalid signature 3");
+        // let count = UInt64.from(0);
         // for (let i = 0; i < validators.length; i++) {
         //   const validator = validators[i];
         //   const xKey = validator.x.toBigInt().toString();
@@ -204,7 +214,20 @@ __decorate([
 __decorate([
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UInt64, PublicKey, UInt64, PublicKey, Array, Array]),
+    __metadata("design:paramtypes", [UInt64,
+        PublicKey,
+        UInt64,
+        PublicKey,
+        Ecdsa,
+        Secp256k1,
+        Ecdsa,
+        Secp256k1,
+        Ecdsa,
+        Secp256k1,
+        Ecdsa,
+        Secp256k1,
+        Ecdsa,
+        Secp256k1]),
     __metadata("design:returntype", Promise)
 ], Bridge.prototype, "unlock", null);
 //# sourceMappingURL=Bridge.js.map
