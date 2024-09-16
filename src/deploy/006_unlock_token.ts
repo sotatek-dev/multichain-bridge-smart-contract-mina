@@ -14,11 +14,12 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1 } from '../index.js';
+import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
 
 // check command line arg
 
-let after_fix = "";
+let after_fix = "_2";
 
 const tokenAlias = "token" + after_fix;
 const adminContractAlias = "admin" + after_fix;
@@ -94,6 +95,18 @@ const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21_000_000_000_000)
 
+let privateKey = Secp256k1.Scalar.random();
+let publicKey = Secp256k1.generator.scale(privateKey);
+
+let privateKey_1 = Secp256k1.Scalar.random();
+let publicKey_1 = Secp256k1.generator.scale(privateKey_1);
+
+let amount = UInt64.from(2);
+
+let msg = Bytes256.fromString(`unlock receiver = ${feepayerAddress.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddress.toFields}`);
+
+let signature = Ecdsa.sign(msg.toBytes(), privateKey.toBigInt());
+
 
 
 let sentTx;
@@ -106,7 +119,23 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      await bridgeContract.unlock(UInt64.from(2), feepayerAddress , UInt64.from(1), tokenAddress);
+      await bridgeContract.unlock(
+        amount,
+        feepayerAddress,
+        UInt64.from(1),
+        tokenAddress,
+        signature,
+        publicKey,
+        signature,
+        publicKey,
+        signature,
+        publicKey,
+        signature,
+        publicKey,
+        signature,
+        publicKey
+      
+      );
     }
   );
   await tx.prove();
