@@ -97,7 +97,7 @@ const validatorManagerContract = new ValidatorManager(validatorManagerAddress)
 
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
-const supply = UInt64.from(21_000_000_000_000)
+const supply = UInt64.from(21_000_000_000_000_000)
 
 let validatorSeed1 = "123456789012345678901234567890123456787";
 let validatorSeed2 = "123456789012345678901234567890123456788";

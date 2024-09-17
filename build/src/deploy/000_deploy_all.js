@@ -66,7 +66,7 @@ const managerContract = new Manager(managerAddress);
 const validatorManagerContract = new ValidatorManager(validatorManagerAddress);
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
-const supply = UInt64.from(21000000000000);
+const supply = UInt64.from(21000000000000000);
 let validatorSeed1 = "123456789012345678901234567890123456787";
 let validatorSeed2 = "123456789012345678901234567890123456788";
 let validatorSeed3 = "123456789012345678901234567890123456789";
@@ -110,7 +110,7 @@ try {
             validatorPub: validatorManagerAddress,
             manager: managerAddress
         });
-        // await token.mint(feepayerAddress, UInt64.from(1_000_000_000_000));
+        await token.mint(feepayerAddress, UInt64.from(1000000000000));
     });
     console.log('prove transaction...');
     await tx.prove();

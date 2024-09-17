@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, UInt32 } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
 
 // check command line arg
@@ -51,27 +51,27 @@ let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
 
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 
-const allConfig = {
+const allConfig = 
+{
   token: {
-    privateKey: "EKEduaLewszM2TAAZAbWC7RyuG4QNMn8ux524pVbUwpHRzj54Q18",
-    publicKey: "B62qisgt5S7LwrBKEc8wvWNjW7SGTQjMZJTDL2N6FmZSVGrWiNkV21H"
+    privateKey: 'EKEKTpjMCg9ZPJLALe6mid43jRBFS9bT7fBbZEsuGQcB5chuVFUj',
+    publicKey: 'B62qr73ygjzM7VDAE2DS5CsTdBa8BNPAw3hWLExHTvjB9L2XHDEiyPY'
   },
   adminContract: {
-    privateKey: "EKERSuhfw7JAAW7dgW5T7WtenQ7e5KJSUn81fNbJtgbx6mRvZC4N",
-    publicKey: "B62qp6GHBtDh2corBRYDmciQ6wcXwQtFw72p4q82H4W8upEeuwZcRqU"
-  }
-  ,
+    privateKey: 'EKEsF2a22gi1YDbcks3ArNrLEn3aNdmDuTUurJDDz4kBbC64GVV3',
+    publicKey: 'B62qjUdeywXRb3BKhf9TB9cqcrsWMvpLgXniEdTHsr7XDLD1JN8mns9'
+  },
   bridgeContract: {
-    privateKey: 'EKFGpQ17SoZo8d9csh7tsjDwAezcdP8G44FBQX1swfU2wdztSwSy',
-    publicKey: 'B62qjv5RdC63eidxMofZBtMJdFCnuM9bAoxok1jE7xD2ZXE17WKuT9V'
+    privateKey: 'EKFFsYK1qCS6pWeHCaRGfwW6v9337PGmEvnanNnmvK5uRmeNJVCZ',
+    publicKey: 'B62qkpc9CMLjrzJUkaWJjoys2BJUP6cSAqendNizZeveCGJgKoSyfhf'
   },
   managerContract: {
-    privateKey: 'EKFRSa846HcBvbgh7KA2RyP2bv88DDXCrWXDDtCaJsQ9nrUJ2Y4z',
-    publicKey: 'B62qpnD6kqKpqLKod7TQ1fTccWeVuy5CqFkuqZ3q7h9LKoC2xGj3KYg'
+    privateKey: 'EKFTrjnkZAKVshpHDG1G2Rqo76CBkpnr5LiuomDoYfbeXQcTPAQe',
+    publicKey: 'B62qmqooeY16gx6P8aTMoY9qPzDtkLUt6iZ4fdNrubgKCJEVqAZn6zN'
   },
   validatorManagerContract: {
-    privateKey: 'EKFPSYABq9mHbuJVgrk3xq1mCfLY6BCZt9W7K23Tcrx7uRXRAyxf',
-    publicKey: 'B62qkSDKKTgTcXhwmRd2iVipQZh6qEriHK22VQPxmSsootgj93MWLoZ'
+    privateKey: 'EKEJ5JZ82zyQoeq6xFxaad3zc96jt8mA4F2iGwbeGqMRyXagd41q',
+    publicKey: 'B62qqriDkZ9nMTic1bL1mdv5s9m1b2Cz8koNFxmPGtr25iYCGP26kNc'
   },
   validator_1: { seed: '123456789012345678901234567890123456787' },
   validator_2: { seed: '123456789012345678901234567890123456788' },
@@ -111,6 +111,8 @@ const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(1_000_000_000_000)
 
+await fetchAccount({publicKey: feepayerAddress})
+
 
 
 let sentTx;
@@ -120,20 +122,30 @@ console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58())
 console.log("🚀 ~ token address:", tokenAddress.toBase58())
 console.log("🚀 ~ bridge address:", bridgeAddress.toBase58())
 
+const nonce = await fetchAccount({ publicKey: feepayerAddress }).then((acc) => acc.account?.nonce);
+console.log("🚀 ~ nonce:", nonce?.toString())
+let newNonce = nonce?.add(0);
+if (newNonce === undefined) {
+  newNonce  = UInt32.from(0);
+}
+console.log("🚀 ~ newNonce:", newNonce)
+
+
 
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
   let tx = await Mina.transaction(
-    { sender: feepayerAddress, fee },
+    { sender: feepayerAddress, fee},
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1)
+      await token.approveAccountUpdate
       await token.mint(PublicKey.fromBase58("B62qq2TYNeGeUAXsMKzKeJ8wTWnNnTnESfpGGKZXHCw8FRf23uYzqXc"), supply);
     }
   );
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, bridgeContractKey, adminContractKey]).send();
+  sentTx = await tx.sign([feepayerKey, tokenKey]).send();
 } catch (err) {
   console.log(err);
 }
