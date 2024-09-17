@@ -139,7 +139,7 @@ try {
     { sender: feepayerAddress, fee},
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 1)
-      await token.approveAccountUpdate
+      // await token.approveAccountUpdate
       await token.mint(PublicKey.fromBase58("B62qq2TYNeGeUAXsMKzKeJ8wTWnNnTnESfpGGKZXHCw8FRf23uYzqXc"), supply);
     }
   );
