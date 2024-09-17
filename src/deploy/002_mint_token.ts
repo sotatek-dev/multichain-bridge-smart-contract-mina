@@ -54,24 +54,24 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 const allConfig = 
 {
   token: {
-    privateKey: 'EKEKTpjMCg9ZPJLALe6mid43jRBFS9bT7fBbZEsuGQcB5chuVFUj',
-    publicKey: 'B62qr73ygjzM7VDAE2DS5CsTdBa8BNPAw3hWLExHTvjB9L2XHDEiyPY'
+    privateKey: 'EKFXVJdsaqGTpzfc2ZWVVPyN4iXGcveJAq12gtVCEtKuBW7wXm7y',
+    publicKey: 'B62qpwtfjzMEbfnanY6jrd96nirpZvdrGqJTpzchxZtUD6wksHT9VHH'
   },
   adminContract: {
-    privateKey: 'EKEsF2a22gi1YDbcks3ArNrLEn3aNdmDuTUurJDDz4kBbC64GVV3',
-    publicKey: 'B62qjUdeywXRb3BKhf9TB9cqcrsWMvpLgXniEdTHsr7XDLD1JN8mns9'
+    privateKey: 'EKFcDiY51cDh5c75A7pcfuo3g5L6DXjWhVKwtfoU4uNWBiW543Um',
+    publicKey: 'B62qkBCeXvNRHyKqsAUkZi6ZH1cYpCscYLij41kZeTi9Pa9hJSTc76R'
   },
   bridgeContract: {
-    privateKey: 'EKFFsYK1qCS6pWeHCaRGfwW6v9337PGmEvnanNnmvK5uRmeNJVCZ',
-    publicKey: 'B62qkpc9CMLjrzJUkaWJjoys2BJUP6cSAqendNizZeveCGJgKoSyfhf'
+    privateKey: 'EKEbAVrrg9Q13p96mDs19QpbZWAhgJDKNqJZDxnzHB7N7tnXCj9v',
+    publicKey: 'B62qpkRAfbdt3jpAHJFKX5U9DdCirBB98y5F4WbUhKoCV6vkJyS42L1'
   },
   managerContract: {
-    privateKey: 'EKFTrjnkZAKVshpHDG1G2Rqo76CBkpnr5LiuomDoYfbeXQcTPAQe',
-    publicKey: 'B62qmqooeY16gx6P8aTMoY9qPzDtkLUt6iZ4fdNrubgKCJEVqAZn6zN'
+    privateKey: 'EKDspw4dNE726DdCqQPPqqBBybHXdGDPhkczdQRHMU87ya2C5b9P',
+    publicKey: 'B62qnAwK6sW7mUxZH5FahLN8odZL1uTGBu1NsgBguZ3Fz91jCG2HP1A'
   },
   validatorManagerContract: {
-    privateKey: 'EKEJ5JZ82zyQoeq6xFxaad3zc96jt8mA4F2iGwbeGqMRyXagd41q',
-    publicKey: 'B62qqriDkZ9nMTic1bL1mdv5s9m1b2Cz8koNFxmPGtr25iYCGP26kNc'
+    privateKey: 'EKFPbNdfqBHZYJyLnZH9dFNpphKmDoUZtwxaAf9b64N6agnR2zMA',
+    publicKey: 'B62qpbLp5nzM9uHcnukKzKegVejVJQwvwwHCEKeaERGJLYZ12TBXRya'
   },
   validator_1: { seed: '123456789012345678901234567890123456787' },
   validator_2: { seed: '123456789012345678901234567890123456788' },
@@ -145,7 +145,7 @@ try {
   );
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, tokenKey]).send();
+  sentTx = await tx.sign([feepayerKey, bridgeContractKey, tokenKey]).send();
 } catch (err) {
   console.log(err);
 }

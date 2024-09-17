@@ -110,7 +110,7 @@ try {
             validatorPub: validatorManagerAddress,
             manager: managerAddress
         });
-        await token.mint(feepayerAddress, UInt64.from(1000000000000));
+        // await token.mint(feepayerAddress, UInt64.from(1_000_000_000_000));
     });
     console.log('prove transaction...');
     await tx.prove();
