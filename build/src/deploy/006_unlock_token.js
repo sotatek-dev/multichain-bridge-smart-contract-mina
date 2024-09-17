@@ -13,26 +13,52 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1 } from '../index.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Bool } from 'o1js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
 import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
 // check command line arg
-let after_fix = "_2";
-const tokenAlias = "token" + after_fix;
-const adminContractAlias = "admin" + after_fix;
-const bridgeAlias = "bridge" + after_fix;
+let deployAlias = process.argv[2];
+if (!deployAlias)
+    throw Error(`Missing <deployAlias> argument.
+
+Usage:
+node build/src/interact.js <deployAlias>
+`);
+const project_alias = "env_" + deployAlias;
 let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
-let config = configJson.deployAliases[tokenAlias];
-let adminConfig = configJson.deployAliases[adminContractAlias];
-let bridgeConfig = configJson.deployAliases[bridgeAlias];
+let config = configJson.deployAliases[project_alias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
-let zkAppKeysBase58 = JSON.parse(await fs.readFile(config.keyPath, 'utf8'));
-let adminZkAppKeysBase58 = JSON.parse(await fs.readFile(adminConfig.keyPath, 'utf8'));
-let bridgeZkappKeysBase58 = JSON.parse(await fs.readFile(bridgeConfig.keyPath, 'utf8'));
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-let tokenKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-let adminContractKey = PrivateKey.fromBase58(adminZkAppKeysBase58.privateKey);
-let bridgeContractKey = PrivateKey.fromBase58(bridgeZkappKeysBase58.privateKey);
+const allConfig = {
+    token: {
+        privateKey: 'EKE1pv44JYNYavrh1z1ZHZ8TcR8CLA9iyPkUhhFzEurij8xZviyr',
+        publicKey: 'B62qkyVudSyo3rVou5wfuwPtZ9Xc22bhrypQJ17XK6rFG1KxnnepN3z'
+    },
+    adminContract: {
+        privateKey: 'EKFcBdfwdr4udbK54STxPcRQ7QsPC42pkqP5X56mVxRKZWSsGqQj',
+        publicKey: 'B62qjgEykPpVqB23tVJ2U6YLBNRKc4bHTTKnyyNwZRQi3guRXpbDULq'
+    },
+    bridgeContract: {
+        privateKey: 'EKELHk1mmM7SjhtaYpSEWLTchREZb5wP9iqsbwPajBH3eJD52H6h',
+        publicKey: 'B62qjDZDU4CmJMhWWTPJ6cQWxTH4USyHtqEi73mrXi4L5Uir59WZu5q'
+    },
+    managerContract: {
+        privateKey: 'EKFRSa846HcBvbgh7KA2RyP2bv88DDXCrWXDDtCaJsQ9nrUJ2Y4z',
+        publicKey: 'B62qpnD6kqKpqLKod7TQ1fTccWeVuy5CqFkuqZ3q7h9LKoC2xGj3KYg'
+    },
+    validatorManagerContract: {
+        privateKey: 'EKFPSYABq9mHbuJVgrk3xq1mCfLY6BCZt9W7K23Tcrx7uRXRAyxf',
+        publicKey: 'B62qkSDKKTgTcXhwmRd2iVipQZh6qEriHK22VQPxmSsootgj93MWLoZ'
+    },
+    validator_1: { seed: '123456789012345678901234567890123456787' },
+    validator_2: { seed: '123456789012345678901234567890123456788' },
+    validator_3: { seed: '123456789012345678901234567890123456789' }
+};
+let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
+let adminContractKey = PrivateKey.fromBase58(allConfig["adminContract"].privateKey);
+let bridgeContractKey = PrivateKey.fromBase58(allConfig["bridgeContract"].privateKey);
+let managerContractKey = PrivateKey.fromBase58(allConfig["managerContract"].privateKey);
+let validatorManagerContractKey = PrivateKey.fromBase58(allConfig["validatorManagerContract"].privateKey);
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
@@ -45,23 +71,36 @@ console.log('compile the contract...');
 await FungibleToken.compile();
 await FungibleTokenAdmin.compile();
 await Bridge.compile();
+await Manager.compile();
+await ValidatorManager.compile();
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let tokenAddress = tokenKey.toPublicKey();
 let adminContractAddress = adminContractKey.toPublicKey();
 let bridgeAddress = bridgeContractKey.toPublicKey();
+let managerAddress = managerContractKey.toPublicKey();
+let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
 const token = new FungibleToken(tokenAddress);
 const adminContract = new FungibleTokenAdmin(adminContractAddress);
 let bridgeContract = new Bridge(bridgeAddress);
+let managerContract = new Manager(managerAddress);
+let validatorManagerContract = new ValidatorManager(validatorManagerAddress);
+await fetchAccount({ publicKey: managerAddress });
+await fetchAccount({ publicKey: validatorManagerAddress });
+const x1 = await validatorManagerContract.validator1X.get();
+console.log("🚀 ~ x1:", x1);
+const admin = await managerContract.admin.get();
+console.log("🚀 ~ admin:", admin);
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21000000000000);
-let privateKey = Secp256k1.Scalar.random();
+const seed1 = allConfig['validator_1'].seed;
+let privateKey = Secp256k1.Scalar.from(seed1);
 let publicKey = Secp256k1.generator.scale(privateKey);
-let privateKey_1 = Secp256k1.Scalar.random();
-let publicKey_1 = Secp256k1.generator.scale(privateKey_1);
-let amount = UInt64.from(2);
-let msg = Bytes256.fromString(`unlock receiver = ${feepayerAddress.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddress.toFields}`);
+let amount = UInt64.from(2000000000000);
+// let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
+let receiver = PublicKey.fromBase58("B62qjWwgHupW7k7fcTbb2Kszp4RPYBWYdL4KMmoqfkMH3iRN2FN8u5n");
+let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddress.toFields}`);
 let signature = Ecdsa.sign(msg.toBytes(), privateKey.toBigInt());
 let sentTx;
 // compile the contract to create prover keys
@@ -71,7 +110,7 @@ try {
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        await bridgeContract.unlock(amount, feepayerAddress, UInt64.from(1), tokenAddress, signature, publicKey, signature, publicKey, signature, publicKey, signature, publicKey, signature, publicKey);
+        await bridgeContract.unlock(amount, receiver, UInt64.from(1), tokenAddress, Bool(true), signature, publicKey, Bool(false), signature, publicKey, Bool(false), signature, publicKey);
     });
     await tx.prove();
     console.log('send transaction...');

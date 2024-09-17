@@ -1,5 +1,5 @@
 import { PublicKey, SmartContract, State, UInt64, Bool, DeployArgs, Field } from 'o1js';
-import { Secp256k1, Ecdsa, Bytes32 } from './ecdsa/ecdsa.js';
+import { Secp256k1, Ecdsa, Bytes32, Bytes256 } from './ecdsa/ecdsa.js';
 declare const UnlockEvent_base: (new (value: {
     receiver: PublicKey;
     tokenAddress: PublicKey;
@@ -189,27 +189,30 @@ declare class LockEvent extends LockEvent_base {
     constructor(locker: PublicKey, receipt: Field, amount: UInt64, tokenAddress: PublicKey);
 }
 export declare class Bridge extends SmartContract {
-    minter: State<PublicKey>;
-    admin: State<PublicKey>;
+    minAmount: State<UInt64>;
+    maxAmount: State<UInt64>;
+    threshold: State<UInt64>;
+    validatorManager: State<PublicKey>;
+    manager: State<PublicKey>;
     events: {
         Unlock: typeof UnlockEvent;
         Lock: typeof LockEvent;
     };
-    decrementBalance(amount: UInt64): Promise<void>;
     deploy(args: DeployArgs & {
-        validatorsMapRoot: Field;
         minAmount: UInt64;
         maxAmount: UInt64;
         threshold: UInt64;
+        validatorPub: PublicKey;
+        manager: PublicKey;
     }): Promise<void>;
-    changeAdmin(_admin: PublicKey): Promise<void>;
-    setValidator(xKey: Field, yKey: Field, isOk: Bool): Promise<void>;
+    setAmountLimits(newMinAmount: UInt64, newMaxAmount: UInt64): Promise<void>;
+    changeManager(newManager: PublicKey): Promise<void>;
+    changeValidatorManager(validatorManager: PublicKey): Promise<void>;
     lock(amount: UInt64, address: Field, tokenAddr: PublicKey): Promise<void>;
-    unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, signature_1: Ecdsa, validator_1: Secp256k1, signature_2: Ecdsa, validator_2: Secp256k1, signature_3: Ecdsa, validator_3: Secp256k1, signature_4: Ecdsa, validator_4: Secp256k1, signature_5: Ecdsa, validator_5: Secp256k1): Promise<void>;
-    checkProof(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool>;
+    unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, useSig1: Bool, signature_1: Ecdsa, validator_1: Secp256k1, useSig2: Bool, signature_2: Ecdsa, validator_2: Secp256k1, useSig3: Bool, signature_3: Ecdsa, validator_3: Secp256k1): Promise<void>;
+    isValidator(validator: Secp256k1, useSig: Bool): Bool;
+    validateValidator(useSig1: Bool, validator_1: Secp256k1, useSig2: Bool, validator_2: Secp256k1, useSig3: Bool, validator_3: Secp256k1): void;
+    validateSig(msg: Bytes256, signature: Ecdsa, validator: Secp256k1, useSig: Bool): Promise<void>;
     validateMsg(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool>;
-    secp256k1ToPublicKey(secp256k1Key: Secp256k1): void;
-    validateValidator(validator: Secp256k1): void;
-    isValidator(validator: Secp256k1): Bool;
 }
 export {};

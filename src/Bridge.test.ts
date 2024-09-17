@@ -2,7 +2,9 @@ import { Account, AccountUpdate, Bool, EcdsaSignature, EcdsaSignatureV2, Encodin
 import { Bridge } from './Bridge'
 import { FungibleToken, FungibleTokenAdmin } from 'mina-fungible-token';
 import { Bytes256, ecdsa, Ecdsa, keccakAndEcdsa, Secp256k1 } from './ecdsa/ecdsa';
-const proofsEnabled = true
+import { ValidatorManager } from './ValidatorManager';
+import { Manager } from './Manager';
+const proofsEnabled = false
 
 const Local = await Mina.LocalBlockchain({ proofsEnabled })
 Mina.setActiveInstance(Local)
@@ -16,6 +18,31 @@ describe("Bridge", () => {
     const normalUserPrivkey = Local.testAccounts[2].key
     const normalUserPubkey = Local.testAccounts[2]
 
+    const validatorPrivateKey1 = Secp256k1.Scalar.random();
+    const validatorPublicKey1 = Secp256k1.generator.scale(validatorPrivateKey1);
+
+    const validatorPrivateKey2 = Secp256k1.Scalar.random();
+    const validatorPublicKey2 = Secp256k1.generator.scale(validatorPrivateKey2);
+
+    const validatorPrivateKey3 = Secp256k1.Scalar.random();
+    const validatorPublicKey3 = Secp256k1.generator.scale(validatorPrivateKey3);
+
+    const validatorPrivateKeyGen = Secp256k1.Scalar.from(BigInt('123456789012345678901234567890123456789'));
+    const validatorPublicKeyGen = Secp256k1.generator.scale(validatorPrivateKeyGen);
+    console.log("🚀 ~ describe ~ validatorPublicKeyGen:", validatorPublicKeyGen)
+    console.log("🚀 ~ describe ~ validatorPublicKeyGen x :", validatorPublicKeyGen.x.toBigInt().toString());
+    console.log("🚀 ~ describe ~ validatorPublicKeyGen y :", validatorPublicKeyGen.y.toBigInt().toString());
+    
+
+    const x1 = Field.from(validatorPublicKey1.x.toBigInt().toString());
+    const y1 = Field.from(validatorPublicKey1.y.toBigInt().toString());
+
+    let x2 = Field.from(validatorPublicKey2.x.toBigInt().toString());
+    let y2 = Field.from(validatorPublicKey2.y.toBigInt().toString());
+
+    let x3 = Field.from(validatorPublicKey3.x.toBigInt().toString());
+    let y3 = Field.from(validatorPublicKey3.y.toBigInt().toString());
+
     const adminContractPrivkey = PrivateKey.random()
     const adminContractPubkey = adminContractPrivkey.toPublicKey()
     const tokenPrivkey = PrivateKey.random()
@@ -23,6 +50,13 @@ describe("Bridge", () => {
 
     const token = new FungibleToken(tokenPubkey);
     const adminContract = new FungibleTokenAdmin(adminContractPubkey);
+    const validatorManagerPrivkey = PrivateKey.random()
+    const validatorManagerPubkey = validatorManagerPrivkey.toPublicKey()
+    const validatorZkapp = new ValidatorManager(validatorManagerPubkey);
+
+    const managerPrivkey = PrivateKey.random();
+    const managerPubkey = managerPrivkey.toPublicKey()
+    const managerZkapp = new Manager(managerPubkey); 
 
 
     const symbol = 'WETH';
@@ -78,17 +112,44 @@ describe("Bridge", () => {
         await tokenDeployTx.prove();
         await tokenDeployTx.send()
 
-        let privateKey = Secp256k1.Scalar.random();
-        let publicKey = Secp256k1.generator.scale(privateKey);
-        let validators = [Field(publicKey.x.toBigInt()), Field(publicKey.y.toBigInt())];
+        let managerTx = await Mina.transaction(userPubkey, async () => {
+            AccountUpdate.fundNewAccount(userPubkey, 1)
+            await managerZkapp.deploy({
+                _admin: userPubkey,
+                _minter: userPubkey,
+            })
+        })
+        await managerTx.prove()
+        await managerTx.sign([userPrivkey, managerPrivkey])
+        await managerTx.send()
+
+        let validatorManagerTx = await Mina.transaction(userPubkey, async () => {
+            AccountUpdate.fundNewAccount(userPubkey, 1)
+            await validatorZkapp.deploy({
+                _val1X: x1,
+                _val1Y: y1,
+                _val2X: x2,
+                _val2Y: y2,
+                _val3X: x3,
+                _val3Y: y3,
+                _manager: managerPubkey,
+            })
+        })
+
+        await validatorManagerTx.prove()
+        await validatorManagerTx.sign([userPrivkey, validatorManagerPrivkey])
+        await validatorManagerTx.send()
+        
         
         let bridgeTx = await Mina.transaction(userPubkey, async () => {
             AccountUpdate.fundNewAccount(userPubkey, 1)
             await bridgeZkapp.deploy({
-                threshold: UInt64.from(1),
-                validatorsMapRoot: new Field(0),
                 minAmount: UInt64.from(2),
                 maxAmount: UInt64.from(1_000_000_000_000_000),
+                validatorPub: validatorManagerPubkey,
+                threshold: UInt64.from(1),
+                manager: managerPubkey,
+                
             });
         })
         await bridgeTx.prove()
@@ -179,49 +240,58 @@ describe("Bridge", () => {
         let publicKey = Secp256k1.generator.scale(privateKey);
 
         let privateKey_1 = Secp256k1.Scalar.random();
-        let publicKey_1 = Secp256k1.generator.scale(privateKey_1);
+        // let publicKey_1 = Secp256k1.from({
+        //     x: 1,
+        //     y: 1,
+        // });
 
-        let amount = UInt64.from(3);
+        // console.log("publicKey_1:", publicKey_1);
+
+        let amount = UInt64.from(10);
 
         let msg = Bytes256.fromString(`unlock receiver = ${normalUserPubkey.toFields} amount = ${amount.toFields} tokenAddr = ${tokenPubkey.toFields}`);
 
-        let signature = Ecdsa.sign(msg.toBytes(), privateKey.toBigInt());
+        let signature = Ecdsa.sign(msg.toBytes(), validatorPrivateKey1.toBigInt());
+        let signature1 = Ecdsa.sign(msg.toBytes(), privateKey_1.toBigInt());
 
-        // let setValidator = await Mina.transaction(userPubkey, async () => {
-        //     await bridgeZkapp.setValidator(xKey, yKey, Bool(true));
-        // });
-        // setValidator.sign([userPrivkey])
-        // await setValidator.prove()
-        // await setValidator.send()
-
-        let lockTx = await Mina.transaction(userPubkey, async () => {
-            // AccountUpdate.fundNewAccount(normalUserPubkey, 1);
-            // await bridgeZkapp.setValidator(xKey, yKey, Bool(true));
-                // await bridgeZkapp.unlock(
-                //     amount,
-                //     normalUserPubkey,
-                //     UInt64.from(1),
-                //     tokenPubkey,
-                //     signature,
-                //     publicKey,
-                //     signature,
-                //     publicKey,
-                //     signature,
-                //     publicKey,
-                //     signature,
-                //     publicKey,
-                //     signature,
-                //     publicKey,
-                // );
-            // await token.transfer(normalUserPubkey, bridgePubkey, UInt64.from(1));
-            // await token.burn(normalUserPubkey, UInt64.from(1));
+        let unlockTx = await Mina.transaction(userPubkey, async () => {
+            // AccountUpdate.fundNewAccount(userPubkey, 1);
+            await bridgeZkapp.unlock(
+                amount,
+                normalUserPubkey,
+                UInt64.from(1),
+                tokenPubkey,
+                Bool(true),
+                signature,
+                validatorPublicKey1,
+                Bool(false),
+                signature,
+                validatorPublicKey1,
+                Bool(false),
+                signature,
+                validatorPublicKey1,
+            );
         })
-        lockTx.sign([userPrivkey, bridgePrivkey])
+        unlockTx.sign([userPrivkey, bridgePrivkey])
+        await unlockTx.prove()
+        await unlockTx.send()
+
+        const beforeLockBalance = await token.getBalanceOf(normalUserPubkey);
+        console.log("before lock balance:", beforeLockBalance.toString());
+
+
+        let lockTx = await Mina.transaction(normalUserPubkey, async () => {
+            await bridgeZkapp.lock(UInt64.from(5), Field.from(1), tokenPubkey);
+        })
+        lockTx.sign([normalUserPrivkey])
         await lockTx.prove()
         await lockTx.send()
 
-        const check = await bridgeZkapp.isValidator(publicKey);
-        console.log("��� ~ it ~ check:", check.toString());
+        const afterLockBalance = await token.getBalanceOf(normalUserPubkey);
+        console.log("after lock balance:", afterLockBalance.toString());
+
+        // const check = await validatorZkapp.isValidator(publicKey_1)
+        // console.log("��� ~ it ~ check:", check.toString());
     })
 
     

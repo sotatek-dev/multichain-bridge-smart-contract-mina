@@ -13,18 +13,21 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
+import path from 'path';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager, Secp256k1 } from '../index.js';
 
 // check command line arg
 
-let after_fix = "_3";
+let deployAlias = process.argv[2];
+if (!deployAlias)
+  throw Error(`Missing <deployAlias> argument.
 
-const tokenAlias = "token" + after_fix;
-const adminContractAlias = "admin" + after_fix;
-const bridgeAlias = "bridge" + after_fix;
-const managerAlias = "manager" + after_fix;
-const validatorManangerAlias = "validator" + after_fix;
+Usage:
+node build/src/interact.js <deployAlias>
+`);
+
+const project_alias = "env_" + deployAlias;
 
 // parse config and private key from file
 type Config = {
@@ -41,41 +44,18 @@ type Config = {
 };
 let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
 
-let config = configJson.deployAliases[tokenAlias];
-let adminConfig = configJson.deployAliases[adminContractAlias];
-let bridgeConfig = configJson.deployAliases[bridgeAlias];
-let managerConfig = configJson.deployAliases[managerAlias];
-let validatorManagerConfig = configJson.deployAliases[validatorManangerAlias];
+let config = configJson.deployAliases[project_alias];
+
 let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
   await fs.readFile(config.feepayerKeyPath, 'utf8')
 );
 
-let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.keyPath, 'utf8')
-);
-
-
-let adminZkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(adminConfig.keyPath, 'utf8')
-);
-let bridgeZkappKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(bridgeConfig.keyPath, 'utf8')
-)
-
-let managerZkappKeyBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(managerConfig.keyPath, 'utf8')
-)
-
-let validatorManagerZkappKeyBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(validatorManagerConfig.keyPath, 'utf8')
-)
-
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-let tokenKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
-let adminContractKey = PrivateKey.fromBase58(adminZkAppKeysBase58.privateKey);
-let bridgeContractKey = PrivateKey.fromBase58(bridgeZkappKeysBase58.privateKey);
-let managerKey = PrivateKey.fromBase58(managerZkappKeyBase58.privateKey);
-let validatorManagerKey = PrivateKey.fromBase58(validatorManagerZkappKeyBase58.privateKey);
+let tokenKey = PrivateKey.random();
+let adminContractKey = PrivateKey.random();
+let bridgeContractKey = PrivateKey.random();
+let managerKey = PrivateKey.random();
+let validatorManagerKey = PrivateKey.random();
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -119,9 +99,18 @@ const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21_000_000_000_000)
 
+let validatorSeed1 = "123456789012345678901234567890123456787";
+let validatorSeed2 = "123456789012345678901234567890123456788";
+let validatorSeed3 = "123456789012345678901234567890123456789";
 
-const validatorPrivateKeyGen = Secp256k1.Scalar.from(BigInt('123456789012345678901234567890123456789'));
-const validatorPublicKey = Secp256k1.generator.scale(validatorPrivateKeyGen);
+const validatorPrivateKeyGen1 = Secp256k1.Scalar.from(BigInt(validatorSeed1));
+const validatorPublicKey1 = Secp256k1.generator.scale(validatorPrivateKeyGen1);
+
+const validatorPrivateKeyGen2 = Secp256k1.Scalar.from(BigInt(validatorSeed2));
+const validatorPublicKey2 = Secp256k1.generator.scale(validatorPrivateKeyGen2);
+
+const validatorPrivateKeyGen3 = Secp256k1.Scalar.from(BigInt(validatorSeed3));
+const validatorPublicKey3 = Secp256k1.generator.scale(validatorPrivateKeyGen3);
 
 
 let sentTx;
@@ -151,8 +140,13 @@ try {
             })
 
             await validatorManagerContract.deploy({
-              _val1X: Field.from(validatorPublicKey.x.toBigInt().toString()),
-              _val1Y: Field.from(validatorPublicKey.y.toBigInt().toString()),
+              _val1X: Field.from(validatorPublicKey1.x.toBigInt().toString()),
+              _val1Y: Field.from(validatorPublicKey1.y.toBigInt().toString()),
+              _val2X: Field.from(validatorPublicKey2.x.toBigInt().toString()),
+              _val2Y: Field.from(validatorPublicKey2.y.toBigInt().toString()),
+              _val3X: Field.from(validatorPublicKey3.x.toBigInt().toString()),
+              _val3Y: Field.from(validatorPublicKey3.y.toBigInt().toString()),
+              _manager: managerAddress,
             });
 
             await bridgeContract.deploy({
@@ -175,6 +169,46 @@ try {
 }
 console.log("=====================txhash: ", sentTx?.hash);
 await sentTx?.wait();
+// Save all private and public keys to a single JSON file
+const keysToSave = [
+  { name: 'token', privateKey: tokenKey, publicKey: tokenAddress },
+  { name: 'adminContract', privateKey: adminContractKey, publicKey: adminContractAddress },
+  { name: 'bridgeContract', privateKey: bridgeContractKey, publicKey: bridgeAddress },
+  { name: 'managerContract', privateKey: managerKey, publicKey: managerAddress },
+  { name: 'validatorManagerContract', privateKey: validatorManagerKey, publicKey: validatorManagerAddress }
+];
+
+const allKeys = {};
+for (const key of keysToSave) {
+  (allKeys as Record<string, { privateKey: string; publicKey: string }>)[key.name] = {
+    privateKey: key.privateKey.toBase58(),
+    publicKey: key.publicKey.toBase58()
+  };
+}
+
+(allKeys as Record<string, { seed: string }>)['validator_1'] = {
+  seed: validatorSeed1
+};
+
+(allKeys as Record<string, { seed: string }>)['validator_2'] = {
+  seed: validatorSeed2
+};
+
+(allKeys as Record<string, { seed: string }>)['validator_3'] = {
+  seed: validatorSeed3
+};
+
+console.log("🚀 ~ allKeys:", allKeys);
+
+// const keysDir = path.join('..', '..', 'keys');
+// const fileName = path.join(keysDir, `${project_alias}_all_keys.json`);
+
+// // Create the keys directory if it doesn't exist
+// await fs.mkdir(keysDir, { recursive: true });
+
+
+// await fs.writeFile(fileName, JSON.stringify(allKeys, null, 2));
+// console.log(`Saved all keys to ${fileName}`);
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname
