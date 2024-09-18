@@ -13,10 +13,11 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64 } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64 } from 'o1js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1 } from '../index.js';
+import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
 // check command line arg
-let after_fix = "";
+let after_fix = "_3";
 const tokenAlias = "token" + after_fix;
 const adminContractAlias = "admin" + after_fix;
 const bridgeAlias = "bridge" + after_fix;
@@ -58,12 +59,17 @@ const supply = UInt64.from(21000000000000);
 let sentTx;
 // compile the contract to create prover keys
 await fetchAccount({ publicKey: feepayerAddress });
+let privateKey = Secp256k1.Scalar.random();
+let publicKey = Secp256k1.generator.scale(privateKey);
+let amount = UInt64.from(3);
+let msg = Bytes256.fromString(`unlock receiver = ${feepayerAddress.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddress.toFields}`);
+let signature = Ecdsa.sign(msg.toBytes(), privateKey.toBigInt());
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
         await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        await bridgeContract.unlock(UInt64.from(2), feepayerAddress, UInt64.from(1), tokenAddress);
+        await bridgeContract.unlock(UInt64.from(2000000000000), PublicKey.fromBase58("B62qq2TYNeGeUAXsMKzKeJ8wTWnNnTnESfpGGKZXHCw8FRf23uYzqXc"), UInt64.from(1), tokenAddress, signature, publicKey, signature, publicKey, signature, publicKey, signature, publicKey, signature, publicKey);
     });
     await tx.prove();
     console.log('send transaction...');

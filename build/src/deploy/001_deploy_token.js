@@ -16,7 +16,7 @@ import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, UInt64, UInt8, Bool, Field } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge } from '../index.js';
 // check command line arg
-let after_fix = "_2";
+let after_fix = "_3";
 const tokenAlias = "token" + after_fix;
 const adminContractAlias = "admin" + after_fix;
 const bridgeAlias = "bridge" + after_fix;

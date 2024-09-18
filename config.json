@@ -63,6 +63,27 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
       "feepayerAlias": "brd",
       "fee": "0.5"
+    },
+    "token_3": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/token_3.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
+    },
+    "bridge_3": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/bridge_3.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
+    },
+    "admin_3": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/admin_3.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/brd.json",
+      "feepayerAlias": "brd",
+      "fee": "0.5"
     }
   }
 }
