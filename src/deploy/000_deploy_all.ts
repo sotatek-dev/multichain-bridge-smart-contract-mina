@@ -57,6 +57,10 @@ let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
 
+const validator1Key = PrivateKey.random();
+const validator2Key = PrivateKey.random();
+const validator3Key = PrivateKey.random();
+
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
 const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
@@ -87,6 +91,9 @@ let adminContractAddress = adminContractKey.toPublicKey();
 let bridgeAddress = bridgeContractKey.toPublicKey();
 let managerAddress = managerKey.toPublicKey();
 let validatorManagerAddress = validatorManagerKey.toPublicKey();
+const validator1Address = validator1Key.toPublicKey();
+const validator2Address = validator2Key.toPublicKey();
+const validator3Address = validator3Key.toPublicKey();
 
 const token = new FungibleToken(tokenAddress)
 const adminContract = new FungibleTokenAdmin(adminContractAddress)
@@ -99,18 +106,7 @@ const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21_000_000_000_000_000)
 
-let validatorSeed1 = "123456789012345678901234567890123456787";
-let validatorSeed2 = "123456789012345678901234567890123456788";
-let validatorSeed3 = "123456789012345678901234567890123456789";
 
-const validatorPrivateKeyGen1 = Secp256k1.Scalar.from(BigInt(validatorSeed1));
-const validatorPublicKey1 = Secp256k1.generator.scale(validatorPrivateKeyGen1);
-
-const validatorPrivateKeyGen2 = Secp256k1.Scalar.from(BigInt(validatorSeed2));
-const validatorPublicKey2 = Secp256k1.generator.scale(validatorPrivateKeyGen2);
-
-const validatorPrivateKeyGen3 = Secp256k1.Scalar.from(BigInt(validatorSeed3));
-const validatorPublicKey3 = Secp256k1.generator.scale(validatorPrivateKeyGen3);
 
 
 let sentTx;
@@ -140,12 +136,9 @@ try {
             })
 
             await validatorManagerContract.deploy({
-              _val1X: Field.from(validatorPublicKey1.x.toBigInt().toString()),
-              _val1Y: Field.from(validatorPublicKey1.y.toBigInt().toString()),
-              _val2X: Field.from(validatorPublicKey2.x.toBigInt().toString()),
-              _val2Y: Field.from(validatorPublicKey2.y.toBigInt().toString()),
-              _val3X: Field.from(validatorPublicKey3.x.toBigInt().toString()),
-              _val3Y: Field.from(validatorPublicKey3.y.toBigInt().toString()),
+              _validator1: validator1Address,
+              _validator2: validator2Address,
+              _validator3: validator3Address,
               _manager: managerAddress,
             });
 
@@ -175,7 +168,10 @@ const keysToSave = [
   { name: 'adminContract', privateKey: adminContractKey, publicKey: adminContractAddress },
   { name: 'bridgeContract', privateKey: bridgeContractKey, publicKey: bridgeAddress },
   { name: 'managerContract', privateKey: managerKey, publicKey: managerAddress },
-  { name: 'validatorManagerContract', privateKey: validatorManagerKey, publicKey: validatorManagerAddress }
+  { name: 'validatorManagerContract', privateKey: validatorManagerKey, publicKey: validatorManagerAddress },
+  { name: 'validator_1', privateKey: validator1Key, publicKey: validator1Address },
+  { name: 'validator_2', privateKey: validator2Key, publicKey: validator2Address },
+  { name: 'validator_3', privateKey: validator3Key, publicKey: validator3Address },
 ];
 
 const allKeys = {};
@@ -186,29 +182,7 @@ for (const key of keysToSave) {
   };
 }
 
-(allKeys as Record<string, { seed: string }>)['validator_1'] = {
-  seed: validatorSeed1
-};
-
-(allKeys as Record<string, { seed: string }>)['validator_2'] = {
-  seed: validatorSeed2
-};
-
-(allKeys as Record<string, { seed: string }>)['validator_3'] = {
-  seed: validatorSeed3
-};
-
 console.log("🚀 ~ allKeys:", allKeys);
-
-// const keysDir = path.join('..', '..', 'keys');
-// const fileName = path.join(keysDir, `${project_alias}_all_keys.json`);
-
-// // Create the keys directory if it doesn't exist
-// await fs.mkdir(keysDir, { recursive: true });
-
-
-// await fs.writeFile(fileName, JSON.stringify(allKeys, null, 2));
-// console.log(`Saved all keys to ${fileName}`);
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname

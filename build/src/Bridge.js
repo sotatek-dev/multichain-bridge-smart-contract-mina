@@ -7,9 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Bool, Provable, Field, MerkleMap } from 'o1js';
+import { PublicKey, SmartContract, State, UInt64, method, state, Struct, Bool, Provable, Field, Signature } from 'o1js';
 import { FungibleToken } from "mina-fungible-token";
-import { Secp256k1, Ecdsa, Bytes256 } from './ecdsa/ecdsa.js';
 import { ValidatorManager } from './ValidatorManager.js';
 import { Manager } from './Manager.js';
 class UnlockEvent extends Struct({
@@ -83,72 +82,52 @@ export class Bridge extends SmartContract {
         await token.burn(this.sender.getAndRequireSignature(), amount);
         this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddr));
     }
-    async unlock(amount, receiver, id, tokenAddr, useSig1, signature_1, validator_1, useSig2, signature_2, validator_2, useSig3, signature_3, validator_3) {
+    async unlock(amount, receiver, id, tokenAddr, useSig1, validator1, sig1, useSig2, validator2, sig2, useSig3, validator3, sig3) {
         const managerZkapp = new Manager(this.manager.getAndRequireEquals());
         managerZkapp.isAdmin(this.sender.getAndRequireSignature());
-        let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
-        this.validateValidator(useSig1, validator_1, useSig2, validator_2, useSig3, validator_3);
-        this.validateSig(msg, signature_1, validator_1, useSig1);
-        this.validateSig(msg, signature_2, validator_2, useSig2);
-        this.validateSig(msg, signature_3, validator_3, useSig3);
+        const msg = [
+            ...receiver.toFields(),
+            ...amount.toFields(),
+            ...tokenAddr.toFields(),
+        ];
+        this.validateValidator(useSig1, validator1, useSig2, validator2, useSig3, validator3);
+        this.validateSig(msg, sig1, validator1, useSig1);
+        this.validateSig(msg, sig2, validator2, useSig2);
+        this.validateSig(msg, sig3, validator3, useSig3);
         const token = new FungibleToken(tokenAddr);
         await token.mint(receiver, amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
     }
-    isValidator(validator, useSig) {
-        const validatorManager = new ValidatorManager(this.validatorManager.getAndRequireEquals());
-        let isValid = Bool(false);
-        Provable.asProver(() => {
-            const x = Field.from(validator.x.toBigInt());
-            const y = Field.from(validator.y.toBigInt());
-            isValid = useSig.toBoolean() ? validatorManager.isValidator(x, y) : Bool(false);
-            Provable.log("isValid", isValid);
-        });
-        return isValid;
-    }
-    validateValidator(useSig1, validator_1, useSig2, validator_2, useSig3, validator_3) {
+    async validateValidator(useSig1, validator1, useSig2, validator2, useSig3, validator3) {
         let count = UInt64.from(0);
-        Provable.asProver(async () => {
-            const map = new MerkleMap();
-            const checkValidator = (useSig, validator) => {
-                if (useSig.toBoolean()) {
-                    const x = Field.from(validator.x.toBigInt());
-                    const y = Field.from(validator.y.toBigInt());
-                    let yMap = map.get(x);
-                    yMap.assertNotEquals(y);
-                    map.set(x, y);
-                }
-            };
-            checkValidator(useSig1, validator_1);
-            checkValidator(useSig2, validator_2);
-            checkValidator(useSig3, validator_3);
-        });
-        if (this.isValidator(validator_1, useSig1).toBoolean()) {
-            count = count.add(1);
-        }
-        if (this.isValidator(validator_2, useSig2).toBoolean()) {
-            count = count.add(1);
-        }
-        if (this.isValidator(validator_3, useSig3).toBoolean()) {
-            count = count.add(1);
-        }
-        Provable.log("count", count);
-        count.assertGreaterThanOrEqual(this.threshold.getAndRequireEquals(), "Not enough validators");
+        const zero = Field.from(0);
+        const falseB = Bool(false);
+        const trueB = Bool(true);
+        const validatorManager = new ValidatorManager(this.validatorManager.getAndRequireEquals());
+        const validateIndex = async (validator, useSig) => {
+            const index = await validatorManager.getValidatorIndex(validator);
+            const isGreaterThanZero = index.greaterThan(zero);
+            let isOk = Provable.if(useSig, Provable.if(isGreaterThanZero, trueB, falseB), trueB);
+            isOk.assertTrue("Public key not found in validators");
+        };
+        const notDupValidator12 = Provable.if(useSig1.and(useSig2), Provable.if(validator1.equals(validator2), falseB, trueB), trueB);
+        const notDupValidator13 = Provable.if(useSig1.and(useSig3), Provable.if(validator1.equals(validator3), falseB, trueB), trueB);
+        const notDupValidator23 = Provable.if(useSig2.and(useSig3), Provable.if(validator2.equals(validator3), falseB, trueB), trueB);
+        const isDuplicate = Provable.if(notDupValidator12.and(notDupValidator13).and(notDupValidator23), falseB, trueB);
+        isDuplicate.assertFalse("Duplicate validator keys");
+        count = Provable.if(useSig1, count.add(1), count);
+        count = Provable.if(useSig2, count.add(1), count);
+        count = Provable.if(useSig3, count.add(1), count);
+        count.assertGreaterThanOrEqual(this.threshold.getAndRequireEquals(), "Not reached threshold");
     }
     async validateSig(msg, signature, validator, useSig) {
-        let isValid = Bool(false);
-        Provable.asProver(async () => {
-            if (useSig.toBoolean()) {
-                isValid = await this.validateMsg(msg, signature, validator);
-                Provable.log("validateMsg isValid", isValid);
-                isValid.assertTrue("Invalid signature for validator");
-            }
-        });
+        let isValidSig = signature.verify(validator, msg);
+        const isValid = Provable.if(useSig, isValidSig, Bool(true));
+        isValid.assertTrue("Invalid signature");
     }
-    async validateMsg(message, signature, publicKey) {
-        let proof = await signature.verifyV2(message, publicKey);
-        Provable.log("proof", proof);
-        return proof;
+    async verifyMsg(publicKey, msg, sig) {
+        const isOk = await sig.verify(publicKey, msg);
+        Provable.log("isOk", isOk.toString());
     }
 }
 __decorate([
@@ -203,14 +182,14 @@ __decorate([
         UInt64,
         PublicKey,
         Bool,
-        Ecdsa,
-        Secp256k1,
+        PublicKey,
+        Signature,
         Bool,
-        Ecdsa,
-        Secp256k1,
+        PublicKey,
+        Signature,
         Bool,
-        Ecdsa,
-        Secp256k1]),
+        PublicKey,
+        Signature]),
     __metadata("design:returntype", Promise)
 ], Bridge.prototype, "unlock", null);
 //# sourceMappingURL=Bridge.js.map

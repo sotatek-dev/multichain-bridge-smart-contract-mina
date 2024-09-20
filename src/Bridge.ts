@@ -6,25 +6,15 @@ import {
   method,
   state,
   Struct,
-  CircuitString,
   Bool,
   DeployArgs,
-  Permissions,
   Provable,
   Field,
-  ZkProgram,
-  Crypto,
-  createEcdsaV2,
-  createForeignCurveV2,
-  Poseidon,
   MerkleMap,
-  MerkleMapWitness,
-  fetchAccount
+  Signature
 } from 'o1js'
 
 import { FungibleToken } from "mina-fungible-token"
-
-import { Secp256k1, Ecdsa, keccakAndEcdsa, ecdsa, Bytes32, Bytes256 } from './ecdsa/ecdsa.js';
 import { ValidatorManager } from './ValidatorManager.js';
 import { Manager } from './Manager.js';
 
@@ -33,12 +23,12 @@ class UnlockEvent extends Struct({
   tokenAddress: PublicKey,
   amount: UInt64,
   id: UInt64,
-}){
+}) {
   constructor(
-      receiver: PublicKey,
-      tokenAddress: PublicKey,
-      amount: UInt64,
-      id: UInt64,
+    receiver: PublicKey,
+    tokenAddress: PublicKey,
+    amount: UInt64,
+    id: UInt64,
   ) {
     super({ receiver, tokenAddress, amount, id });
   }
@@ -49,7 +39,7 @@ class LockEvent extends Struct({
   receipt: Field,
   amount: UInt64,
   tokenAddress: PublicKey
-}){
+}) {
   constructor(locker: PublicKey, receipt: Field, amount: UInt64, tokenAddress: PublicKey) {
     super({ locker, receipt, amount, tokenAddress });
   }
@@ -62,9 +52,9 @@ export class Bridge extends SmartContract {
   @state(PublicKey) validatorManager = State<PublicKey>();
   @state(PublicKey) manager = State<PublicKey>();
 
-  events = {"Unlock": UnlockEvent, "Lock": LockEvent};
+  events = { "Unlock": UnlockEvent, "Lock": LockEvent };
 
-  async deploy(args: DeployArgs & { 
+  async deploy(args: DeployArgs & {
     minAmount: UInt64,
     maxAmount: UInt64,
     threshold: UInt64,
@@ -82,7 +72,7 @@ export class Bridge extends SmartContract {
 
   @method async setAmountLimits(newMinAmount: UInt64, newMaxAmount: UInt64) {
     // Ensure the caller is the manager
-    
+
     const managerZkapp = new Manager(this.manager.getAndRequireEquals());
     managerZkapp.isAdmin(this.sender.getAndRequireSignature());
     // Set the new minimum and maximum amounts
@@ -112,7 +102,7 @@ export class Bridge extends SmartContract {
     // Check if the amount is within the allowed range
     const minAmount = this.minAmount.getAndRequireEquals();
     const maxAmount = this.maxAmount.getAndRequireEquals();
-    
+
     amount.assertGreaterThanOrEqual(minAmount, "Amount is less than minimum allowed");
     amount.assertLessThanOrEqual(maxAmount, "Amount exceeds maximum allowed");
     const token = new FungibleToken(tokenAddr);
@@ -127,105 +117,88 @@ export class Bridge extends SmartContract {
     id: UInt64,
     tokenAddr: PublicKey,
     useSig1: Bool,
-    signature_1: Ecdsa,
-    validator_1: Secp256k1,
+    validator1: PublicKey,
+    sig1: Signature,
     useSig2: Bool,
-    signature_2: Ecdsa,
-    validator_2: Secp256k1,
+    validator2: PublicKey,
+    sig2: Signature,
     useSig3: Bool,
-    signature_3: Ecdsa,
-    validator_3: Secp256k1,
+    validator3: PublicKey,
+    sig3: Signature,
   ) {
     const managerZkapp = new Manager(this.manager.getAndRequireEquals());
     managerZkapp.isAdmin(this.sender.getAndRequireSignature());
-    let msg = Bytes256.fromString(`unlock receiver = ${receiver.toFields} amount = ${amount.toFields} tokenAddr = ${tokenAddr.toFields}`);
+    const msg = [
+      ...receiver.toFields(),
+      ...amount.toFields(),
+      ...tokenAddr.toFields(),
+    ]
     this.validateValidator(
       useSig1,
-      validator_1,
+      validator1,
       useSig2,
-      validator_2,
+      validator2,
       useSig3,
-      validator_3,
+      validator3,
     );
 
-    this.validateSig(msg, signature_1, validator_1, useSig1);
-    this.validateSig(msg, signature_2, validator_2, useSig2);
-    this.validateSig(msg, signature_3, validator_3, useSig3);
-
+    this.validateSig(msg, sig1, validator1, useSig1);
+    this.validateSig(msg, sig2, validator2, useSig2);
+    this.validateSig(msg, sig3, validator3, useSig3);
     const token = new FungibleToken(tokenAddr)
     await token.mint(receiver, amount)
     this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
   }
-  public isValidator(validator: Secp256k1, useSig: Bool): Bool {
-    const validatorManager = new ValidatorManager(this.validatorManager.getAndRequireEquals());
-    let isValid = Bool(false);
-    Provable.asProver(() => {
-      const x = Field.from(validator.x.toBigInt());
-      const y = Field.from(validator.y.toBigInt());
-      isValid = useSig.toBoolean() ? validatorManager.isValidator(x, y): Bool(false);
-      Provable.log("isValid", isValid);
-     })
-    return isValid;
-  }
 
-  public validateValidator(
+  public async validateValidator(
     useSig1: Bool,
-    validator_1: Secp256k1,
+    validator1: PublicKey,
     useSig2: Bool,
-    validator_2: Secp256k1,
+    validator2: PublicKey,
     useSig3: Bool,
-    validator_3: Secp256k1,
-    ) {
+    validator3: PublicKey,
+  ) {
+
     let count = UInt64.from(0);
+    const zero = Field.from(0);
+    const falseB = Bool(false);
+    const trueB = Bool(true);
+    const validatorManager = new ValidatorManager(this.validatorManager.getAndRequireEquals());
+    const validateIndex = async (validator: PublicKey, useSig: Bool) => {
+      const index = await validatorManager.getValidatorIndex(validator);
+      const isGreaterThanZero = index.greaterThan(zero);
+      let isOk = Provable.if(useSig, Provable.if(isGreaterThanZero, trueB, falseB), trueB);
+      isOk.assertTrue("Public key not found in validators");
+    };
 
-    Provable.asProver(async () => {
-      const map = new MerkleMap();
+    const notDupValidator12 = Provable.if(useSig1.and(useSig2), Provable.if(validator1.equals(validator2), falseB, trueB), trueB);
+    const notDupValidator13 = Provable.if(useSig1.and(useSig3), Provable.if(validator1.equals(validator3), falseB, trueB),trueB);
+    const notDupValidator23 = Provable.if(useSig2.and(useSig3), Provable.if(validator2.equals(validator3), falseB, trueB), trueB);
 
-      const checkValidator = (useSig: Bool, validator: Secp256k1) => {
-        if (useSig.toBoolean()) {
-          const x = Field.from(validator.x.toBigInt());
-          const y = Field.from(validator.y.toBigInt());
-          let yMap = map.get(x);
-          yMap.assertNotEquals(y);
-          map.set(x, y);
-        }
-      };
+    const isDuplicate = Provable.if(
+      notDupValidator12.and(notDupValidator13).and(notDupValidator23),
+      falseB,
+      trueB,
+    );
 
-      checkValidator(useSig1, validator_1);
-      checkValidator(useSig2, validator_2);
-      checkValidator(useSig3, validator_3);
-    })
-    
-    if (this.isValidator(validator_1, useSig1).toBoolean()) {
-      count = count.add(1);
-    }
-    if (this.isValidator(validator_2, useSig2).toBoolean()) {
-      count = count.add(1);
-    }
-    if (this.isValidator(validator_3, useSig3).toBoolean()) {
-      count = count.add(1);
-    }
-    Provable.log("count", count);
-   
-    count.assertGreaterThanOrEqual(this.threshold.getAndRequireEquals(), "Not enough validators");
+    isDuplicate.assertFalse("Duplicate validator keys");
+
+    count = Provable.if(useSig1, count.add(1), count);
+    count = Provable.if(useSig2, count.add(1), count);
+    count = Provable.if(useSig3, count.add(1), count);
+    count.assertGreaterThanOrEqual(this.threshold.getAndRequireEquals(), "Not reached threshold");
+
   }
 
-  public async validateSig(msg: Bytes256, signature: Ecdsa, validator: Secp256k1, useSig: Bool) {
-    let isValid = Bool(false);
-    Provable.asProver(async () => {
-      if (useSig.toBoolean()) {
-        isValid = await this.validateMsg(msg, signature, validator);
-        Provable.log("validateMsg isValid", isValid);
-        isValid.assertTrue("Invalid signature for validator");
-      }
-    })
-    
+  public async validateSig(msg: Field[], signature: Signature, validator: PublicKey, useSig: Bool) {
+    let isValidSig = signature.verify(validator, msg);
+    const isValid = Provable.if(useSig, isValidSig, Bool(true));
+    isValid.assertTrue("Invalid signature");
   }
 
-  public async validateMsg(message: Bytes32, signature: Ecdsa, publicKey: Secp256k1): Promise<Bool> {
-    let proof = await signature.verifyV2(message, publicKey);
-    Provable.log("proof", proof);
-    return proof;
+  public async verifyMsg(publicKey: PublicKey, msg: Field[], sig: Signature) {
+    const isOk = await sig.verify(publicKey, msg);
+    Provable.log("isOk", isOk.toString());
   }
 
 }
