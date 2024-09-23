@@ -104,9 +104,9 @@ const validator3Privkey = PrivateKey.fromBase58(allConfig.validator_3.privateKey
 const validator1 = validator1Privkey.toPublicKey();
 const validator2 = validator2Privkey.toPublicKey();
 const validator3 = validator3Privkey.toPublicKey();
-let amount = UInt64.from(2000000000000);
+let amount = UInt64.from(2000000000);
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let receiver = PublicKey.fromBase58("B62qjWwgHupW7k7fcTbb2Kszp4RPYBWYdL4KMmoqfkMH3iRN2FN8u5n");
+let receiver = PublicKey.fromBase58("B62qr28GA4raLgQJ5qKUPWXhqiYrvKNUfYc4LH68Wy5Wfz4siHsAMns");
 const msg = [
     ...receiver.toFields(),
     ...amount.toFields(),
