@@ -54,37 +54,72 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 
 const allConfig = 
 {
+  // token: {
+  //   privateKey: 'EKFJCJnfuv85kSqrNyqMxhCJzCqKYrJ9Gd6Q7Laakvh6DcoAA8D4',
+  //   publicKey: 'B62qkuPGhLfrD12buqho48hSnc3DMGQ1d4ugzNjtYuRmSi5vvAjoZRz'
+  // },
+  // adminContract: {
+  //   privateKey: 'EKFWVTP5cmdkeu3n3TEHo5jEToo2YVLiJCWR4zjbpavAJV4eSpUt',
+  //   publicKey: 'B62qqY8QRCbTbUM2Va3Lzn91EZKWWFaobX5KhFmpbve4wzvgo7ZER9A'
+  // },
+  // bridgeContract: {
+  //   privateKey: 'EKFVE4fiRtBgdkKgffRzcNHZ6GJmkg95mWEDatmJ3ZueGgZg5K4W',
+  //   publicKey: 'B62qqKFZav5StzHmRkaU21Mw34CgGu5fWCsdGcCuxdgjZb3MSrxo67Q'
+  // },
+  // managerContract: {
+  //   privateKey: 'EKEmiXywqnKC8vWXko8ktKnGbYbQqmCHfrZ7YRbKRZEr1PREcDNN',
+  //   publicKey: 'B62qpTBL7K2NEYfiW5jLr4p8iY3x1kccyMETFi7ZUwFor5Viw337ivd'
+  // },
+  // validatorManagerContract: {
+  //   privateKey: 'EKEfwksv72JHarTSZAXgeSwcZGejvRkcdVmPQ7mujtczv2gJhQU6',
+  //   publicKey: 'B62qnFAsrYfqgRk8MD8F5Lbpi6RdqkEb7wqJjYhQk3NbC2mQmjcFGJ1'
+  // },
+  // validator_1: {
+  //   privateKey: 'EKE8MzLKBQQn3v53v6JSCXHRPvrTwAB6xytnxYfpATgYnX17bMeM',
+  //   publicKey: 'B62qnatDbNraYYPAnUYW1rGpS5tzXsGzLvyPebafNseYgNrHF83eu7d'
+  // },
+  // validator_2: {
+  //   privateKey: 'EKF3PE1286RVzZNgieYeDw96LrMKc6V2szhvV2zyj2Z9qLwzc1SG',
+  //   publicKey: 'B62qroF6gTiaDNBqFETV2wPWmdVxufxaQHr3gKSGqh9U4tXVYjJZsVc'
+  // },
+  // validator_3: {
+  //   privateKey: 'EKEqLGiiuaZwAV5XZeWGWBsQUmBCXAWR5zzq2vZtyCXou7ZYwryi',
+  //   publicKey: 'B62qjM9WyCn9BK2jyv6KkuLeXqiWsvaFPNtkNt9snt7U1TKxcZq9q7P'
+  // }
+
+
+
   token: {
-    privateKey: 'EKFJCJnfuv85kSqrNyqMxhCJzCqKYrJ9Gd6Q7Laakvh6DcoAA8D4',
-    publicKey: 'B62qkuPGhLfrD12buqho48hSnc3DMGQ1d4ugzNjtYuRmSi5vvAjoZRz'
+    privateKey: 'EKEcoMWrsTBfoGnathz7BRYbUNET7QRvSWUd2Z4VNU7cgKshCLsZ',
+    publicKey: 'B62qqKNnNRpCtgcBexw5khZSpk9K2d9Z7Wzcyir3WZcVd15Bz8eShVi'
   },
   adminContract: {
-    privateKey: 'EKFWVTP5cmdkeu3n3TEHo5jEToo2YVLiJCWR4zjbpavAJV4eSpUt',
-    publicKey: 'B62qqY8QRCbTbUM2Va3Lzn91EZKWWFaobX5KhFmpbve4wzvgo7ZER9A'
+    privateKey: 'EKDqtw3oZcjNzZi9tBVyRB3RcXeCwXRi7CLyaZHfW9Zf1i3bmEWm',
+    publicKey: 'B62qoee93ggvKcm9t9fGVnEMLFbLtAtL2NzKoZLNGEFG5hWB6wyEXZB'
   },
   bridgeContract: {
-    privateKey: 'EKFVE4fiRtBgdkKgffRzcNHZ6GJmkg95mWEDatmJ3ZueGgZg5K4W',
-    publicKey: 'B62qqKFZav5StzHmRkaU21Mw34CgGu5fWCsdGcCuxdgjZb3MSrxo67Q'
+    privateKey: 'EKF3KdEnYJui1dhRgLTfiQAVUVddUybU1e9bZnpYYDGFVwhWWZH3',
+    publicKey: 'B62qpeJGDMHp36rqyvfxHmjmHEZk7a7ryq2nCFFHkGHRMqXqkq5F2VS'
   },
   managerContract: {
-    privateKey: 'EKEmiXywqnKC8vWXko8ktKnGbYbQqmCHfrZ7YRbKRZEr1PREcDNN',
-    publicKey: 'B62qpTBL7K2NEYfiW5jLr4p8iY3x1kccyMETFi7ZUwFor5Viw337ivd'
+    privateKey: 'EKE5q5WTPDaBdRghfwcfEF2HeS7Sf4S1QQwspTUM1Szd72bHmdQo',
+    publicKey: 'B62qpzVF3Kv2r6bzUwrKDdUsgjduEQUYwdpy7yQCxq5MPBGr8A1cB8x'
   },
   validatorManagerContract: {
-    privateKey: 'EKEfwksv72JHarTSZAXgeSwcZGejvRkcdVmPQ7mujtczv2gJhQU6',
-    publicKey: 'B62qnFAsrYfqgRk8MD8F5Lbpi6RdqkEb7wqJjYhQk3NbC2mQmjcFGJ1'
+    privateKey: 'EKDoyqLeJfSKWFqL6JUV47uq3vW96egaTJPJPoSmNMrMrTCSVmnh',
+    publicKey: 'B62qpF6RVH1huSrXjfcxhNhnSNK3f8ZxgC2fQ2rTok4LSxYZKGBEz79'
   },
   validator_1: {
-    privateKey: 'EKE8MzLKBQQn3v53v6JSCXHRPvrTwAB6xytnxYfpATgYnX17bMeM',
-    publicKey: 'B62qnatDbNraYYPAnUYW1rGpS5tzXsGzLvyPebafNseYgNrHF83eu7d'
+    privateKey: 'EKE13it8YUCmD59RbCjumdnt7C155zVGJvCH6gsFUgMh3nXY5Ev4',
+    publicKey: 'B62qkQ96hyWcc5tyjhN2Qda5X2DfFgVC14ELLAaQTjkpQdveZExK5H9'
   },
   validator_2: {
-    privateKey: 'EKF3PE1286RVzZNgieYeDw96LrMKc6V2szhvV2zyj2Z9qLwzc1SG',
-    publicKey: 'B62qroF6gTiaDNBqFETV2wPWmdVxufxaQHr3gKSGqh9U4tXVYjJZsVc'
+    privateKey: 'EKETXTSiv6DvSUQErrz8t1AEtsgoT6j2uCAP82HryqjPfNPmDSoE',
+    publicKey: 'B62qnqGrRCgzsRTLjvWsaaKuoWmiShmZhJgZ5Km1oef5R4gNh2ZefWw'
   },
   validator_3: {
-    privateKey: 'EKEqLGiiuaZwAV5XZeWGWBsQUmBCXAWR5zzq2vZtyCXou7ZYwryi',
-    publicKey: 'B62qjM9WyCn9BK2jyv6KkuLeXqiWsvaFPNtkNt9snt7U1TKxcZq9q7P'
+    privateKey: 'EKF2w9AivRXgJefeBV4wErmgBKUYChDwhnK46YBkVwbhEvviYbeg',
+    publicKey: 'B62qq8614KZCuDM7cVScqBLPiLmqLrhVxBt9mRwy95aCZDsbCjfQx8v'
   }
 }
 
@@ -145,10 +180,10 @@ const validator2 = validator2Privkey.toPublicKey();
 const validator3 = validator3Privkey.toPublicKey();
 
 
-let amount = UInt64.from(2_000_000_000);
+let amount = UInt64.from(200_000_000_000);
 
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let receiver = PublicKey.fromBase58("B62qr28GA4raLgQJ5qKUPWXhqiYrvKNUfYc4LH68Wy5Wfz4siHsAMns");
+let receiver = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
 const msg = [
   ...receiver.toFields(),
   ...amount.toFields(),
@@ -165,7 +200,7 @@ try {
   let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+      // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
       await bridgeContract.unlock(
         amount,
         receiver,

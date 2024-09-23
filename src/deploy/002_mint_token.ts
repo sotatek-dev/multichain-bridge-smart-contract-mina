@@ -147,7 +147,7 @@ const validator3 = validator3Privkey.toPublicKey();
 
 let amount = UInt64.from(2_000_000_000);
 
-// let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
+let receiver1 = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
 let receiver = PublicKey.fromBase58("B62qr28GA4raLgQJ5qKUPWXhqiYrvKNUfYc4LH68Wy5Wfz4siHsAMns");
 const msg = [
   ...receiver.toFields(),
@@ -158,15 +158,28 @@ const signature = await Signature.create(validator1Privkey, msg);
 
 let sentTx;
 // compile the contract to create prover keys
-await fetchAccount({publicKey: feepayerAddress});
+await fetchAccount({publicKey: tokenAddress});
+await fetchAccount({publicKey: receiver});
+await fetchAccount({publicKey: receiver1});
+
+const tokenId = token.tokenId;
+console.log("🚀 ~ tokenId:", tokenId.toString())
+
+
+const has = await Mina.hasAccount(receiver, tokenId);
+console.log("🚀 ~ has:", has)
+
+const has1 = await Mina.hasAccount(receiver1, tokenId);
+console.log("🚀 ~ has1:", has1)
+
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
   let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      await token.mint(receiver, amount);
+      // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+      // await token.mint(receiver, amount);
       
     }
   );
