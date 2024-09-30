@@ -138,7 +138,7 @@ const validator2 = validator2Privkey.toPublicKey();
 const validator3 = validator3Privkey.toPublicKey();
 let amount = UInt64.from(200000000000);
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let receiver = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
+let receiver = PublicKey.fromBase58("B62qkrmYG3iGanZWAT3xf6rEsFXcQfyNcFcwRNyCPPm6F3wYLcf4Dav");
 const msg = [
     ...receiver.toFields(),
     ...amount.toFields(),
