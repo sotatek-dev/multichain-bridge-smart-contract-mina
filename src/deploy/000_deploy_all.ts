@@ -60,6 +60,7 @@ let validatorManagerKey = PrivateKey.random();
 const validator1Key = PrivateKey.random();
 const validator2Key = PrivateKey.random();
 const validator3Key = PrivateKey.random();
+const adminKey = PrivateKey.random();
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -94,6 +95,7 @@ let validatorManagerAddress = validatorManagerKey.toPublicKey();
 const validator1Address = validator1Key.toPublicKey();
 const validator2Address = validator2Key.toPublicKey();
 const validator3Address = validator3Key.toPublicKey();
+const adminAddress = adminKey.toPublicKey();
 
 const token = new FungibleToken(tokenAddress)
 const adminContract = new FungibleTokenAdmin(adminContractAddress)
@@ -131,7 +133,7 @@ try {
             )
 
             await managerContract.deploy({
-              _admin: feepayerAddress,
+              _admin: adminAddress,
               _minter: feepayerAddress,
             })
 
@@ -172,6 +174,8 @@ const keysToSave = [
   { name: 'validator_1', privateKey: validator1Key, publicKey: validator1Address },
   { name: 'validator_2', privateKey: validator2Key, publicKey: validator2Address },
   { name: 'validator_3', privateKey: validator3Key, publicKey: validator3Address },
+  { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
+  { name: 'minter', privateKey: feepayerKey, publicKey: feepayerAddress },
 ];
 
 const allKeys = {};

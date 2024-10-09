@@ -127,7 +127,7 @@ export class Bridge extends SmartContract {
     sig3: Signature,
   ) {
     const managerZkapp = new Manager(this.manager.getAndRequireEquals());
-    managerZkapp.isAdmin(this.sender.getAndRequireSignature());
+    managerZkapp.isMinter(this.sender.getAndRequireSignature());
     const msg = [
       ...receiver.toFields(),
       ...amount.toFields(),

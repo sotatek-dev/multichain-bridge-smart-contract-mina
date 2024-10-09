@@ -84,7 +84,7 @@ export class Bridge extends SmartContract {
     }
     async unlock(amount, receiver, id, tokenAddr, useSig1, validator1, sig1, useSig2, validator2, sig2, useSig3, validator3, sig3) {
         const managerZkapp = new Manager(this.manager.getAndRequireEquals());
-        managerZkapp.isAdmin(this.sender.getAndRequireSignature());
+        managerZkapp.isMinter(this.sender.getAndRequireSignature());
         const msg = [
             ...receiver.toFields(),
             ...amount.toFields(),

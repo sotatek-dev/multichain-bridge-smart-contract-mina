@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -62,36 +62,36 @@ const allConfig = {
     //   publicKey: 'B62qjM9WyCn9BK2jyv6KkuLeXqiWsvaFPNtkNt9snt7U1TKxcZq9q7P'
     // }
     token: {
-        privateKey: 'EKEcoMWrsTBfoGnathz7BRYbUNET7QRvSWUd2Z4VNU7cgKshCLsZ',
-        publicKey: 'B62qqKNnNRpCtgcBexw5khZSpk9K2d9Z7Wzcyir3WZcVd15Bz8eShVi'
+        privateKey: 'EKEEFU8sfqUGWUpvGpwAwAP3vk2RKz36Mc8GHgVALwkDZB9e3SsT',
+        publicKey: 'B62qm9LkCc1ZHNmMEGkP6kUMhAoGaoytDwWY5eYJs7gdVfktoSTVQ1f'
     },
     adminContract: {
-        privateKey: 'EKDqtw3oZcjNzZi9tBVyRB3RcXeCwXRi7CLyaZHfW9Zf1i3bmEWm',
-        publicKey: 'B62qoee93ggvKcm9t9fGVnEMLFbLtAtL2NzKoZLNGEFG5hWB6wyEXZB'
+        privateKey: 'EKDrWNdHqurFfr5uX8rpSedoXFXdxqZgKWBMgHkWYMBdHCaAsmWB',
+        publicKey: 'B62qmTbjCd1oZDhbqQ5p3jZbAgcuoH1bjJxnjWe71eAp1mR5Kq91TNE'
     },
     bridgeContract: {
-        privateKey: 'EKF3KdEnYJui1dhRgLTfiQAVUVddUybU1e9bZnpYYDGFVwhWWZH3',
-        publicKey: 'B62qpeJGDMHp36rqyvfxHmjmHEZk7a7ryq2nCFFHkGHRMqXqkq5F2VS'
+        privateKey: 'EKEA3DBZe8nVUiENFoXjJzwXxKhAhg49PnWMTAb3ZDrMNRFmFpxt',
+        publicKey: 'B62qqeNd3TyZ9QF5iavAWuknb6aekPEbbmsVVWEqrMTCHwXe2Qs2m8c'
     },
     managerContract: {
-        privateKey: 'EKE5q5WTPDaBdRghfwcfEF2HeS7Sf4S1QQwspTUM1Szd72bHmdQo',
-        publicKey: 'B62qpzVF3Kv2r6bzUwrKDdUsgjduEQUYwdpy7yQCxq5MPBGr8A1cB8x'
+        privateKey: 'EKDmvKKcFRmL8fNNw1VPkPX8YAviRNkKAF2XmN2tREyGaH6sUPdg',
+        publicKey: 'B62qrfKSBinPkFtKHVdPV3YWEY3kGpxeqr6NuVfLYsFyhbGQnHfU9V1'
     },
     validatorManagerContract: {
-        privateKey: 'EKDoyqLeJfSKWFqL6JUV47uq3vW96egaTJPJPoSmNMrMrTCSVmnh',
-        publicKey: 'B62qpF6RVH1huSrXjfcxhNhnSNK3f8ZxgC2fQ2rTok4LSxYZKGBEz79'
+        privateKey: 'EKDujGrhRm4KZL1knZixeWh3SqKuZ3zzZ64towMVfNxrTUQtHroF',
+        publicKey: 'B62qpbfiWeaaVxp5pCcTJcqNB7J4VUdjWtLeMW1q3bttS6MQPYGBVHm'
     },
     validator_1: {
-        privateKey: 'EKE13it8YUCmD59RbCjumdnt7C155zVGJvCH6gsFUgMh3nXY5Ev4',
-        publicKey: 'B62qkQ96hyWcc5tyjhN2Qda5X2DfFgVC14ELLAaQTjkpQdveZExK5H9'
+        privateKey: 'EKFFGXqXihrCA3VSzg9dWP8Us2edn9TmrtFBAdPNiqNXH2Q9rvYL',
+        publicKey: 'B62qk6fbtU78qjR96BgBXwxa7w4DYyGACkswjX7D8sqjTCocFdGLyxV'
     },
     validator_2: {
-        privateKey: 'EKETXTSiv6DvSUQErrz8t1AEtsgoT6j2uCAP82HryqjPfNPmDSoE',
-        publicKey: 'B62qnqGrRCgzsRTLjvWsaaKuoWmiShmZhJgZ5Km1oef5R4gNh2ZefWw'
+        privateKey: 'EKFb1kXLEpCTZHnbqPutuVGA2GGKemmJPUc5ubPsLKG9VWWKArCu',
+        publicKey: 'B62qjAqhhmTR2Ser2SGD7rqerqHHgAtV3TJkqkmPVWhm5o64DxijJtW'
     },
     validator_3: {
-        privateKey: 'EKF2w9AivRXgJefeBV4wErmgBKUYChDwhnK46YBkVwbhEvviYbeg',
-        publicKey: 'B62qq8614KZCuDM7cVScqBLPiLmqLrhVxBt9mRwy95aCZDsbCjfQx8v'
+        privateKey: 'EKFVYzL6wrxajadxKsZZb3vAUHUw1k8g6vGDxDjiR3SSUvNNjWKn',
+        publicKey: 'B62qkrRnBFNWN6A6rwfA9RNyRLSTinnxtsHnQA5P1itTR6WzrA33Gxj'
     }
 };
 let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
@@ -152,7 +152,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        await AccountUpdate.fundNewAccount(feepayerAddress, 1);
         await bridgeContract.unlock(amount, receiver, UInt64.from(1), tokenAddress, Bool(true), validator1, signature, Bool(false), validator2, signature, Bool(false), validator3, signature);
     });
     await tx.prove();
