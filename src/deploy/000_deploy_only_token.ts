@@ -27,7 +27,7 @@ Usage:
 node build/src/interact.js <deployAlias>
 `);
 
-const project_alias = "env_" + deployAlias;
+const project_alias = deployAlias;
 
 // parse config and private key from file
 type Config = {

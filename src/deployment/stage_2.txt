@@ -1,0 +1,42 @@
+{
+    token: {
+      privateKey: 'EKE8YwVKgpkHks4uqjB2h3MgEGZBefY76dsvxp6w9GGDM9i3rnxg',
+      publicKey: 'B62qkop41jFsYh3MVRwacLvFoGCbPkBMCdPncaDfdx1tfGxmgZSrm6u'
+    },
+    adminContract: {
+      privateKey: 'EKEHkng5BzEZTsAaeANQ7uXSrk2rY6UBVZaF8SfwakqLyAxohZmc',
+      publicKey: 'B62qmvhHuyiZjKeHnKs7P2KaXHAi2H2j7ZcV5YKyf6SbcPa2CSiA3Th'
+    },
+    bridgeContract: {
+      privateKey: 'EKEFUsGAPWmhjwiKWq4vbewQBmQSWSAo3diKWYYf5Ss9Ss3ZmAi5',
+      publicKey: 'B62qmhCKWHDEK6Pr5AMH55J8xe8HSh9ekMDYiT6hNP8PjkoCCDHYDSB'
+    },
+    managerContract: {
+      privateKey: 'EKEspxLYuhQHug26vSoyy4Rm3c6o1Ru4tXj4piL6jnCgZLvruQNh',
+      publicKey: 'B62qqj2FBQFEZrUZ2r5et37wDKDRShZ9jZVRPfjs92vik2UkW8G6niR'
+    },
+    validatorManagerContract: {
+      privateKey: 'EKEPeEDT67nzs4uxW9CXMxBdyXupZUK4TJhW5J5Kk9NeHWLuJ3CX',
+      publicKey: 'B62qjjvwGCmo7A3Xw9zmMAzAmjvE4WTvvhT8j87L5S6cw1JaW472zve'
+    },
+    validator_1: {
+      privateKey: 'EKDqBq812SkDsoPvQxTWHiYCboJuuNuYRvLAW2N1gY4pjNN3ewpu',
+      publicKey: 'B62qjbHgZkC8a8xrVNVKLc99R3178TRYyAhaW3xzXqM3DEZ8mQyxYfj'
+    },
+    validator_2: {
+      privateKey: 'EKFAEMZLGXJrxFZM9MvJMSThH5qWGuCtqiS6QrYmPkuyWKeefMEJ',
+      publicKey: 'B62qkzbJYYfT9ugG35rBvyqL57k7wVdxN87msUSiEdYi8E1E55UNrrr'
+    },
+    validator_3: {
+      privateKey: 'EKEa51brGpYWh4TR25jXNShH1Xug5ap1Emb1yN8pFGy4mP4dNpvp',
+      publicKey: 'B62qiikDSN4Xv2LaBb18CdaZbUivEKwMFyoJogdET3LFx3TStLS1DBW'
+    },
+    admin: {
+      privateKey: 'EKFUXpkiJtg3SUMM6iWzH9Ju4tRLAYoa5HcPnpkE7jw6TYA5P9eG',
+      publicKey: 'B62qrehYuKD6ugygLcbaySm3fDuKs8Dk7ChFUrbitYNWvj7qP9Li6JM'
+    },
+    minter: {
+      privateKey: 'EKDthADs5hqqXBg3vd4Nj2PHLQoXGqaTVnAEC5CzivmHJ51d66RE',
+      publicKey: 'B62qrHd4Wg8z6N6tCC9pVtRtxEuBXLWPH61gbcgotURdiU1rSURMdFB'
+    }
+}

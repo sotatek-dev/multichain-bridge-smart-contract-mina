@@ -195,14 +195,7 @@ const validator3 = validator3Privkey.toPublicKey();
 let amount = UInt64.from(200_000_000_000);
 
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let receiver = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
-const msg = [
-  ...receiver.toFields(),
-  ...amount.toFields(),
-  ...tokenAddress.toFields(),
-]
-const signature = await Signature.create(validator1Privkey, msg);
-
+let newMinterPubKey = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
 let sentTx;
 // compile the contract to create prover keys
 await fetchAccount({publicKey: feepayerAddress});
@@ -212,27 +205,12 @@ try {
   let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      await bridgeContract.unlock(
-        amount,
-        receiver,
-        UInt64.from(1),
-        tokenAddress,
-        Bool(true),
-        validator1,
-        signature,
-        Bool(false),
-        validator2,
-        signature,
-        Bool(false),
-        validator3,
-        signature,
-      );
+      await managerContract.changeMinter(newMinterPubKey);
     }
   );
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, bridgeContractKey]).send();
+  sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
   console.log(err);
 }

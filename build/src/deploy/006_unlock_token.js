@@ -27,7 +27,6 @@ const project_alias = "env_" + deployAlias;
 let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
 let config = configJson.deployAliases[project_alias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
-let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 const allConfig = {
     // token: {
     //   privateKey: 'EKFJCJnfuv85kSqrNyqMxhCJzCqKYrJ9Gd6Q7Laakvh6DcoAA8D4',
@@ -62,38 +61,47 @@ const allConfig = {
     //   publicKey: 'B62qjM9WyCn9BK2jyv6KkuLeXqiWsvaFPNtkNt9snt7U1TKxcZq9q7P'
     // }
     token: {
-        privateKey: 'EKEEFU8sfqUGWUpvGpwAwAP3vk2RKz36Mc8GHgVALwkDZB9e3SsT',
-        publicKey: 'B62qm9LkCc1ZHNmMEGkP6kUMhAoGaoytDwWY5eYJs7gdVfktoSTVQ1f'
+        privateKey: 'EKDn5QRDi16RbgWoQCbvqzo1XF4B6TDd2WmXF8r5YpYimR5NxQ5g',
+        publicKey: 'B62qjM88vh9bmR24QTRqJBurdJ8pWKbuPMtmTohiDtdmQEAdPzsBrif'
     },
     adminContract: {
-        privateKey: 'EKDrWNdHqurFfr5uX8rpSedoXFXdxqZgKWBMgHkWYMBdHCaAsmWB',
-        publicKey: 'B62qmTbjCd1oZDhbqQ5p3jZbAgcuoH1bjJxnjWe71eAp1mR5Kq91TNE'
+        privateKey: 'EKE2BwhPwhpjzRCsFQehCKV9qrLmFjV37HM5JMPpgFjoDrZWj1BX',
+        publicKey: 'B62qjBb8Wh9aW66yKZQng7FiZXVtu2nQdhSXYRGS9KwL6iNnN6nhq15'
     },
     bridgeContract: {
-        privateKey: 'EKEA3DBZe8nVUiENFoXjJzwXxKhAhg49PnWMTAb3ZDrMNRFmFpxt',
-        publicKey: 'B62qqeNd3TyZ9QF5iavAWuknb6aekPEbbmsVVWEqrMTCHwXe2Qs2m8c'
+        privateKey: 'EKF19hihcXry9QMttf719fVp56DuRB2vZySdeQ1y9BkkvWWxnJAa',
+        publicKey: 'B62qmL9EHYMWJHhbLg2oVRqVJ7i9hEYx6u9qRPGRaq8iyrYFyAAiTc2'
     },
     managerContract: {
-        privateKey: 'EKDmvKKcFRmL8fNNw1VPkPX8YAviRNkKAF2XmN2tREyGaH6sUPdg',
-        publicKey: 'B62qrfKSBinPkFtKHVdPV3YWEY3kGpxeqr6NuVfLYsFyhbGQnHfU9V1'
+        privateKey: 'EKFJTWVcq6Qixm9s2guG2yXh7adbP9jX8ZpVYhkDf8NvhvoFadPY',
+        publicKey: 'B62qqP6TrYTCXrM7p2HmrLHpP41nwgb4iykf1sdpkFCo4NJD2AxK51r'
     },
     validatorManagerContract: {
-        privateKey: 'EKDujGrhRm4KZL1knZixeWh3SqKuZ3zzZ64towMVfNxrTUQtHroF',
-        publicKey: 'B62qpbfiWeaaVxp5pCcTJcqNB7J4VUdjWtLeMW1q3bttS6MQPYGBVHm'
+        privateKey: 'EKEeeKpgQWwcp2hGyATAgK1EshbaYiNZWfAyiheDzCXaJntLV5ma',
+        publicKey: 'B62qnTKW4ogzzioZ9ApynRE8f4vjPnoFbhs4ANokSRHA7CBhRgpxCs9'
     },
     validator_1: {
-        privateKey: 'EKFFGXqXihrCA3VSzg9dWP8Us2edn9TmrtFBAdPNiqNXH2Q9rvYL',
-        publicKey: 'B62qk6fbtU78qjR96BgBXwxa7w4DYyGACkswjX7D8sqjTCocFdGLyxV'
+        privateKey: 'EKEo6bA2EsKgHEXoqogccvX6iTwdiGZfHijyMn7xmUXj7CG5e47m',
+        publicKey: 'B62qnXpFWCh3wg1ZjiJgoxYFdiwmnsMCZ313DyWFua6ZYcfSyKH1qYH'
     },
     validator_2: {
-        privateKey: 'EKFb1kXLEpCTZHnbqPutuVGA2GGKemmJPUc5ubPsLKG9VWWKArCu',
-        publicKey: 'B62qjAqhhmTR2Ser2SGD7rqerqHHgAtV3TJkqkmPVWhm5o64DxijJtW'
+        privateKey: 'EKEMpP9tfvkH4t5HrLUnySzK16ZJMVxmCLHVgiY9LQtzfRXigxMW',
+        publicKey: 'B62qk5QZLop9UQoCkj81DRNHmXVLmVn5ccRmng7RrTi4u6ChUUEvUGi'
     },
     validator_3: {
-        privateKey: 'EKFVYzL6wrxajadxKsZZb3vAUHUw1k8g6vGDxDjiR3SSUvNNjWKn',
-        publicKey: 'B62qkrRnBFNWN6A6rwfA9RNyRLSTinnxtsHnQA5P1itTR6WzrA33Gxj'
+        privateKey: 'EKE7SCvSR7oDoKrNs6LFMi1XdaYhHxVqcpeUuYWZcsBHjDGZbHmS',
+        publicKey: 'B62qpjFBgyNWv4RAroZTnypqMaYjhqWv7ppduHzoTHhmvwVajho6dPq'
+    },
+    admin: {
+        privateKey: 'EKENccWLj2Tvgiuw29EeGARh4APVJHZc7d1DjMKQuHNQxpjPTPqb',
+        publicKey: 'B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7'
+    },
+    minter: {
+        privateKey: 'EKEhzBN7hxnCnki7xqYa72vkagwC4quoANYPXtRrKwDsVznxMgvu',
+        publicKey: 'B62qrCAYXUuRLg9CY9QbNRW8b7hXLkN9JY3QdNhfNmXBD2xF88JU4MH'
     }
 };
+let feepayerKey = PrivateKey.fromBase58(allConfig.minter.privateKey);
 let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
 let adminContractKey = PrivateKey.fromBase58(allConfig["adminContract"].privateKey);
 let bridgeContractKey = PrivateKey.fromBase58(allConfig["bridgeContract"].privateKey);
@@ -115,6 +123,10 @@ await Manager.compile();
 await ValidatorManager.compile();
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58());
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields());
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[0].toString());
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[1].toString());
 let tokenAddress = tokenKey.toPublicKey();
 let adminContractAddress = adminContractKey.toPublicKey();
 let bridgeAddress = bridgeContractKey.toPublicKey();
@@ -138,7 +150,7 @@ const validator2 = validator2Privkey.toPublicKey();
 const validator3 = validator3Privkey.toPublicKey();
 let amount = UInt64.from(200000000000);
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let receiver = PublicKey.fromBase58("B62qkrmYG3iGanZWAT3xf6rEsFXcQfyNcFcwRNyCPPm6F3wYLcf4Dav");
+let receiver = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
 const msg = [
     ...receiver.toFields(),
     ...amount.toFields(),

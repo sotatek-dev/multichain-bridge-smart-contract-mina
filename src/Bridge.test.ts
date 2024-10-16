@@ -292,58 +292,73 @@ describe("Bridge", () => {
     })
 
 
-    // it('unlock from with one signature ', async () => {
-    //     const normalUserBalance = await token.getBalanceOf(normalUserPubkey);
-    //     console.log("balance:", normalUserBalance.toString());
+    it('set amount limits', async () => {
+        const newMin = UInt64.from(10);
+        const newMax = UInt64.from(100);
+        let setAmountLimitsTx = await Mina.transaction(adminPubkey, async () => {
+            await bridgeZkapp.setAmountLimits(newMin, newMax);
+        })
+        setAmountLimitsTx.sign([adminUserPrivkey, bridgePrivkey])
+        await setAmountLimitsTx.prove()
+        await setAmountLimitsTx.send()
 
-    //     let amount = UInt64.from(10);
-    //     const msg = [
-    //         ...normalUserPubkey.toFields(),
-    //         ...amount.toFields(),
-    //         ...tokenPubkey.toFields(),
-    //     ]
+    })
 
-    //     let signature1 = Signature.create(validator1Privkey, msg);
-    //     let signature2 = Signature.create(validator2Privkey, msg);
-    //     let signature3 = Signature.create(validator3Privkey, msg);;
+    it('set minter', async () => {
+        const newMinterPrivateKey = PrivateKey.random()
+        const newMinterPubKey = newMinterPrivateKey.toPublicKey();
+        let setMinterTx = await Mina.transaction(adminPubkey, async () => {
+            await managerZkapp.changeMinter(newMinterPubKey);
+        })
+        setMinterTx.sign([adminUserPrivkey])
+        await setMinterTx.prove()
+        await setMinterTx.send()
 
-    //     let unlockTx = await Mina.transaction(userPubkey, async () => {
-    //         await bridgeZkapp.unlock(
-    //             amount,
-    //             normalUserPubkey,
-    //             UInt64.from(1),
-    //             tokenPubkey,
-    //             Bool(true),
-    //             validator1Pubkey,
-    //             signature1,
-    //             Bool(false),
-    //             validator2Pubkey,
-    //             signature2,
-    //             Bool(false),
-    //             validator3Pubkey,
-    //             signature3,
-    //         );
-    //     })
-    //     unlockTx.sign([userPrivkey, bridgePrivkey])
-    //     await unlockTx.prove()
-    //     await unlockTx.send()
-    
+    })
 
+    it('set validator', async () => {
+        const newVal1Priv = PrivateKey.random()
+        const newVal2Priv = PrivateKey.random()
+        const newVal3Priv = PrivateKey.random()
+        const newVal1Pub = newVal1Priv.toPublicKey();
+        const newVal2Pub = newVal2Priv.toPublicKey();
+        const newVal3Pub = newVal3Priv.toPublicKey();
 
-    //     const beforeLockBalance = await token.getBalanceOf(normalUserPubkey);
-    //     console.log("before lock balance:", beforeLockBalance.toString());
+        let setValidatorTx = await Mina.transaction(adminPubkey, async () => {
+            await validatorZkapp.changeValidator(newVal1Pub, newVal2Pub, newVal3Pub);
+        })
+        setValidatorTx.sign([adminUserPrivkey])
+        await setValidatorTx.prove()
+        await setValidatorTx.send()
 
+        const isValidator1 = await validatorZkapp.isValidator(newVal1Pub);
+        isValidator1.assertTrue("New validator 1 is not registered");
 
-    //     let lockTx = await Mina.transaction(normalUserPubkey, async () => {
-    //         await bridgeZkapp.lock(UInt64.from(5), Field.from(1), tokenPubkey);
-    //     })
-    //     lockTx.sign([normalUserPrivkey])
-    //     await lockTx.prove()
-    //     await lockTx.send()
+        const isValidator2 = await validatorZkapp.isValidator(newVal2Pub);
+        isValidator2.assertTrue("New validator 2 is not registered");
 
-    //     const afterLockBalance = await token.getBalanceOf(normalUserPubkey);
-    //     console.log("after lock balance:", afterLockBalance.toString());
-    // })
+        const isValidator3 = await validatorZkapp.isValidator(newVal3Pub);
+        isValidator3.assertTrue("New validator 3 is not registered");
+        
+    })
+
+    it('set admin', async () => {
+        const newAdminPrivateKey = Local.testAccounts[9].key;
+        const newAdminPubKey = Local.testAccounts[9];
+        let setMinterTx = await Mina.transaction(adminPubkey, async () => {
+            await managerZkapp.changeAdmin(newAdminPubKey);
+        })
+        setMinterTx.sign([adminUserPrivkey])
+        await setMinterTx.prove()
+        await setMinterTx.send()
+
+        let setMinterTx1 = await Mina.transaction(newAdminPubKey, async () => {
+            await managerZkapp.changeAdmin(adminPubkey);
+        })
+        setMinterTx1.sign([newAdminPrivateKey])
+        await setMinterTx1.prove()
+        await setMinterTx1.send()
+    })
 
     
 })
