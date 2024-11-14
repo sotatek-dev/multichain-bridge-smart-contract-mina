@@ -36,10 +36,17 @@ export class ValidatorManager extends SmartContract {
   }
 
   public getValidatorIndex(p: PublicKey): Field {
-    if (this.compareValidators(p, this.validator1.getAndRequireEquals())) return Field.from(1);
-    if (this.compareValidators(p, this.validator2.getAndRequireEquals())) return Field.from(2);
-    if (this.compareValidators(p, this.validator3.getAndRequireEquals())) return Field.from(3);
-    return Field.from(0);
+    const isValidator1 = this.compareValidators(p, this.validator1.getAndRequireEquals());
+    const isValidator2 = this.compareValidators(p, this.validator2.getAndRequireEquals());
+    const isValidator3 = this.compareValidators(p, this.validator3.getAndRequireEquals());
+
+    return Provable.if(isValidator1, Field(1),
+        Provable.if(isValidator2, Field(2),
+          Provable.if(isValidator3, Field(3),
+            Field(0)
+          )
+        )
+      );
   }
 
   public compareValidators(p1: PublicKey, p2: PublicKey): Bool {

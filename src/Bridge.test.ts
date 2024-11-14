@@ -30,10 +30,6 @@ describe("Bridge", () => {
     const validator3Privkey = Local.testAccounts[5].key
     const validator3Pubkey = Local.testAccounts[5]
 
-    
-
-
-
     const adminContractPrivkey = PrivateKey.random()
     const adminContractPubkey = adminContractPrivkey.toPublicKey()
     const tokenPrivkey = PrivateKey.random()
@@ -67,15 +63,6 @@ describe("Bridge", () => {
     const AMOUNT_SEND = UInt64.from(1_000_000_000n)
     const AMOUNT_WITHDRAW = UInt64.from(3_000_000_000_000_000n)
     const totalSupply = UInt64.from(5_000_000_000_000_000n)
-    // console.log("🚀 ~ beforeAll ~ proofsEnabled:", proofsEnabled);
-    // console.log("🚀 ~ beforeAll ~ userPubkey:", userPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ userPrivkey:", userPrivkey);
-    // console.log("🚀 ~ beforeAll ~ normalUserPubkey:", normalUserPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ normalUserPrivkey:", normalUserPrivkey);
-    // console.log("🚀 ~ beforeAll ~ tokenPubkey:", tokenPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ tokenPrivkey:", tokenPrivkey);
-    // console.log("🚀 ~ beforeAll ~ bridgePubkey:", bridgePubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ bridgePrivkey:", bridgePrivkey);
 
     beforeAll(async () => {
 
