@@ -33,6 +33,8 @@ let adminContractKey = PrivateKey.random();
 let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
+let minter_2 = PrivateKey.random();
+let minter_3 = PrivateKey.random();
 const validator1Key = PrivateKey.random();
 const validator2Key = PrivateKey.random();
 const validator3Key = PrivateKey.random();
@@ -67,6 +69,8 @@ const validator1Address = validator1Key.toPublicKey();
 const validator2Address = validator2Key.toPublicKey();
 const validator3Address = validator3Key.toPublicKey();
 const adminAddress = adminKey.toPublicKey();
+const minter2Address = minter_2.toPublicKey();
+const minter3Address = minter_3.toPublicKey();
 const token = new FungibleToken(tokenAddress);
 const adminContract = new FungibleTokenAdmin(adminContractAddress);
 const bridgeContract = new Bridge(bridgeAddress);
@@ -91,7 +95,9 @@ try {
         await token.initialize(adminContractAddress, UInt8.from(9), Bool(false));
         await managerContract.deploy({
             _admin: adminAddress,
-            _minter: feepayerAddress,
+            _minter_1: feepayerAddress,
+            _minter_2: minter2Address,
+            _minter_3: minter3Address
         });
         await validatorManagerContract.deploy({
             _validator1: validator1Address,

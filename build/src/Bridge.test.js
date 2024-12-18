@@ -46,15 +46,6 @@ describe("Bridge", () => {
     const AMOUNT_SEND = UInt64.from(1000000000n);
     const AMOUNT_WITHDRAW = UInt64.from(3000000000000000n);
     const totalSupply = UInt64.from(5000000000000000n);
-    // console.log("🚀 ~ beforeAll ~ proofsEnabled:", proofsEnabled);
-    // console.log("🚀 ~ beforeAll ~ userPubkey:", userPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ userPrivkey:", userPrivkey);
-    // console.log("🚀 ~ beforeAll ~ normalUserPubkey:", normalUserPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ normalUserPrivkey:", normalUserPrivkey);
-    // console.log("🚀 ~ beforeAll ~ tokenPubkey:", tokenPubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ tokenPrivkey:", tokenPrivkey);
-    // console.log("🚀 ~ beforeAll ~ bridgePubkey:", bridgePubkey.toBase58());
-    // console.log("🚀 ~ beforeAll ~ bridgePrivkey:", bridgePrivkey);
     beforeAll(async () => {
         if (proofsEnabled) {
             await FungibleToken.compile();

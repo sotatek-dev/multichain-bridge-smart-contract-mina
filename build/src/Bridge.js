@@ -106,10 +106,14 @@ export class Bridge extends SmartContract {
         const validatorManager = new ValidatorManager(this.validatorManager.getAndRequireEquals());
         const validateIndex = async (validator, useSig) => {
             const index = await validatorManager.getValidatorIndex(validator);
-            const isGreaterThanZero = index.greaterThan(zero);
-            let isOk = Provable.if(useSig, Provable.if(isGreaterThanZero, trueB, falseB), trueB);
+            const isValidIndex = Provable.if(index.equals(Field(1)), trueB, Provable.if(index.equals(Field(2)), trueB, Provable.if(index.equals(Field(3)), trueB, falseB)));
+            let isOk = Provable.if(useSig, Provable.if(isValidIndex, trueB, falseB), trueB);
             isOk.assertTrue("Public key not found in validators");
         };
+        // Execute validateIndex for each validator
+        await validateIndex(validator1, useSig1);
+        await validateIndex(validator2, useSig2);
+        await validateIndex(validator3, useSig3);
         const notDupValidator12 = Provable.if(useSig1.and(useSig2), Provable.if(validator1.equals(validator2), falseB, trueB), trueB);
         const notDupValidator13 = Provable.if(useSig1.and(useSig3), Provable.if(validator1.equals(validator3), falseB, trueB), trueB);
         const notDupValidator23 = Provable.if(useSig2.and(useSig3), Provable.if(validator2.equals(validator3), falseB, trueB), trueB);

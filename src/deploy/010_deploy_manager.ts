@@ -13,45 +13,11 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, Signature } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
-import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
+import path from 'path';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager, Secp256k1 } from '../index.js';
 
-// check command line arg
-
-let deployAlias = process.argv[2];
-if (!deployAlias)
-  throw Error(`Missing <deployAlias> argument.
-
-Usage:
-node build/src/interact.js <deployAlias>
-`);
-
-const project_alias = "env_" + deployAlias;
-
-// parse config and private key from file
-type Config = {
-  deployAliases: Record<
-    string,
-    {
-      url: string;
-      keyPath: string;
-      fee: string;
-      feepayerKeyPath: string;
-      feepayerAlias: string;
-    }
-  >;
-};
-let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
-
-let config = configJson.deployAliases[project_alias];
-
-let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.feepayerKeyPath, 'utf8')
-);
-
-
-const allConfig =
+const allConfig = 
 {
   // token: {
   //   privateKey: 'EKFJCJnfuv85kSqrNyqMxhCJzCqKYrJ9Gd6Q7Laakvh6DcoAA8D4',
@@ -128,15 +94,12 @@ const allConfig =
   }
 }
 
-let feepayerKey = PrivateKey.fromBase58(allConfig.minter.privateKey);
+let feepayerKey = PrivateKey.fromBase58(allConfig.admin.privateKey);
 
-
-
-let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
-let adminContractKey = PrivateKey.fromBase58(allConfig["adminContract"].privateKey);
-let bridgeContractKey = PrivateKey.fromBase58(allConfig["bridgeContract"].privateKey);
-let managerContractKey = PrivateKey.fromBase58(allConfig["managerContract"].privateKey);
-let validatorManagerContractKey = PrivateKey.fromBase58(allConfig["validatorManagerContract"].privateKey);
+let minter_2 = PrivateKey.random();
+let minter_3 = PrivateKey.random();
+let adminKey = feepayerKey;
+let managerKey = PrivateKey.random();
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -148,74 +111,66 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
-console.log('compile the contract...');
-await FungibleToken.compile();
-await FungibleTokenAdmin.compile();
-await Bridge.compile();
 await Manager.compile();
-await ValidatorManager.compile();
+console.log('compile the validator contract...');
 
 
-const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
+const fee = Number(0.5) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
-console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58())
-console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields());
-console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[0].toString());
-console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[1].toString());
-let tokenAddress = tokenKey.toPublicKey();
-let adminContractAddress = adminContractKey.toPublicKey();
-let bridgeAddress = bridgeContractKey.toPublicKey();
-let managerAddress = managerContractKey.toPublicKey();
-let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
+let managerAddress = managerKey.toPublicKey();
+const adminAddress = adminKey.toPublicKey();
+const minter2Address = minter_2.toPublicKey();
+const minter3Address = minter_3.toPublicKey();
+
+const managerContract = new Manager(managerAddress)
 
 
-const token = new FungibleToken(tokenAddress)
-const adminContract = new FungibleTokenAdmin(adminContractAddress)
-let bridgeContract = new Bridge(bridgeAddress)
-let managerContract = new Manager(managerAddress)
-let validatorManagerContract = new ValidatorManager(validatorManagerAddress)
-
-await fetchAccount({ publicKey: managerAddress });
-await fetchAccount({ publicKey: validatorManagerAddress });
-
-
-const symbol = 'WETH';
-const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
-const supply = UInt64.from(21_000_000_000_000)
-
-
-const validator1Privkey = PrivateKey.fromBase58(allConfig.validator_1.privateKey);
-const validator2Privkey = PrivateKey.fromBase58(allConfig.validator_2.privateKey);
-const validator3Privkey = PrivateKey.fromBase58(allConfig.validator_3.privateKey);
-const validator1 = validator1Privkey.toPublicKey();
-const validator2 = validator2Privkey.toPublicKey();
-const validator3 = validator3Privkey.toPublicKey();
-
-
-let amount = UInt64.from(200_000_000_000);
-
-// let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let newAdminPubkey = PublicKey.fromBase58("B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7");
 let sentTx;
 // compile the contract to create prover keys
-await fetchAccount({ publicKey: feepayerAddress });
+// await fetchAccount({publicKey: feepayerAddress});
 try {
   // call update() and send transaction
-  console.log('build transaction and create proof...');
+  console.log('Deploying...');
   let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
-      await managerContract.changeAdmin(newAdminPubkey);
+      AccountUpdate.fundNewAccount(feepayerAddress, 1)
+            await managerContract.deploy({
+              _admin: adminAddress,
+              _minter_1: feepayerAddress,
+              _minter_2: minter2Address,
+              _minter_3: minter3Address
+            })
+            // await token.mint(feepayerAddress, UInt64.from(1_000_000_000_000));
     }
   );
+  console.log('prove transaction...');
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey]).send();
+  sentTx = await tx.sign([feepayerKey, managerKey]).send();
 } catch (err) {
   console.log(err);
 }
 console.log("=====================txhash: ", sentTx?.hash);
 await sentTx?.wait();
+// Save all private and public keys to a single JSON file
+const keysToSave = [
+  { name: 'managerContract', privateKey: managerKey, publicKey: managerAddress },
+  { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
+  { name: 'minter_1', privateKey: feepayerKey, publicKey: feepayerAddress },
+  { name: 'minter_2', privateKey: minter_2, publicKey: minter2Address },
+  { name: 'minter_3', privateKey: minter_3, publicKey: minter3Address },
+];
+
+const allKeys = {};
+for (const key of keysToSave) {
+  (allKeys as Record<string, { privateKey: string; publicKey: string }>)[key.name] = {
+    privateKey: key.privateKey.toBase58(),
+    publicKey: key.publicKey.toBase58()
+  };
+}
+
+console.log("🚀 ~ allKeys:", allKeys);
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname
