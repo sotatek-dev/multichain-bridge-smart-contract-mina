@@ -56,6 +56,7 @@ let adminContractKey = PrivateKey.random();
 let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
+let minter_1 = PrivateKey.random();
 let minter_2 = PrivateKey.random();
 let minter_3 = PrivateKey.random();
 
@@ -98,6 +99,7 @@ const validator1Address = validator1Key.toPublicKey();
 const validator2Address = validator2Key.toPublicKey();
 const validator3Address = validator3Key.toPublicKey();
 const adminAddress = adminKey.toPublicKey();
+const minter1Address = minter_1.toPublicKey();
 const minter2Address = minter_2.toPublicKey();
 const minter3Address = minter_3.toPublicKey();
 
@@ -112,6 +114,12 @@ const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21_000_000_000_000_000)
 
+
+await fetchAccount({publicKey: tokenAddress});
+await fetchAccount({publicKey: adminAddress});
+await fetchAccount({publicKey: bridgeAddress});
+await fetchAccount({publicKey: managerAddress});
+await fetchAccount({publicKey: validatorManagerAddress});
 
 
 
@@ -138,7 +146,7 @@ try {
 
             await managerContract.deploy({
               _admin: adminAddress,
-              _minter_1: feepayerAddress,
+              _minter_1: minter1Address,
               _minter_2: minter2Address,
               _minter_3: minter3Address
             })
@@ -181,7 +189,9 @@ const keysToSave = [
   { name: 'validator_2', privateKey: validator2Key, publicKey: validator2Address },
   { name: 'validator_3', privateKey: validator3Key, publicKey: validator3Address },
   { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
-  { name: 'minter', privateKey: feepayerKey, publicKey: feepayerAddress },
+  { name: 'minter_1', privateKey: minter_1, publicKey: minter1Address },
+  { name: 'minter_2', privateKey: minter_2, publicKey: minter2Address },
+  { name: 'minter_3', privateKey: minter_3, publicKey: minter3Address },
 ];
 
 const allKeys = {};

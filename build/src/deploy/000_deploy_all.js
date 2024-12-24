@@ -13,7 +13,7 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import { Mina, PrivateKey, AccountUpdate, UInt64, UInt8, Bool } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, UInt64, UInt8, Bool } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager } from '../index.js';
 // check command line arg
 let deployAlias = process.argv[2];
@@ -33,6 +33,7 @@ let adminContractKey = PrivateKey.random();
 let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
+let minter_1 = PrivateKey.random();
 let minter_2 = PrivateKey.random();
 let minter_3 = PrivateKey.random();
 const validator1Key = PrivateKey.random();
@@ -69,6 +70,7 @@ const validator1Address = validator1Key.toPublicKey();
 const validator2Address = validator2Key.toPublicKey();
 const validator3Address = validator3Key.toPublicKey();
 const adminAddress = adminKey.toPublicKey();
+const minter1Address = minter_1.toPublicKey();
 const minter2Address = minter_2.toPublicKey();
 const minter3Address = minter_3.toPublicKey();
 const token = new FungibleToken(tokenAddress);
@@ -79,6 +81,11 @@ const validatorManagerContract = new ValidatorManager(validatorManagerAddress);
 const symbol = 'WETH';
 const src = "https://github.com/MinaFoundation/mina-fungible-token/blob/main/FungibleToken.ts";
 const supply = UInt64.from(21000000000000000);
+await fetchAccount({ publicKey: tokenAddress });
+await fetchAccount({ publicKey: adminAddress });
+await fetchAccount({ publicKey: bridgeAddress });
+await fetchAccount({ publicKey: managerAddress });
+await fetchAccount({ publicKey: validatorManagerAddress });
 let sentTx;
 // compile the contract to create prover keys
 // await fetchAccount({publicKey: feepayerAddress});
@@ -95,7 +102,7 @@ try {
         await token.initialize(adminContractAddress, UInt8.from(9), Bool(false));
         await managerContract.deploy({
             _admin: adminAddress,
-            _minter_1: feepayerAddress,
+            _minter_1: minter1Address,
             _minter_2: minter2Address,
             _minter_3: minter3Address
         });
@@ -135,7 +142,9 @@ const keysToSave = [
     { name: 'validator_2', privateKey: validator2Key, publicKey: validator2Address },
     { name: 'validator_3', privateKey: validator3Key, publicKey: validator3Address },
     { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
-    { name: 'minter', privateKey: feepayerKey, publicKey: feepayerAddress },
+    { name: 'minter_1', privateKey: minter_1, publicKey: minter1Address },
+    { name: 'minter_2', privateKey: minter_2, publicKey: minter2Address },
+    { name: 'minter_3', privateKey: minter_3, publicKey: minter3Address },
 ];
 const allKeys = {};
 for (const key of keysToSave) {

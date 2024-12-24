@@ -175,6 +175,13 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/stage_2.json",
       "feepayerAlias": "stage_2",
       "fee": "0.5"
+    },
+    "env_p2_dev": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/env_p2_dev.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/env_p2_dev.json",
+      "feepayerAlias": "env_p2_dev",
+      "fee": "0.5"
     }
   }
 }
