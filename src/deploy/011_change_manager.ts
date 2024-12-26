@@ -17,10 +17,6 @@ import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8
 import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
 import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
 
-// check command line arg
-
-
-
 const allConfig = 
 {
   // token: {
@@ -65,12 +61,12 @@ const allConfig =
     publicKey: 'B62qjBb8Wh9aW66yKZQng7FiZXVtu2nQdhSXYRGS9KwL6iNnN6nhq15'
   },
   bridgeContract: {
-    privateKey: 'EKF19hihcXry9QMttf719fVp56DuRB2vZySdeQ1y9BkkvWWxnJAa',
-    publicKey: 'B62qmL9EHYMWJHhbLg2oVRqVJ7i9hEYx6u9qRPGRaq8iyrYFyAAiTc2'
+    privateKey: 'EKEFUsGAPWmhjwiKWq4vbewQBmQSWSAo3diKWYYf5Ss9Ss3ZmAi5',
+    publicKey: 'B62qmhCKWHDEK6Pr5AMH55J8xe8HSh9ekMDYiT6hNP8PjkoCCDHYDSB'
   },
   managerContract: {
-    privateKey: 'EKFJTWVcq6Qixm9s2guG2yXh7adbP9jX8ZpVYhkDf8NvhvoFadPY',
-    publicKey: 'B62qqP6TrYTCXrM7p2HmrLHpP41nwgb4iykf1sdpkFCo4NJD2AxK51r'
+    privateKey: 'EKFUKpR5Nbj82QQHEZQ2qQs45ujNqyQiG1LFnGYVKpgVxi2ErdLx',
+    publicKey: 'B62qriVASqb3Vm4ryqRPRVhQEWY5CivSiQQdNNbkLrVrfL8EoHM7gz6'
   },
   validatorManagerContract: {
     privateKey: 'EKEeeKpgQWwcp2hGyATAgK1EshbaYiNZWfAyiheDzCXaJntLV5ma',
@@ -92,9 +88,17 @@ const allConfig =
     privateKey: 'EKENccWLj2Tvgiuw29EeGARh4APVJHZc7d1DjMKQuHNQxpjPTPqb',
     publicKey: 'B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7'
   },
-  minter: {
-    privateKey: 'EKEhzBN7hxnCnki7xqYa72vkagwC4quoANYPXtRrKwDsVznxMgvu',
-    publicKey: 'B62qrCAYXUuRLg9CY9QbNRW8b7hXLkN9JY3QdNhfNmXBD2xF88JU4MH'
+  minter_1: {
+    privateKey: 'EKENccWLj2Tvgiuw29EeGARh4APVJHZc7d1DjMKQuHNQxpjPTPqb',
+    publicKey: 'B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7'
+  },
+  minter_2: {
+    privateKey: 'EKF4xJTw5BMi6dCtT9PbHQzkJSbG7vrVyXTeeSBJXJK9xxU79Si9',
+    publicKey: 'B62qmzvufvs3be28v4imYdL64WfcpYEMe7PXSfHEjaWeGgoFTPQY3oa'
+  },
+  minter_3: {
+    privateKey: 'EKEMubrJwi8zYc1gP52zYRyFPC1jgpBqXqL92ScqDM6WyY5L3D71',
+    publicKey: 'B62qnU7YupXnx7ByiV6GYfwPiMcnZQe1SCVtTdG293cwnTZQpLiudzD'
   }
 }
 
@@ -132,24 +136,34 @@ console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58())
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields());
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[0].toString());
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[1].toString());
-let bridgeAddress = bridgeContractKey.toPublicKey();
-let managerAddress = managerContractKey.toPublicKey();
+
+let managerAddress = PublicKey.fromBase58("B62qq6tiEWDqZivcv36WCkR5kFHH8GVqd5wKh1aREAPzCputfuuEfgn")
 let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
 
 
-let bridgeContract = new Bridge(bridgeAddress)
+
+let bridgeAddress = bridgeContractKey.toPublicKey();
 
 await fetchAccount({publicKey: managerAddress});
 await fetchAccount({publicKey: validatorManagerAddress});
 await fetchAccount({publicKey: bridgeAddress});
-
+await fetchAccount({publicKey: managerAddress});
+let bridgeContract = new Bridge(bridgeAddress)
 const currentManager = await bridgeContract.manager.get();
 console.log("🚀 ~ currentManager:", currentManager.toBase58())
+console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
 
-// let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
-let newManager = PublicKey.fromBase58("B62qmBDjZDyLJHZgkBZftvSRrTeYCmgzVCNQHo67u3o2ZF5q1zx5mGp");
+let managerContract = new Manager(managerAddress)
+const minter1 = await managerContract.minter_1.get();
+const minter2 = await managerContract.minter_2.get();
+const minter3 = await managerContract.minter_3.get();
+console.log("🚀 ~ currentManager1:", minter1.toBase58());
+console.log("🚀 ~ currentManager2:", minter2.toBase58());
+console.log("🚀 ~ currentManager3:", minter3.toBase58());
+
+
+let newManager = PublicKey.fromBase58("B62qqj2FBQFEZrUZ2r5et37wDKDRShZ9jZVRPfjs92vik2UkW8G6niR");
 let sentTx;
-// compile the contract to create prover keys
 await fetchAccount({publicKey: feepayerAddress});
 try {
   console.log('build transaction and create proof...');
@@ -179,6 +193,11 @@ try {
 }
 console.log("=====================txhash: ", sentTx?.hash);
 await sentTx?.wait();
+
+
+const currentManagerSC = await bridgeContract.manager.get();
+console.log("🚀 ~ currentManagerSC:", currentManagerSC.toBase58())
+console.log("🚀 ~ currentManagerSC:", currentManagerSC.toFields()[0].toString());
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname

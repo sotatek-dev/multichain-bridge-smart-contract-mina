@@ -13,9 +13,9 @@
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
 import fs from 'fs/promises';
-import path from 'path';
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager, Secp256k1 } from '../index.js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, Signature } from 'o1js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
+import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
 
 const allConfig = 
 {
@@ -61,16 +61,16 @@ const allConfig =
     publicKey: 'B62qjBb8Wh9aW66yKZQng7FiZXVtu2nQdhSXYRGS9KwL6iNnN6nhq15'
   },
   bridgeContract: {
-    privateKey: 'EKF19hihcXry9QMttf719fVp56DuRB2vZySdeQ1y9BkkvWWxnJAa',
-    publicKey: 'B62qmL9EHYMWJHhbLg2oVRqVJ7i9hEYx6u9qRPGRaq8iyrYFyAAiTc2'
+    privateKey: 'EKEFUsGAPWmhjwiKWq4vbewQBmQSWSAo3diKWYYf5Ss9Ss3ZmAi5',
+    publicKey: 'B62qmhCKWHDEK6Pr5AMH55J8xe8HSh9ekMDYiT6hNP8PjkoCCDHYDSB'
   },
   managerContract: {
-    privateKey: 'EKFJTWVcq6Qixm9s2guG2yXh7adbP9jX8ZpVYhkDf8NvhvoFadPY',
-    publicKey: 'B62qqP6TrYTCXrM7p2HmrLHpP41nwgb4iykf1sdpkFCo4NJD2AxK51r'
+    privateKey: 'EKFUKpR5Nbj82QQHEZQ2qQs45ujNqyQiG1LFnGYVKpgVxi2ErdLx',
+    publicKey: 'B62qriVASqb3Vm4ryqRPRVhQEWY5CivSiQQdNNbkLrVrfL8EoHM7gz6'
   },
   validatorManagerContract: {
-    privateKey: 'EKEeeKpgQWwcp2hGyATAgK1EshbaYiNZWfAyiheDzCXaJntLV5ma',
-    publicKey: 'B62qnTKW4ogzzioZ9ApynRE8f4vjPnoFbhs4ANokSRHA7CBhRgpxCs9'
+    privateKey: 'EKEW6QPQo4Dc3vx37YAGtRZ3Xti58hNy3p4Mf6USYD6Mv98wTFGG',
+    publicKey: 'B62qkXeWv8njDz4g8zhSQthfSDn3SMYp9dthhpNSaNVXLZJcpM5BtSK'
   },
   validator_1: {
     privateKey: 'EKEo6bA2EsKgHEXoqogccvX6iTwdiGZfHijyMn7xmUXj7CG5e47m',
@@ -88,19 +88,25 @@ const allConfig =
     privateKey: 'EKENccWLj2Tvgiuw29EeGARh4APVJHZc7d1DjMKQuHNQxpjPTPqb',
     publicKey: 'B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7'
   },
-  minter: {
-    privateKey: 'EKEhzBN7hxnCnki7xqYa72vkagwC4quoANYPXtRrKwDsVznxMgvu',
-    publicKey: 'B62qrCAYXUuRLg9CY9QbNRW8b7hXLkN9JY3QdNhfNmXBD2xF88JU4MH'
+  minter_1: {
+    privateKey: 'EKENccWLj2Tvgiuw29EeGARh4APVJHZc7d1DjMKQuHNQxpjPTPqb',
+    publicKey: 'B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7'
+  },
+  minter_2: {
+    privateKey: 'EKF4xJTw5BMi6dCtT9PbHQzkJSbG7vrVyXTeeSBJXJK9xxU79Si9',
+    publicKey: 'B62qmzvufvs3be28v4imYdL64WfcpYEMe7PXSfHEjaWeGgoFTPQY3oa'
+  },
+  minter_3: {
+    privateKey: 'EKEMubrJwi8zYc1gP52zYRyFPC1jgpBqXqL92ScqDM6WyY5L3D71',
+    publicKey: 'B62qnU7YupXnx7ByiV6GYfwPiMcnZQe1SCVtTdG293cwnTZQpLiudzD'
   }
 }
 
 let feepayerKey = PrivateKey.fromBase58(allConfig.admin.privateKey);
 
-let minter_1 = PrivateKey.random();
-let minter_2 = PrivateKey.random();
-let minter_3 = PrivateKey.random();
-let adminKey = feepayerKey;
-let managerKey = PrivateKey.random();
+
+
+let validatorManagerContractKey = PrivateKey.fromBase58(allConfig["validatorManagerContract"].privateKey);
 
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -112,73 +118,34 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
+console.log('compile the contract...');
+await FungibleToken.compile();
+await FungibleTokenAdmin.compile();
+await Bridge.compile();
 await Manager.compile();
-console.log('compile the validator contract...');
+await ValidatorManager.compile();
 
 
 const fee = Number(0.5) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
-let managerAddress = managerKey.toPublicKey();
-// const adminAddress = adminKey.toPublicKey();
-// const minter1Address = minter_1.toPublicKey();
-// const minter2Address = minter_2.toPublicKey();
-// const minter3Address = minter_3.toPublicKey();
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58())
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields());
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[0].toString());
+console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[1].toString());
 
+let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
+console.log("🚀 ~ validatorManagerAddress:", validatorManagerAddress.toBase58())
 
-const adminAddress = PublicKey.fromBase58("B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7");
-const minter1Address = PublicKey.fromBase58("B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7");
-const minter2Address = PublicKey.fromBase58("B62qmzvufvs3be28v4imYdL64WfcpYEMe7PXSfHEjaWeGgoFTPQY3oa");
-const minter3Address = PublicKey.fromBase58("B62qnU7YupXnx7ByiV6GYfwPiMcnZQe1SCVtTdG293cwnTZQpLiudzD");
+await fetchAccount({publicKey: validatorManagerAddress});
 
-const managerContract = new Manager(managerAddress)
+let validatorContract = new ValidatorManager(validatorManagerAddress);
+const validator1 = await validatorContract.validator1.get();
+console.log("🚀 ~ validator1:", validator1.toBase58())
+const validator2 = await validatorContract.validator2.get();
+console.log("🚀 ~ validator2:", validator2.toBase58())
+const validator3 = await validatorContract.validator3.get();
+console.log("🚀 ~ validator3:", validator3.toBase58())
 
-
-let sentTx;
-// compile the contract to create prover keys
-// await fetchAccount({publicKey: feepayerAddress});
-try {
-  // call update() and send transaction
-  console.log('Deploying...');
-  let tx = await Mina.transaction(
-    { sender: feepayerAddress, fee },
-    async () => {
-      AccountUpdate.fundNewAccount(feepayerAddress, 1)
-            await managerContract.deploy({
-              _admin: adminAddress,
-              _minter_1: minter1Address,
-              _minter_2: minter2Address,
-              _minter_3: minter3Address
-            })
-            // await token.mint(feepayerAddress, UInt64.from(1_000_000_000_000));
-    }
-  );
-  console.log('prove transaction...');
-  await tx.prove();
-  console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey, managerKey]).send();
-} catch (err) {
-  console.log(err);
-}
-console.log("=====================txhash: ", sentTx?.hash);
-await sentTx?.wait();
-// Save all private and public keys to a single JSON file
-const keysToSave = [
-  { name: 'managerContract', privateKey: managerKey, publicKey: managerAddress },
-  { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
-  { name: 'minter_1', privateKey: feepayerKey, publicKey: feepayerAddress },
-  { name: 'minter_2', privateKey: minter_2, publicKey: minter2Address },
-  { name: 'minter_3', privateKey: minter_3, publicKey: minter3Address },
-];
-
-const allKeys = {};
-for (const key of keysToSave) {
-  (allKeys as Record<string, { privateKey: string; publicKey: string }>)[key.name] = {
-    privateKey: key.privateKey.toBase58(),
-    publicKey: key.publicKey.toBase58()
-  };
-}
-
-console.log("🚀 ~ allKeys:", allKeys);
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname
