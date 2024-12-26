@@ -35,7 +35,7 @@ export class Manager extends SmartContract {
         const isMinter2 = sender.equals(minter2);
         const isMinter3 = sender.equals(minter3);
         // Require that sender is one of the minters
-        isMinter1.or(isMinter2).or(isMinter3).assertTrue();
+        isMinter1.or(isMinter2).or(isMinter3).assertTrue("Sender is not a minter");
     }
     async changeAdmin(_admin) {
         this.isAdmin(this.sender.getAndRequireSignature());
