@@ -1,54 +1,54 @@
-import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
+import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
 // check command line arg
 const allConfig = {
     token: {
-        privateKey: 'EKEuM539ELpAFgkyCnmparyYHJky5UXffB3HGexShiB9XhMwsXrX',
-        publicKey: 'B62qkWzVREU1d9NNzu4Whnve6htA9Y9nnUUf4hbqUbMcBhhVmoQ738S'
+        privateKey: 'EKF6PbdJfk2YAF9fapgmQRaHZRrt1PQ226YcpEAV4JvdDdVFHham',
+        publicKey: 'B62qjQJTD1msi2zy3tRo6gzyR3qN94HGqikULkhZqRUZXK5iEhbgWEp'
     },
     adminContract: {
-        privateKey: 'EKErGuUaYJzRN5iDSUKSVFvUoMrwZxnnNc5dcfcsFiZcppgpZ3xa',
-        publicKey: 'B62qjYkw4wAkxsS27sKTQNRmuj3SoocgaezTmGKv5381Hrs53QzHU2q'
+        privateKey: 'EKEeitS6FwUcZRZHvcTPtqJT4bgaVQbKbpURRKYb45oPHDwd5tDs',
+        publicKey: 'B62qmMfKvVCigNY6FArjWEMWf3HumoDbLkg1bBx3qEmkfWnVQiYdk5d'
     },
     bridgeContract: {
-        privateKey: 'EKFXhsvbiAn8XGP3GQvsH5xsKQnfAZauezcGEMGQN5ZpLzvcB3Es',
-        publicKey: 'B62qqUmzvZs1iJwUPm2A6HgZbVRkqTojQuVWPyGhTwC2q1XiZpbAght'
+        privateKey: 'EKEGWYkKMDN4RDn85B68vU2GT9WEoqBC2ioRuRJ7ihRmYucRLcox',
+        publicKey: 'B62qp8hz6spPXyPoiU96mjmBDw8iLGP4AZPijBy1XXqhrK75dECGZvZ'
     },
     managerContract: {
-        privateKey: 'EKEKZmmFrb7jGPYZb9eDDVmCABzp52fVkjjMbyirKTLZr7HuKfpF',
-        publicKey: 'B62qmicwXA4uwms8Zd25128oaUUnXYjUNVFFgzatBH8KkU7NLg8EjMA'
+        privateKey: 'EKEMKffpc73ersrVG9zxuTfeVRgJMG3dquQD2xCZMji1v2eTw8yZ',
+        publicKey: 'B62qrZ7fgjAZq2XnJCg16oRH2L8vjebZvHEGFxanfrwbpKvSk3fFjEy'
     },
     validatorManagerContract: {
-        privateKey: 'EKELBrnWTorisipsP2e9tq4fCY6ETpJY6VZ1oBYVtUZCTMirMVrM',
-        publicKey: 'B62qnN6FBjCGi4n5WGFfZ21aojvSEzm4x2Ac2CYhfkmhAgkJe2G8bRt'
+        privateKey: 'EKDr4W5nxgmWcdNWctN4Yskkef8pfCjvRumpBNYjKwfDMDbCmEVB',
+        publicKey: 'B62qkoUaTgmwkRXtZhLSRSRtrc9AfdjrTnNSSEEkKsdmQv6GjohBxVb'
     },
     validator_1: {
-        privateKey: 'EKEUhvRE34hiXeBJ8FyCXioeiVCEDpjhz72i1dTKy5pVpdufqXFA',
-        publicKey: 'B62qmfFaPCjyBirroHhVQsAN9d39AEhA5CGengTLPuvxiemd1kTEGYF'
+        privateKey: 'EKEHFXdgfxeY9xVg4WSgHCiqgukXXAnZp5vvXoWsag2BxvKgd5Ld',
+        publicKey: 'B62qrTpG875K8ct1hvoEuhc77JfFfMqEqxENdiFWE1H9QuGDjiTw3BF'
     },
     validator_2: {
-        privateKey: 'EKEKjmv8AYamB9Yhr9AYYz8jfNAov37oJE5wg9tTxmYjsWFEpXby',
-        publicKey: 'B62qnUPXfLSG7wg1ZW3qQDkQNyhFzyDZHeMiuvYNF991xL5iZATGyvJ'
+        privateKey: 'EKFZEY59qx2oFYpQJeir8tizXjLbYyrd7rDeoaNzt7bjcqTmfecD',
+        publicKey: 'B62qmr6KLUjXaC5RGVkpLBqNfmYJJ7oinwpTZhRHcckfAnwuwrrSVZJ'
     },
     validator_3: {
-        privateKey: 'EKFQZ7GMWe9GhpWoZnRAFtweLsEbbyUugF8TUz8PwFGrFfiUftZ9',
-        publicKey: 'B62qpo9BKd8p95zrGCcL2sd6sGe6Umjq4PEk5EDVM551vovQMT8dUdb'
+        privateKey: 'EKF4oGqrt4cTuXtkcUsrACnRsxCo5pH1fTyt1bhoQiGPtLLiBi2J',
+        publicKey: 'B62qnS9kc6Bh3NayRzd9Qhhew8TiEDkfXAPq94wK6WsjuebMYAquEa5'
     },
     admin: {
-        privateKey: 'EKDmhptfKxFbLrsY8mfWYLMDeMaX95Yxs2wVWd7fEBjc8eBaQ5f7',
-        publicKey: 'B62qqEBYiYEDmzdUXAtzJDdDqxuKqhU4N4cMV89wnXcG2DLN9dCJfJy'
+        privateKey: 'EKEGqQac3mtUGAELScNk7GR5e1PsoZQDF8CpjFdWdAhTjRjU3jT1',
+        publicKey: 'B62qqjuQJRp4cRrsbMERuEJspyGcPJhJG3LkcFQRpeU3YKGdy7qVnho'
     },
     minter_1: {
-        privateKey: 'EKFQWW89p2oVCd8yfM5SYVUGCiSMAByQ3yWzegLVz2cvcqMPJXgQ',
-        publicKey: 'B62qpsijHYn2VGmLPHMQiGcxtwEin1FhJzXqdQwN3wg5otxqLXZGd8E'
+        privateKey: 'EKFdfWDUQydsZ4q3dw23Wr1kANYaySDzxNzErwkUzSDEi233z6Fk',
+        publicKey: 'B62qmKosYp5GbJc6voKpufJ1e11CDVSTy6YEvNSVAg68bYSqqnEJNrG'
     },
     minter_2: {
-        privateKey: 'EKFM1HgDFrZXjAasv4sJXCGNR82F6FhFaFDvkCk4Xm3cHstKCjJn',
-        publicKey: 'B62qrRLPD8S2tUgnBm3uYQnt8eaH45fikDyFGPGLSr3xUazuUaw1ro6'
+        privateKey: 'EKEnFtcTwnd19FbexkxYFgCyVjzuiMA1dDWUHKto7c72kj2WSF6u',
+        publicKey: 'B62qqiqFmXziBSMDnBNRXiiENAjY2PbXfS3uvBX5tVRGgHkbakQRuEr'
     },
     minter_3: {
-        privateKey: 'EKFcYMacnWeAsxHCpfgjNdBerrEfYeN966BffNa7atrWiJVhZc3L',
-        publicKey: 'B62qozSfYv6Aahpjd5ZxEWrfrfQNP9TQgB1P3vKoZH8Qy6FFTsBiWuV'
+        privateKey: 'EKDykYNZm7G7cccjAq36rZEAQLTcxz7z2Fs5E2YyydcnjNcnWC3T',
+        publicKey: 'B62qmB5Ca7XmLtf4zjtsoEzeejRn9xZNwrYzdviExNPETKJrw2ppAcf'
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
@@ -85,7 +85,7 @@ let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
 const token = new FungibleToken(tokenAddress);
 const adminContract = new FungibleTokenAdmin(adminContractAddress);
 let bridgeContract = new Bridge(bridgeAddress);
-let managerContract = new Manager(managerAddress);
+// let managerContract = new Manager(managerAddress)
 let validatorManagerContract = new ValidatorManager(validatorManagerAddress);
 await fetchAccount({ publicKey: managerAddress });
 await fetchAccount({ publicKey: validatorManagerAddress });
@@ -111,6 +111,13 @@ const signature = await Signature.create(validator1Privkey, msg);
 const currentManager = await bridgeContract.manager.get();
 console.log("🚀 ~ currentManager:", currentManager.toBase58());
 console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
+let managerContract = new Manager(currentManager);
+const minter1 = await managerContract.minter_1.get();
+const minter2 = await managerContract.minter_2.get();
+const minter3 = await managerContract.minter_3.get();
+console.log("🚀 ~ currentManager1:", minter1.toBase58());
+console.log("🚀 ~ currentManager2:", minter2.toBase58());
+console.log("🚀 ~ currentManager3:", minter3.toBase58());
 let sentTx;
 // compile the contract to create prover keys
 await fetchAccount({ publicKey: feepayerAddress });
@@ -118,7 +125,7 @@ try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
     let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
         await bridgeContract.unlock(amount, receiver, UInt64.from(1), tokenAddress, Bool(true), validator1, signature, Bool(false), validator2, signature, Bool(false), validator3, signature);
     });
     await tx.prove();
