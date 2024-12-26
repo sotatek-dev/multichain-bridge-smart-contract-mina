@@ -1,4 +1,4 @@
-import { Mina, PrivateKey, AccountUpdate } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, PublicKey } from 'o1js';
 import { Manager } from '../index.js';
 const allConfig = {
     // token: {
@@ -75,6 +75,7 @@ const allConfig = {
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.admin.privateKey);
+let minter_1 = PrivateKey.random();
 let minter_2 = PrivateKey.random();
 let minter_3 = PrivateKey.random();
 let adminKey = feepayerKey;
@@ -92,9 +93,14 @@ console.log('compile the validator contract...');
 const fee = Number(0.5) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let managerAddress = managerKey.toPublicKey();
-const adminAddress = adminKey.toPublicKey();
-const minter2Address = minter_2.toPublicKey();
-const minter3Address = minter_3.toPublicKey();
+// const adminAddress = adminKey.toPublicKey();
+// const minter1Address = minter_1.toPublicKey();
+// const minter2Address = minter_2.toPublicKey();
+// const minter3Address = minter_3.toPublicKey();
+const adminAddress = PublicKey.fromBase58("B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7");
+const minter1Address = PublicKey.fromBase58("B62qpSTaJEiN9QVmaVDX8B2SmEA9nzdYrjhfaSjabXVgHTS7MQE7he7");
+const minter2Address = PublicKey.fromBase58("B62qmzvufvs3be28v4imYdL64WfcpYEMe7PXSfHEjaWeGgoFTPQY3oa");
+const minter3Address = PublicKey.fromBase58("B62qnU7YupXnx7ByiV6GYfwPiMcnZQe1SCVtTdG293cwnTZQpLiudzD");
 const managerContract = new Manager(managerAddress);
 let sentTx;
 // compile the contract to create prover keys
@@ -106,7 +112,7 @@ try {
         AccountUpdate.fundNewAccount(feepayerAddress, 1);
         await managerContract.deploy({
             _admin: adminAddress,
-            _minter_1: feepayerAddress,
+            _minter_1: minter1Address,
             _minter_2: minter2Address,
             _minter_3: minter3Address
         });

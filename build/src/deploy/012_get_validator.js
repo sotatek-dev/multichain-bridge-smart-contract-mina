@@ -1,4 +1,4 @@
-import { Mina, PrivateKey, fetchAccount, PublicKey } from 'o1js';
+import { Mina, PrivateKey, fetchAccount } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
 const allConfig = {
     // token: {
@@ -50,8 +50,8 @@ const allConfig = {
         publicKey: 'B62qriVASqb3Vm4ryqRPRVhQEWY5CivSiQQdNNbkLrVrfL8EoHM7gz6'
     },
     validatorManagerContract: {
-        privateKey: 'EKEeeKpgQWwcp2hGyATAgK1EshbaYiNZWfAyiheDzCXaJntLV5ma',
-        publicKey: 'B62qnTKW4ogzzioZ9ApynRE8f4vjPnoFbhs4ANokSRHA7CBhRgpxCs9'
+        privateKey: 'EKEW6QPQo4Dc3vx37YAGtRZ3Xti58hNy3p4Mf6USYD6Mv98wTFGG',
+        publicKey: 'B62qkXeWv8njDz4g8zhSQthfSDn3SMYp9dthhpNSaNVXLZJcpM5BtSK'
     },
     validator_1: {
         privateKey: 'EKEo6bA2EsKgHEXoqogccvX6iTwdiGZfHijyMn7xmUXj7CG5e47m',
@@ -83,10 +83,6 @@ const allConfig = {
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.admin.privateKey);
-let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
-let adminContractKey = PrivateKey.fromBase58(allConfig["adminContract"].privateKey);
-let bridgeContractKey = PrivateKey.fromBase58(allConfig["bridgeContract"].privateKey);
-let managerContractKey = PrivateKey.fromBase58(allConfig["managerContract"].privateKey);
 let validatorManagerContractKey = PrivateKey.fromBase58(allConfig["validatorManagerContract"].privateKey);
 // set up Mina instance and contract we interact with
 const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
@@ -108,53 +104,16 @@ console.log("🚀 ~ feepayerAddress:", feepayerAddress.toBase58());
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields());
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[0].toString());
 console.log("🚀 ~ feepayerAddress:", feepayerAddress.toFields()[1].toString());
-let managerAddress = PublicKey.fromBase58("B62qq6tiEWDqZivcv36WCkR5kFHH8GVqd5wKh1aREAPzCputfuuEfgn");
 let validatorManagerAddress = validatorManagerContractKey.toPublicKey();
-let bridgeAddress = bridgeContractKey.toPublicKey();
-await fetchAccount({ publicKey: managerAddress });
+console.log("🚀 ~ validatorManagerAddress:", validatorManagerAddress.toBase58());
 await fetchAccount({ publicKey: validatorManagerAddress });
-await fetchAccount({ publicKey: bridgeAddress });
-await fetchAccount({ publicKey: managerAddress });
-let bridgeContract = new Bridge(bridgeAddress);
-const currentManager = await bridgeContract.manager.get();
-console.log("🚀 ~ currentManager:", currentManager.toBase58());
-console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
-let managerContract = new Manager(managerAddress);
-const minter1 = await managerContract.minter_1.get();
-const minter2 = await managerContract.minter_2.get();
-const minter3 = await managerContract.minter_3.get();
-console.log("🚀 ~ currentManager1:", minter1.toBase58());
-console.log("🚀 ~ currentManager2:", minter2.toBase58());
-console.log("🚀 ~ currentManager3:", minter3.toBase58());
-let newManager = PublicKey.fromBase58("B62qqj2FBQFEZrUZ2r5et37wDKDRShZ9jZVRPfjs92vik2UkW8G6niR");
-let sentTx;
-await fetchAccount({ publicKey: feepayerAddress });
-try {
-    console.log('build transaction and create proof...');
-    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
-        await bridgeContract.changeManager(newManager);
-    });
-    console.log('generating proof...');
-    const proof = await tx.prove();
-    console.log('proof generated successfully');
-    console.log('signing transaction...');
-    const signedTx = await tx.sign([feepayerKey, bridgeContractKey, managerContractKey]);
-    console.log('sending transaction...');
-    sentTx = await signedTx.send();
-}
-catch (err) {
-    console.error('Transaction failed:', err);
-    if (err instanceof Error) {
-        console.error('Error message:', err.message);
-        console.error('Error stack:', err.stack);
-    }
-    process.exit(1);
-}
-console.log("=====================txhash: ", sentTx?.hash);
-await sentTx?.wait();
-const currentManagerSC = await bridgeContract.manager.get();
-console.log("🚀 ~ currentManagerSC:", currentManagerSC.toBase58());
-console.log("🚀 ~ currentManagerSC:", currentManagerSC.toFields()[0].toString());
+let validatorContract = new ValidatorManager(validatorManagerAddress);
+const validator1 = await validatorContract.validator1.get();
+console.log("🚀 ~ validator1:", validator1.toBase58());
+const validator2 = await validatorContract.validator2.get();
+console.log("🚀 ~ validator2:", validator2.toBase58());
+const validator3 = await validatorContract.validator3.get();
+console.log("🚀 ~ validator3:", validator3.toBase58());
 function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')
@@ -167,4 +126,4 @@ function getTxnUrl(graphQlUrl, txnHash) {
     }
     return `Transaction hash: ${txnHash}`;
 }
-//# sourceMappingURL=011_change_manager.js.map
+//# sourceMappingURL=012_get_validator.js.map
