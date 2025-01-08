@@ -1,54 +1,54 @@
-import { Mina, PrivateKey, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
+import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, Bool, Signature } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
 // check command line arg
 const allConfig = {
     token: {
-        privateKey: 'EKF6PbdJfk2YAF9fapgmQRaHZRrt1PQ226YcpEAV4JvdDdVFHham',
-        publicKey: 'B62qjQJTD1msi2zy3tRo6gzyR3qN94HGqikULkhZqRUZXK5iEhbgWEp'
+        privateKey: 'EKEdF6VWNGGXUu8Z1vmVjbEXPdTmh8GpvEBUyzEgR9aPoQdwQUQj',
+        publicKey: 'B62qjPSJG7MrPHSn9HCxHiVSQ6trqjPekZHnnfuXpdzyLNFefy5wY1u'
     },
     adminContract: {
-        privateKey: 'EKEeitS6FwUcZRZHvcTPtqJT4bgaVQbKbpURRKYb45oPHDwd5tDs',
-        publicKey: 'B62qmMfKvVCigNY6FArjWEMWf3HumoDbLkg1bBx3qEmkfWnVQiYdk5d'
+        privateKey: 'EKERitU8c8hVpN4c5JnJGsw2kcR8bAuckN4LmidH9CSb1uYJrAVS',
+        publicKey: 'B62qpnsGfD2nhCWrCdP4JXoqjmXDDpcYkeun3VQwgVG2yeMvRf8vJ7y'
     },
     bridgeContract: {
-        privateKey: 'EKEGWYkKMDN4RDn85B68vU2GT9WEoqBC2ioRuRJ7ihRmYucRLcox',
-        publicKey: 'B62qp8hz6spPXyPoiU96mjmBDw8iLGP4AZPijBy1XXqhrK75dECGZvZ'
+        privateKey: 'EKEY5QnjT5ESCkbCe3TZvahGkbFpNWyZWmo3HLvQE368ydLzyVCw',
+        publicKey: 'B62qirUmdVB1nrvLaEgr1gu3FU7d69wpXZ5ctCyRmNXps4JQBFZs9wT'
     },
     managerContract: {
-        privateKey: 'EKEMKffpc73ersrVG9zxuTfeVRgJMG3dquQD2xCZMji1v2eTw8yZ',
-        publicKey: 'B62qrZ7fgjAZq2XnJCg16oRH2L8vjebZvHEGFxanfrwbpKvSk3fFjEy'
+        privateKey: 'EKFZAdRt4b2Yqpfumcq9htWoVqeuUvwnrs9mnNZKVRKcfzxbVnWS',
+        publicKey: 'B62qqG1ac5ZmWYuWGg8kPdKXqboK7d4r6CzgtzL4bnycjbcjvRhszhx'
     },
     validatorManagerContract: {
-        privateKey: 'EKDr4W5nxgmWcdNWctN4Yskkef8pfCjvRumpBNYjKwfDMDbCmEVB',
-        publicKey: 'B62qkoUaTgmwkRXtZhLSRSRtrc9AfdjrTnNSSEEkKsdmQv6GjohBxVb'
+        privateKey: 'EKDucojSnF1WeBfNeYXsBSas7o8w6wyG7FAPvQGvV8KM7frFrH8B',
+        publicKey: 'B62qqACmQ6SHnrPtbWx4g1MQbsnAKi9y3JAuaZ4t1ULCp2BLzzMyTXF'
     },
     validator_1: {
-        privateKey: 'EKEHFXdgfxeY9xVg4WSgHCiqgukXXAnZp5vvXoWsag2BxvKgd5Ld',
-        publicKey: 'B62qrTpG875K8ct1hvoEuhc77JfFfMqEqxENdiFWE1H9QuGDjiTw3BF'
+        privateKey: 'EKDwmhHtvFHSmdCjibxkYvJdSLqvmPyVvRZdBaos7cM83cR1DVVT',
+        publicKey: 'B62qiuYihCxPxuu9HNri7s53EZrzLJrUJCVf453oPpZk13QzUjVfMMK'
     },
     validator_2: {
-        privateKey: 'EKFZEY59qx2oFYpQJeir8tizXjLbYyrd7rDeoaNzt7bjcqTmfecD',
-        publicKey: 'B62qmr6KLUjXaC5RGVkpLBqNfmYJJ7oinwpTZhRHcckfAnwuwrrSVZJ'
+        privateKey: 'EKEhgc7ePWnkWBUGzeqCVL8A6e4FZsS1VkLdurUMNfBJ2BTCdob2',
+        publicKey: 'B62qj7c85t75DmDwjcW6YLEumYPo3ybury8pWY6G6hFzPiXVbsWg7yr'
     },
     validator_3: {
-        privateKey: 'EKF4oGqrt4cTuXtkcUsrACnRsxCo5pH1fTyt1bhoQiGPtLLiBi2J',
-        publicKey: 'B62qnS9kc6Bh3NayRzd9Qhhew8TiEDkfXAPq94wK6WsjuebMYAquEa5'
+        privateKey: 'EKEH72Ybd5gS4NZgVU4kVqxs1SZe7Gj2nowvkJipm7Xztvm1xtK6',
+        publicKey: 'B62qjxNSmfLyKJkUMvkqTrzAhH5ztgk7wSdLPnnz7soooYcbkHNC9kA'
     },
     admin: {
-        privateKey: 'EKEGqQac3mtUGAELScNk7GR5e1PsoZQDF8CpjFdWdAhTjRjU3jT1',
-        publicKey: 'B62qqjuQJRp4cRrsbMERuEJspyGcPJhJG3LkcFQRpeU3YKGdy7qVnho'
+        privateKey: 'EKE86qT74pHat3gudytwR7mH3PQXgkfsSYTUR2Yu8TV9yTohtBRi',
+        publicKey: 'B62qkJqkXZ1FiwCsyz1gGvakGVFGaUUUnMacjQRK3t7GRsmR2zFhN65'
     },
     minter_1: {
-        privateKey: 'EKFdfWDUQydsZ4q3dw23Wr1kANYaySDzxNzErwkUzSDEi233z6Fk',
-        publicKey: 'B62qmKosYp5GbJc6voKpufJ1e11CDVSTy6YEvNSVAg68bYSqqnEJNrG'
+        privateKey: 'EKEZZrCTuRX4uWnp6YQXnUWkQ7ckW9XBQkbdLbqP9Xdg6exNh3uf',
+        publicKey: 'B62qkhnJUAPJzSRGHhv6ufM6bKcvpadU2oDEk1PsojRMnPM9WGhxmBU'
     },
     minter_2: {
-        privateKey: 'EKEnFtcTwnd19FbexkxYFgCyVjzuiMA1dDWUHKto7c72kj2WSF6u',
-        publicKey: 'B62qqiqFmXziBSMDnBNRXiiENAjY2PbXfS3uvBX5tVRGgHkbakQRuEr'
+        privateKey: 'EKFS6bSUPdS4hgPz6VEa8xbwaRoNRBNi1d5GhLURo2fhkqCdt4er',
+        publicKey: 'B62qk6HV5u1P8dp6YeVPST4xYdzULKYj3MnM4S1KzizVgsxENj74Yvr'
     },
     minter_3: {
-        privateKey: 'EKDykYNZm7G7cccjAq36rZEAQLTcxz7z2Fs5E2YyydcnjNcnWC3T',
-        publicKey: 'B62qmB5Ca7XmLtf4zjtsoEzeejRn9xZNwrYzdviExNPETKJrw2ppAcf'
+        privateKey: 'EKF4M5YvQP4oRkHUaqb5akT7Kn9Ww8SNn94fMKgtdc1DPajpULBw',
+        publicKey: 'B62qpyM31TLkv41DJeZUoWgFzZ4x3uaC6GFhRDmFfMEqrN8SjQGzLSo'
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
@@ -103,11 +103,17 @@ let amount = UInt64.from(200000000000);
 // let receiver = PublicKey.fromBase58("B62qmHMUwiyNfv81NNTumW7Hv8SfRAGLXceGK3ZpyzXgmg2FLqmVhmA");
 let receiver = PublicKey.fromBase58("B62qkkjqtrVmRLQhmkCQPw2dwhCZfUsmxCRTSfgdeUPhyTdoMv7h6b9");
 const msg = [
-    ...receiver.toFields(),
+    ...validator1.toFields(),
     ...amount.toFields(),
     ...tokenAddress.toFields(),
 ];
 const signature = await Signature.create(validator1Privkey, msg);
+const msg2 = [
+    ...validator2.toFields(),
+    ...amount.toFields(),
+    ...tokenAddress.toFields(),
+];
+const signature2 = await Signature.create(validator1Privkey, msg2);
 const currentManager = await bridgeContract.manager.get();
 console.log("🚀 ~ currentManager:", currentManager.toBase58());
 console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
@@ -118,25 +124,84 @@ const minter3 = await managerContract.minter_3.get();
 console.log("🚀 ~ currentManager1:", minter1.toBase58());
 console.log("🚀 ~ currentManager2:", minter2.toBase58());
 console.log("🚀 ~ currentManager3:", minter3.toBase58());
-let sentTx;
-// compile the contract to create prover keys
 await fetchAccount({ publicKey: feepayerAddress });
+let userUpdated = AccountUpdate.createSigned(feepayerAddress);
+let nonce = userUpdated.account.nonce.get(); // nonce that o1js _thinks_ 
+console.log("🚀 ~ it ~ nonce:", nonce.toString());
+// compile the contract to create prover keys
+// await fetchAccount({publicKey: feepayerAddress});
 try {
     // call update() and send transaction
     console.log('build transaction and create proof...');
-    let tx = await Mina.transaction({ sender: feepayerAddress, fee }, async () => {
+    let tx = await Mina.transaction({ sender: feepayerAddress, fee, nonce: +nonce.toString() }, async () => {
         // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-        await bridgeContract.unlock(amount, receiver, UInt64.from(1), tokenAddress, Bool(true), validator1, signature, Bool(false), validator2, signature, Bool(false), validator3, signature);
+        console.log("================================1");
+        await bridgeContract.unlock(amount, validator1, UInt64.from(1), tokenAddress, Bool(true), validator1, signature, Bool(false), validator2, signature, Bool(false), validator3, signature);
     });
+    tx.sign([feepayerKey]);
     await tx.prove();
-    console.log('send transaction...');
-    sentTx = await tx.sign([feepayerKey, bridgeContractKey]).send();
+    let tx2 = await Mina.transaction({ sender: feepayerAddress, fee, nonce: +nonce.add(1).toString() }, async () => {
+        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        console.log("================================2");
+        await bridgeContract.unlock(amount, validator2, UInt64.from(1), tokenAddress, Bool(true), validator1, signature2, Bool(false), validator2, signature, Bool(false), validator3, signature);
+    });
+    tx2.sign([feepayerKey]);
+    await tx2.prove();
+    const startTime = Date.now();
+    let tx3 = await Mina.transaction({ sender: feepayerAddress, fee, nonce: +nonce.add(2).toString() }, async () => {
+        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        console.log("================================3");
+        await bridgeContract.unlock(amount, validator2, UInt64.from(1), tokenAddress, Bool(true), validator1, signature2, Bool(false), validator2, signature, Bool(false), validator3, signature);
+    });
+    tx3.sign([feepayerKey]);
+    await tx3.prove();
+    let tx4 = await Mina.transaction({ sender: feepayerAddress, fee, nonce: +nonce.add(3).toString() }, async () => {
+        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        console.log("================================4");
+        await bridgeContract.unlock(amount, validator2, UInt64.from(1), tokenAddress, Bool(true), validator1, signature2, Bool(false), validator2, signature, Bool(false), validator3, signature);
+    });
+    tx4.sign([feepayerKey]);
+    await tx4.prove();
+    let tx5 = await Mina.transaction({ sender: feepayerAddress, fee, nonce: +nonce.add(4).toString() }, async () => {
+        // await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+        console.log("================================5");
+        await bridgeContract.unlock(amount, validator2, UInt64.from(1), tokenAddress, Bool(true), validator1, signature2, Bool(false), validator2, signature, Bool(false), validator3, signature);
+    });
+    tx5.sign([feepayerKey]);
+    await tx5.prove();
+    const transactions = [tx, tx2, tx3, tx4, tx5];
+    const results = [];
+    for (const transaction of transactions) {
+        const result = await transaction.send();
+        results.push(result);
+    }
+    const [tx1Rs, tx2Rs, tx3Rs, tx4Rs, tx5Rs] = results;
+    console.log("send tx1 is success: ", tx1Rs?.hash);
+    console.log("send tx2 is success: ", tx2Rs?.hash);
+    console.log("send tx3 is success: ", tx3Rs?.hash);
+    console.log("send tx4 is success: ", tx4Rs?.hash);
+    console.log("send tx5 is success: ", tx5Rs?.hash);
+    // const sendTransactionsInOrder = async (txs: any) => {
+    //   const results = await Promise.all(txs.map(async (transaction: any) => {
+    //     const result = await transaction.send();
+    //     console.log("=====================txhash: ", result?.hash);
+    //     return result;
+    //   }));
+    //   return results;
+    // };
+    // const resultTx = await sendTransactionsInOrder(transactions);
+    // let listWait: Promise<any>[] = []; // Explicitly define listWait as an array of promises
+    // resultTx.forEach((txResult: any) => {
+    //   listWait.push(txResult.wait());
+    // })
+    // await Promise.all(listWait);
+    const endTime = Date.now();
+    console.log(`��� ~ time taken to send transactions: ${endTime - startTime}ms`);
+    console.log(`��� ~ time taken to send transactions: ${endTime - startTime}ms`);
 }
 catch (err) {
     console.log(err);
 }
-console.log("=====================txhash: ", sentTx?.hash);
-await sentTx?.wait();
 function getTxnUrl(graphQlUrl, txnHash) {
     const txnBroadcastServiceName = new URL(graphQlUrl).hostname
         .split('.')
