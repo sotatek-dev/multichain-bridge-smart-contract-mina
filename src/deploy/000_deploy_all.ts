@@ -56,7 +56,8 @@ let adminContractKey = PrivateKey.random();
 let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
-let minter_1 = PrivateKey.random();
+// let minter_1 = PrivateKey.random();
+let minter_1 = PrivateKey.fromBase58("EKEZZrCTuRX4uWnp6YQXnUWkQ7ckW9XBQkbdLbqP9Xdg6exNh3uf");
 let minter_2 = PrivateKey.random();
 let minter_3 = PrivateKey.random();
 
@@ -133,7 +134,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 6)
-            await adminContract.deploy({ adminPublicKey: bridgeAddress })
+            await adminContract.deploy({ adminPublicKey: minter1Address })
             await token.deploy({
                 symbol: symbol,
                 src: src,

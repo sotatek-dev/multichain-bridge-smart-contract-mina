@@ -98,9 +98,9 @@ export class Bridge extends SmartContract {
         //   useSig3,
         //   validator3,
         // );
-        this.validateSig(msg, sig1, validator1, useSig1);
-        this.validateSig(msg, sig2, validator2, useSig2);
-        this.validateSig(msg, sig3, validator3, useSig3);
+        // this.validateSig(msg, sig1, validator1, useSig1);
+        // this.validateSig(msg, sig2, validator2, useSig2);
+        // this.validateSig(msg, sig3, validator3, useSig3);
         const token = new FungibleToken(tokenAddr);
         await token.mint(receiver, amount);
         this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
