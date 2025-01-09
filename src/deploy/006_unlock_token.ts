@@ -91,6 +91,9 @@ const network = Mina.Network({
 });
 Mina.setActiveInstance(network);
 
+const startTime = Date.now();
+
+
 console.log('compile the contract...');
 await FungibleToken.compile();
 await FungibleTokenAdmin.compile();
@@ -232,7 +235,6 @@ try {
   tx2.sign([feepayerKey])
   await tx2.prove()
 
-  const startTime = Date.now();
 
   let tx3 = await Mina.transaction(
     { sender: feepayerAddress, fee, nonce: +nonce.add(2).toString()  },
@@ -314,44 +316,47 @@ try {
   await tx5.prove()
 
   const transactions = [tx, tx2, tx3, tx4, tx5];
-  const results = [];
 
-  for (const transaction of transactions) {
-    const result = await transaction.send();
-    results.push(result);
-  }
 
-  const [tx1Rs, tx2Rs, tx3Rs, tx4Rs, tx5Rs] = results;
-  console.log("send tx1 is success: ", tx1Rs?.hash);
-  console.log("send tx2 is success: ", tx2Rs?.hash);
-  console.log("send tx3 is success: ", tx3Rs?.hash);
-  console.log("send tx4 is success: ", tx4Rs?.hash);
-  console.log("send tx5 is success: ", tx5Rs?.hash);
+  const startSendTime = Date.now();
+  // const results = [];
+
+  // for (const transaction of transactions) {
+  //   const result = await transaction.send();
+  //   results.push(result);
+  // }
+
+  // const [tx1Rs, tx2Rs, tx3Rs, tx4Rs, tx5Rs] = results;
+  // console.log("send tx1 is success: ", tx1Rs?.hash);
+  // console.log("send tx2 is success: ", tx2Rs?.hash);
+  // console.log("send tx3 is success: ", tx3Rs?.hash);
+  // console.log("send tx4 is success: ", tx4Rs?.hash);
+  // console.log("send tx5 is success: ", tx5Rs?.hash);
   
 
-  // const sendTransactionsInOrder = async (txs: any) => {
-  //   const results = await Promise.all(txs.map(async (transaction: any) => {
-  //     const result = await transaction.send();
-  //     console.log("=====================txhash: ", result?.hash);
-  //     return result;
-  //   }));
-  //   return results;
-  // };
+  const sendTransactionsInOrder = async (txs: any) => {
+    const results = await Promise.all(txs.map(async (transaction: any) => {
+      const result = await transaction.send();
+      console.log("=====================txhash: ", result?.hash);
+      return result;
+    }));
+    return results;
+  };
 
-  // const resultTx = await sendTransactionsInOrder(transactions);
+  const resultTx = await sendTransactionsInOrder(transactions);
 
-  // let listWait: Promise<any>[] = []; // Explicitly define listWait as an array of promises
+  let listWait: Promise<any>[] = []; // Explicitly define listWait as an array of promises
 
-  // resultTx.forEach((txResult: any) => {
-  //   listWait.push(txResult.wait());
-  // })
+  resultTx.forEach((txResult: any) => {
+    listWait.push(txResult.wait());
+  })
 
-  // await Promise.all(listWait);
+  await Promise.all(listWait);
 
   const endTime = Date.now();
 
-  console.log(`��� ~ time taken to send transactions: ${endTime - startTime}ms`);
-  console.log(`��� ~ time taken to send transactions: ${endTime - startTime}ms`);
+  console.log(`��� ~ time taken to send transactions: ${startSendTime - startTime}ms`);
+  console.log(`��� ~ time taken to send + await  transactions: ${endTime - startSendTime}ms`);
 
 } catch (err) {
   console.log(err);
