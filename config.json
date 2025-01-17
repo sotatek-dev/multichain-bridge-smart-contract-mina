@@ -189,6 +189,13 @@
       "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/env_p2_dev.json",
       "feepayerAlias": "env_p2_dev",
       "fee": "0.5"
+    },
+    "env_audit": {
+      "url": "https://proxy.devnet.minaexplorer.com/graphql",
+      "keyPath": "keys/env_audit.json",
+      "feepayerKeyPath": "/Users/sotatek/.cache/zkapp-cli/keys/bridgedeployer.json",
+      "feepayerAlias": "bridgedeployer",
+      "fee": "0.5"
     }
   }
 }
