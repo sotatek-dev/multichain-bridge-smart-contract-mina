@@ -134,7 +134,7 @@ try {
     { sender: feepayerAddress, fee },
     async () => {
       AccountUpdate.fundNewAccount(feepayerAddress, 6)
-            await adminContract.deploy({ adminPublicKey: minter1Address })
+            await adminContract.deploy({ adminPublicKey: feepayerAddress })
             await token.deploy({
                 symbol: symbol,
                 src: src,
@@ -147,7 +147,7 @@ try {
 
             await managerContract.deploy({
               _admin: adminAddress,
-              _minter_1: minter1Address,
+              _minter_1: feepayerAddress,
               _minter_2: minter2Address,
               _minter_3: minter3Address
             })
