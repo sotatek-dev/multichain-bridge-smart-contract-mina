@@ -123,6 +123,7 @@ try {
             await token.deploy({
                 symbol: symbol,
                 src: src,
+                allowUpdates: true
             })
             await token.initialize(
                 adminContractAddress,
