@@ -3476,10 +3476,10 @@ mimic-fn@^2.1.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-mina-fungible-token@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/mina-fungible-token/-/mina-fungible-token-1.0.0.tgz#41cdfa2de1732f046b1ab4ba1c3dadbfe25e7187"
-  integrity sha512-2LfoBIuwQO5qk3H1JjRLKsCdZsSu+B/lannjMBdujdoHnoj6aWEcLQOY4jAz4BnhVCgAmJ/uUrTqVZ86J63iTg==
+mina-fungible-token@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mina-fungible-token/-/mina-fungible-token-1.1.0.tgz#d1817d9ffe80bd6b33a5c36a3e97bfee1cf5cf93"
+  integrity sha512-nfpKQuo49KBUkTFQjE+H47sXs2SzzAs484S6IXwSX38JX+VJKSEihuMv08Mi+x8cVjJ2hVsPlsvRcApIUI1lug==
 
 mina-transaction-visualizer@^0.1.0:
   version "0.1.0"

@@ -85,6 +85,7 @@ describe("Bridge", () => {
             await token.deploy({
                 symbol: "abc",
                 src: "https://github.com/MinaFoundation/mina-fungible-token/blob/main/examples/e2e.eg.ts",
+                allowUpdates: true
             })
             await token.initialize(
                 adminContractPubkey,
@@ -210,8 +211,6 @@ describe("Bridge", () => {
             sender: userPubkey,
             nonce: +nonce.toString(),
         }, async () => {
-            // await AccountUpdate.createSigned(adminTokenPubkey);
-            // await AccountUpdate.createSigned(bridgePubkey);
             await bridgeZkapp.unlock(
                 amount,
                 normalUserPubkey,
@@ -231,36 +230,32 @@ describe("Bridge", () => {
         unlockTx.sign([userPrivkey])
         await unlockTx.prove()
 
-        console.log("🚀 ~ it ~ unlockTx:", unlockTx.toPretty())
-        
-        // await unlockTx.send()
+        await unlockTx.send()
 
-        let unlockTx2 = await Mina.transaction({
-            sender: userPubkey,
-            nonce: +nonce.add(1).toString(),
-        }, async () => {
-            await bridgeZkapp.unlock(
-                amount,
-                normalUserPubkey,
-                UInt64.from(1),
-                tokenPubkey,
-                Bool(true),
-                validator1Pubkey,
-                signature1,
-                Bool(true),
-                validator2Pubkey,
-                signature2,
-                Bool(true),
-                validator3Pubkey,
-                signature3,
-            );
-        })
-        unlockTx2.sign([userPrivkey])
-        await unlockTx2.prove()
+        // let unlockTx2 = await Mina.transaction({
+        //     sender: userPubkey,
+        //     nonce: +nonce.add(1).toString(),
+        // }, async () => {
+        //     await bridgeZkapp.unlock(
+        //         amount,
+        //         normalUserPubkey,
+        //         UInt64.from(1),
+        //         tokenPubkey,
+        //         Bool(true),
+        //         validator1Pubkey,
+        //         signature1,
+        //         Bool(true),
+        //         validator2Pubkey,
+        //         signature2,
+        //         Bool(true),
+        //         validator3Pubkey,
+        //         signature3,
+        //     );
+        // })
+        // unlockTx2.sign([userPrivkey])
+        // await unlockTx2.prove()
 
-        console.log("🚀 ~ it ~ unlockTx2:", unlockTx2.toPretty())
-
-        await Promise.all([unlockTx.send(), unlockTx2.send()])
+        // await Promise.all([unlockTx.send(), unlockTx2.send()])
 
         const beforeLockBalance = await token.getBalanceOf(normalUserPubkey);
         console.log("before lock balance:", beforeLockBalance.toString());

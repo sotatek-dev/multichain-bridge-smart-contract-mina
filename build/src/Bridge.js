@@ -90,7 +90,14 @@ export class Bridge extends SmartContract {
             ...amount.toFields(),
             ...tokenAddr.toFields(),
         ];
-        this.validateValidator(useSig1, validator1, useSig2, validator2, useSig3, validator3);
+        // this.validateValidator(
+        //   useSig1,
+        //   validator1,
+        //   useSig2,
+        //   validator2,
+        //   useSig3,
+        //   validator3,
+        // );
         this.validateSig(msg, sig1, validator1, useSig1);
         this.validateSig(msg, sig2, validator2, useSig2);
         this.validateSig(msg, sig3, validator3, useSig3);

@@ -3,52 +3,52 @@ import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } 
 // check command line arg
 const allConfig = {
     token: {
-        privateKey: 'EKF7itnJCXSZU68eXMFw7JCy3e6UrMgeoCW288vAMzXsHo7hCW8h',
-        publicKey: 'B62qqcH9gouXRJxViLxKYMrtWPUT1KkV9t8SbPpJ1sDcezPoVzvvake'
+        privateKey: 'EKDvgY1NiPfnwMPLmaqRbF9J7DJ5hc3LYLceVuBLUe94MVsddnVM',
+        publicKey: 'B62qm3Q7ye2L6nvYzjxe8GZXwoKcFawPRKkGdm7RKXD1Tft5hhDkLLw'
     },
     adminContract: {
-        privateKey: 'EKEftTBVadbsAwQ88Mawm9VzGYec7Eyn1e8JWJQUNmpxwYAA8NGq',
-        publicKey: 'B62qkw2waHGyEewF6mUvSeEX63KEaGfKJud71nxoyoqKyhbgb9rVDQw'
+        privateKey: 'EKEPuCPKwnjsN3TuxZdWJetNH51SBbybHi38awyiJRFVzusk21pA',
+        publicKey: 'B62qqpAmPhSwrL4QzWV12Bt37rjuTCoZXHnbDGXZ5MjqpCHa7FDcpdf'
     },
     bridgeContract: {
-        privateKey: 'EKEhLNL8Ho5BhXYSbPtJtjr4KE2kK89Zx3zVZZ7YWw4bLDn24Kf5',
-        publicKey: 'B62qpCtfnEsWe2MxTwSD3QDxEUyVnG2nwk64ytx2cUj9MDFfLMRN1qo'
+        privateKey: 'EKFTiQdYrGU2n2TEM9NzFDPxEird4d52ZDmzdqE4PJNvkM575Fcj',
+        publicKey: 'B62qjGpJyWYchMh1hZnKZzaSozuC23WGYkFmfZVgY9mwcJWteyPZB6L'
     },
     managerContract: {
-        privateKey: 'EKFUcBPTvioAjStYpciUGewESHXpRAiN8khoReaeM5x4rL8MVYi4',
-        publicKey: 'B62qmTocUPk3GP23LkQ14rb93UZ64cZRhLp2yQVewxDtZ3agN3mH3AM'
+        privateKey: 'EKEkfVUCTXwTciCURajfDqEozeegdzg4srXw5bBhukdL1svuBcHa',
+        publicKey: 'B62qmg8pfMMQN6zhJbfHRTaX26YPYBSUrMACt1Mfxi1i878t6iUD2rm'
     },
     validatorManagerContract: {
-        privateKey: 'EKEi6bM3LB5s9b3pB79o87FkGd6sY8nwKrNT9SRpYrTv3JkJg2rs',
-        publicKey: 'B62qj1cgBH1c8q8aJqFU9Xq3W7zRq9esGTtuEJMpKRPBD8CT3nZp1s8'
+        privateKey: 'EKF2kh5g3GZ6aj5kdrM4bkKCg5Kr1hZbdBuHh6JUcxziHGgCh4y8',
+        publicKey: 'B62qpGoJ2P6GxcdPbhZ9kJtUbixgg6V3L2bdUVYhB69zz2mYobV42Sg'
     },
     validator_1: {
-        privateKey: 'EKE1nnSVM3bWyqupNiqA1bP87XhqfV4Y6nLUGLAZZNiVgTEqD6Xp',
-        publicKey: 'B62qkx13A9jfeebfNDNqawyVmqCAQdD4vrNdchoGG5KDCV1X9kuN5NS'
+        privateKey: 'EKDyQGWs5CNgoQjvRgZWEcqYmiactpy3swRFn5FJXG1KsGCrLuEk',
+        publicKey: 'B62qrLugmbbzWCij82vBTMri7VDcGdWzRUDiKEe5XzaSm9rbrG5s1th'
     },
     validator_2: {
-        privateKey: 'EKFK7v87vUSjc2sb2TgQm2aKwJumzTc1oFebx16uBcG65JWoXu7d',
-        publicKey: 'B62qjc2AF1FiHBpnm1EE3nTNDeryz5XJPkkZ66ZVE5bQAvjkJz4Tcju'
+        privateKey: 'EKEKPiUqXN4j8YH24u7BXu2UZvhmuPWshEN9EghDe7QEyKs1g4Tq',
+        publicKey: 'B62qph4qJTkY5WSC7LQq8yDGjW6SGjbEBUaGNjcSWjAmbHLWZdP8SBh'
     },
     validator_3: {
-        privateKey: 'EKEdHqhFVrQsZSuJAEkn2Mko3AQYjmfrV57CnzTc5VHiwVmCbzvi',
-        publicKey: 'B62qqhRrtoshL2qtccvMS7CQpBVQhtYLgZhyMg6UTSQAHZxcLi9ciW5'
+        privateKey: 'EKEyyH4ctND11MbekD4FiWcoonv5tAp2WYjZ6X2SZ7wJ4zJVcEQf',
+        publicKey: 'B62qnEsMkLZoW28f6U25zLTfU4i7iCfhybLdumvks66HvjPiujVAgAL'
     },
     admin: {
-        privateKey: 'EKF4K8o13ZPGov7m89d8bsDSpKWEQUw1rfsmEKnFjUQGwYYSjLLg',
-        publicKey: 'B62qk9LodeoCLjsFPd6wUgzsr5dW5DSYKDfHppbqt6AZZx724mMKQmp'
+        privateKey: "EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD",
+        publicKey: "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"
     },
     minter_1: {
         privateKey: "EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD",
         publicKey: "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"
     },
     minter_2: {
-        privateKey: 'EKEdSDp7CDcUY6KDSSWvVCUjkBJRPPFxoeN4csfqicYHS2bpZC82',
-        publicKey: 'B62qkGv5mbgSXCRrYyyyzRq9qfTjK8x3KeeiuhaTssFgYGjWtvCQ56k'
+        privateKey: 'EKEcHxCzajipJnzTjfaQcG7UnEV4VPxNm19zq7B1sgaosqo6UxS1',
+        publicKey: 'B62qqhxtwRQG94AB4TxpdSHcC6Gp97RJDwkzcZuqig6u3xbXvMsoz8r'
     },
     minter_3: {
-        privateKey: 'EKF9qYLaSzYqLpoNsm1VUpip2VkmnfzoSCLMrampVEdSV4zfMDaE',
-        publicKey: 'B62qmdo5oUpCYAcoujMWzmPsyQqAuDog8gMxVoSkzBTyihkuDY8zFa1'
+        privateKey: 'EKDvZthn3T94k3pLPr7TYvGouCrU7Suakk987JjxZADHjVcu7cbQ',
+        publicKey: 'B62qr5LTR9qyz4tJRr2vxThza9g3SLYnspKnjcctxwed6fxYR5bnJVW'
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
