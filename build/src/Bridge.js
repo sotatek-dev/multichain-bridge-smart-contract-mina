@@ -82,6 +82,43 @@ export class Bridge extends SmartContract {
         await token.burn(this.sender.getAndRequireSignature(), amount);
         this.emitEvent("Lock", new LockEvent(this.sender.getAndRequireSignature(), address, amount, tokenAddr));
     }
+    // @method async unlock(
+    //   amount: UInt64,
+    //   receiver: PublicKey,
+    //   id: UInt64,
+    //   tokenAddr: PublicKey,
+    //   useSig1: Bool,
+    //   validator1: PublicKey,
+    //   sig1: Signature,
+    //   useSig2: Bool,
+    //   validator2: PublicKey,
+    //   sig2: Signature,
+    //   useSig3: Bool,
+    //   validator3: PublicKey,
+    //   sig3: Signature,
+    // ) {
+    //   const managerZkapp = new Manager(this.manager.getAndRequireEquals());
+    //   managerZkapp.isMinter(this.sender.getAndRequireSignature());
+    //   const msg = [
+    //     ...receiver.toFields(),
+    //     ...amount.toFields(),
+    //     ...tokenAddr.toFields(),
+    //   ]
+    //   this.validateValidator(
+    //     useSig1,
+    //     validator1,
+    //     useSig2,
+    //     validator2,
+    //     useSig3,
+    //     validator3,
+    //   );
+    //   this.validateSig(msg, sig1, validator1, useSig1);
+    //   this.validateSig(msg, sig2, validator2, useSig2);
+    //   this.validateSig(msg, sig3, validator3, useSig3);
+    //   const token = new FungibleToken(tokenAddr)
+    //   await token.mint(receiver, amount)
+    //   this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
+    // }
     async unlock(amount, receiver, id, tokenAddr, useSig1, validator1, sig1, useSig2, validator2, sig2, useSig3, validator3, sig3) {
         const managerZkapp = new Manager(this.manager.getAndRequireEquals());
         managerZkapp.isMinter(this.sender.getAndRequireSignature());
@@ -90,20 +127,13 @@ export class Bridge extends SmartContract {
             ...amount.toFields(),
             ...tokenAddr.toFields(),
         ];
-        // this.validateValidator(
-        //   useSig1,
-        //   validator1,
-        //   useSig2,
-        //   validator2,
-        //   useSig3,
-        //   validator3,
-        // );
-        this.validateSig(msg, sig1, validator1, useSig1);
-        this.validateSig(msg, sig2, validator2, useSig2);
-        this.validateSig(msg, sig3, validator3, useSig3);
+        await this.validateValidator(useSig1, validator1, useSig2, validator2, useSig3, validator3);
+        await this.validateSig(msg, sig1, validator1, useSig1);
+        await this.validateSig(msg, sig2, validator2, useSig2);
+        await this.validateSig(msg, sig3, validator3, useSig3);
         const token = new FungibleToken(tokenAddr);
         await token.mint(receiver, amount);
-        this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
+        this.emitEvent('Unlock', new UnlockEvent(receiver, tokenAddr, amount, id));
     }
     async validateValidator(useSig1, validator1, useSig2, validator2, useSig3, validator3) {
         let count = UInt64.from(0);
