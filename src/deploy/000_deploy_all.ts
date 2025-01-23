@@ -191,7 +191,7 @@ const keysToSave = [
   { name: 'validator_2', privateKey: validator2Key, publicKey: validator2Address },
   { name: 'validator_3', privateKey: validator3Key, publicKey: validator3Address },
   { name: 'admin', privateKey: adminKey, publicKey: adminAddress },
-  { name: 'minter_1', privateKey: minter_1, publicKey: minter1Address },
+  { name: 'minter_1', privateKey: feepayerKey, publicKey: feepayerAddress },
   { name: 'minter_2', privateKey: minter_2, publicKey: minter2Address },
   { name: 'minter_3', privateKey: minter_3, publicKey: minter3Address },
 ];
