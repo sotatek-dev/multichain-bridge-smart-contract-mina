@@ -3,36 +3,36 @@ import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } 
 // check command line arg
 const allConfig = {
     token: {
-        privateKey: 'EKDvgY1NiPfnwMPLmaqRbF9J7DJ5hc3LYLceVuBLUe94MVsddnVM',
-        publicKey: 'B62qm3Q7ye2L6nvYzjxe8GZXwoKcFawPRKkGdm7RKXD1Tft5hhDkLLw'
+        privateKey: 'EKDr9hBqdjwZLecmphNF9cXWRBSWXHfSsnD2Pid5r2BUBmLiLoqM',
+        publicKey: 'B62qjHAiGSN1tEvp2E9TgPVxyyomwJFr8PKCB3yqKQL7AgJ7ieZ8j5L'
     },
     adminContract: {
-        privateKey: 'EKEPuCPKwnjsN3TuxZdWJetNH51SBbybHi38awyiJRFVzusk21pA',
-        publicKey: 'B62qqpAmPhSwrL4QzWV12Bt37rjuTCoZXHnbDGXZ5MjqpCHa7FDcpdf'
+        privateKey: 'EKEHoabgJxLtvYFNnmsNkLo9mY1SZxipU3FjUpy1scBcjW2DF26f',
+        publicKey: 'B62qpyKsmMrHaiyMsuqggLSJbucfWVesh6LqY5kAvz7dTzhzgtx8826'
     },
     bridgeContract: {
-        privateKey: 'EKFTiQdYrGU2n2TEM9NzFDPxEird4d52ZDmzdqE4PJNvkM575Fcj',
-        publicKey: 'B62qjGpJyWYchMh1hZnKZzaSozuC23WGYkFmfZVgY9mwcJWteyPZB6L'
+        privateKey: 'EKFMw2TtZoEaFgNDULA7PHikkvdqq4WGkP2SLTJP7gTfUAtTFdfD',
+        publicKey: 'B62qraiMK838V8f5DvsmquRRtc6zi1X9u8v257NHCFnX5QQzj9G365s'
     },
     managerContract: {
-        privateKey: 'EKEkfVUCTXwTciCURajfDqEozeegdzg4srXw5bBhukdL1svuBcHa',
-        publicKey: 'B62qmg8pfMMQN6zhJbfHRTaX26YPYBSUrMACt1Mfxi1i878t6iUD2rm'
+        privateKey: 'EKF197bgnQtP7qNqNYwNtkndPAyPyv2RQgySqEZ8cwfNXCEGXRka',
+        publicKey: 'B62qqyMbSpoXTLimCaDgtmu8scdmrDxUykjjreurn18YLkeZ6NJJLhY'
     },
     validatorManagerContract: {
-        privateKey: 'EKF2kh5g3GZ6aj5kdrM4bkKCg5Kr1hZbdBuHh6JUcxziHGgCh4y8',
-        publicKey: 'B62qpGoJ2P6GxcdPbhZ9kJtUbixgg6V3L2bdUVYhB69zz2mYobV42Sg'
+        privateKey: 'EKFEjraTPnWmcuuABWUVwm4HFndJnMu5U2ox8tSFiWLcvTrHaTmz',
+        publicKey: 'B62qqarGzKhX18JgNePZGcqSowJg3T3YaStwj2uigs86C2ypSAcT9Sa'
     },
     validator_1: {
-        privateKey: 'EKDyQGWs5CNgoQjvRgZWEcqYmiactpy3swRFn5FJXG1KsGCrLuEk',
-        publicKey: 'B62qrLugmbbzWCij82vBTMri7VDcGdWzRUDiKEe5XzaSm9rbrG5s1th'
+        privateKey: 'EKDu1Jrm9LQ4yTZjNjcDvNggdvvwusjDSe7Krk43u3fLUTmcjRaW',
+        publicKey: 'B62qog352TxV8ug4o9TkQEsTEEWSpC6ERkXfq3bgZJvyBhraJ1VQ32H'
     },
     validator_2: {
-        privateKey: 'EKEKPiUqXN4j8YH24u7BXu2UZvhmuPWshEN9EghDe7QEyKs1g4Tq',
-        publicKey: 'B62qph4qJTkY5WSC7LQq8yDGjW6SGjbEBUaGNjcSWjAmbHLWZdP8SBh'
+        privateKey: 'EKDjeb9oqvcvddLpPoGymM7CeECyv2YiBeSsvtMxgvxbCSR6tokA',
+        publicKey: 'B62qke4TwFqcmRL7FxVPNrz6Ne8YKVU1japGC5FMXoT9SfvTETHmKZz'
     },
     validator_3: {
-        privateKey: 'EKEyyH4ctND11MbekD4FiWcoonv5tAp2WYjZ6X2SZ7wJ4zJVcEQf',
-        publicKey: 'B62qnEsMkLZoW28f6U25zLTfU4i7iCfhybLdumvks66HvjPiujVAgAL'
+        privateKey: 'EKEHPrdTJdweigymbws2dAMUimoz8eapmrNZqkcz19z6svyYvB8A',
+        publicKey: 'B62qm75B7en1F5b8WVq4cxq6EAyoFVGtVBQiduJTRdchzh2kVQfJ25P'
     },
     admin: {
         privateKey: "EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD",
@@ -43,12 +43,12 @@ const allConfig = {
         publicKey: "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"
     },
     minter_2: {
-        privateKey: 'EKEcHxCzajipJnzTjfaQcG7UnEV4VPxNm19zq7B1sgaosqo6UxS1',
-        publicKey: 'B62qqhxtwRQG94AB4TxpdSHcC6Gp97RJDwkzcZuqig6u3xbXvMsoz8r'
+        privateKey: 'EKFWi6XGsK9Wruu2pc9cLroKSggUrcs6XC2GTmbn1AwgHGkk3cdK',
+        publicKey: 'B62qrPwF3qKJvysk2ji248C22WnBiFLVsKqU7XdSrcj3P4wUByDbQfP'
     },
     minter_3: {
-        privateKey: 'EKDvZthn3T94k3pLPr7TYvGouCrU7Suakk987JjxZADHjVcu7cbQ',
-        publicKey: 'B62qr5LTR9qyz4tJRr2vxThza9g3SLYnspKnjcctxwed6fxYR5bnJVW'
+        privateKey: 'EKEaKn1d8cfaLV32RA7abzkaiRXp45dwViEzrHdQ9uHb4kpWZest',
+        publicKey: 'B62qr2CLY4vgaZb9T9oW7RBKaKpL2NURTEkcVC6KHmLeYvGZKRfPPGp'
     }
 };
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
