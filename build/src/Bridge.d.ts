@@ -211,6 +211,5 @@ export declare class Bridge extends SmartContract {
     unlock(amount: UInt64, receiver: PublicKey, id: UInt64, tokenAddr: PublicKey, useSig1: Bool, validator1: PublicKey, sig1: Signature, useSig2: Bool, validator2: PublicKey, sig2: Signature, useSig3: Bool, validator3: PublicKey, sig3: Signature): Promise<void>;
     validateValidator(useSig1: Bool, validator1: PublicKey, useSig2: Bool, validator2: PublicKey, useSig3: Bool, validator3: PublicKey): Promise<void>;
     validateSig(msg: Field[], signature: Signature, validator: PublicKey, useSig: Bool): Promise<void>;
-    verifyMsg(publicKey: PublicKey, msg: Field[], sig: Signature): Promise<void>;
 }
 export {};

@@ -5,8 +5,6 @@ import { ValidatorManager } from "./ValidatorManager.js";
 export { ValidatorManager };
 import { Manager } from "./Manager.js";
 export { Manager };
-import { Secp256k1, Ecdsa, keccakAndEcdsa, ecdsa, Bytes32 } from './ecdsa/ecdsa.js';
-export { Secp256k1, Ecdsa, keccakAndEcdsa, ecdsa, Bytes32 };
 import { FungibleToken, FungibleTokenAdmin } from "mina-fungible-token";
 export { FungibleToken, FungibleTokenAdmin };
 //# sourceMappingURL=index.js.map

@@ -23,7 +23,7 @@ if (!deployAlias)
 Usage:
 node build/src/interact.js <deployAlias>
 `);
-const project_alias = "env_" + deployAlias;
+const project_alias = deployAlias;
 let configJson = JSON.parse(await fs.readFile('config.json', 'utf8'));
 let config = configJson.deployAliases[project_alias];
 let feepayerKeysBase58 = JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
