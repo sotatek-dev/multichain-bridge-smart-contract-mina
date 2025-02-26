@@ -111,45 +111,6 @@ export class Bridge extends SmartContract {
 
   }
 
-  // @method async unlock(
-  //   amount: UInt64,
-  //   receiver: PublicKey,
-  //   id: UInt64,
-  //   tokenAddr: PublicKey,
-  //   useSig1: Bool,
-  //   validator1: PublicKey,
-  //   sig1: Signature,
-  //   useSig2: Bool,
-  //   validator2: PublicKey,
-  //   sig2: Signature,
-  //   useSig3: Bool,
-  //   validator3: PublicKey,
-  //   sig3: Signature,
-  // ) {
-  //   const managerZkapp = new Manager(this.manager.getAndRequireEquals());
-  //   managerZkapp.isMinter(this.sender.getAndRequireSignature());
-  //   const msg = [
-  //     ...receiver.toFields(),
-  //     ...amount.toFields(),
-  //     ...tokenAddr.toFields(),
-  //   ]
-  //   this.validateValidator(
-  //     useSig1,
-  //     validator1,
-  //     useSig2,
-  //     validator2,
-  //     useSig3,
-  //     validator3,
-  //   );
-
-  //   this.validateSig(msg, sig1, validator1, useSig1);
-  //   this.validateSig(msg, sig2, validator2, useSig2);
-  //   this.validateSig(msg, sig3, validator3, useSig3);
-  //   const token = new FungibleToken(tokenAddr)
-  //   await token.mint(receiver, amount)
-  //   this.emitEvent("Unlock", new UnlockEvent(receiver, tokenAddr, amount, id));
-  // }
-
   @method async unlock(
     amount: UInt64,
     receiver: PublicKey,
@@ -222,11 +183,6 @@ export class Bridge extends SmartContract {
     let isValidSig = signature.verify(validator, msg);
     const isValid = Provable.if(useSig, isValidSig, Bool(true));
     isValid.assertTrue("Invalid signature");
-  }
-
-  public async verifyMsg(publicKey: PublicKey, msg: Field[], sig: Signature) {
-    const isOk = await sig.verify(publicKey, msg);
-    Provable.log("isOk", isOk.toString());
   }
 
 }

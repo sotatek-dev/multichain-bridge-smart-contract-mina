@@ -143,71 +143,72 @@ const msg = [
   ...tokenAddress.toFields(),
 ]
 const signature = await Signature.create(validator1Privkey, msg);
+console.log("🚀 ~ signature:", signature.toJSON())
 
 
-const msg2 = [
-  ...validator2.toFields(),
-  ...amount.toFields(),
-  ...tokenAddress.toFields(),
-]
-const signature2 = await Signature.create(validator1Privkey, msg2);
+// const msg2 = [
+//   ...validator2.toFields(),
+//   ...amount.toFields(),
+//   ...tokenAddress.toFields(),
+// ]
+// const signature2 = await Signature.create(validator1Privkey, msg2);
 
 
 
-const currentManager = await bridgeContract.manager.get();
-console.log("🚀 ~ currentManager:", currentManager.toBase58())
-console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
+// const currentManager = await bridgeContract.manager.get();
+// console.log("🚀 ~ currentManager:", currentManager.toBase58())
+// console.log("🚀 ~ currentManager:", currentManager.toFields()[0].toString());
 
-let managerContract = new Manager(currentManager)
-const minter1 = await managerContract.minter_1.get();
-const minter2 = await managerContract.minter_2.get();
-const minter3 = await managerContract.minter_3.get();
-console.log("🚀 ~ currentManager1:", minter1.toBase58());
-console.log("🚀 ~ currentManager2:", minter2.toBase58());
-console.log("🚀 ~ currentManager3:", minter3.toBase58());
-await fetchAccount({publicKey: feepayerAddress});
-let userUpdated = AccountUpdate.createSigned(feepayerAddress);
-let nonce = userUpdated.account.nonce.get(); // nonce that o1js _thinks_ 
-console.log("🚀 ~ it ~ nonce:", nonce.toString())
-
-
-// compile the contract to create prover keys
+// let managerContract = new Manager(currentManager)
+// const minter1 = await managerContract.minter_1.get();
+// const minter2 = await managerContract.minter_2.get();
+// const minter3 = await managerContract.minter_3.get();
+// console.log("🚀 ~ currentManager1:", minter1.toBase58());
+// console.log("🚀 ~ currentManager2:", minter2.toBase58());
+// console.log("🚀 ~ currentManager3:", minter3.toBase58());
 // await fetchAccount({publicKey: feepayerAddress});
-try {
-  // call update() and send transaction
-  console.log('build transaction and create proof...');
-  let tx = await Mina.transaction(
-    { sender: feepayerAddress, fee },
-    async () => {
-      await AccountUpdate.fundNewAccount(feepayerAddress, 1);
-      await bridgeContract.unlock(
-        amount,
-        validator1,
-        UInt64.from(1),
-        tokenAddress,
-        Bool(true),
-        validator1,
-        signature,
-        Bool(false),
-        validator2,
-        signature,
-        Bool(false),
-        validator3,
-        signature,
-      );
-    }
-  );
-
-  tx.sign([feepayerKey])
-  await tx.prove()
+// let userUpdated = AccountUpdate.createSigned(feepayerAddress);
+// let nonce = userUpdated.account.nonce.get(); // nonce that o1js _thinks_ 
+// console.log("🚀 ~ it ~ nonce:", nonce.toString())
 
 
-  const sentTx = await tx.send();
-  await sentTx.wait();
-  console.log("🚀 ~ sentTx:", sentTx.hash)
-} catch (err) {
-  console.log(err);
-}
+// // compile the contract to create prover keys
+// // await fetchAccount({publicKey: feepayerAddress});
+// try {
+//   // call update() and send transaction
+//   console.log('build transaction and create proof...');
+//   let tx = await Mina.transaction(
+//     { sender: feepayerAddress, fee },
+//     async () => {
+//       await AccountUpdate.fundNewAccount(feepayerAddress, 1);
+//       await bridgeContract.unlock(
+//         amount,
+//         validator1,
+//         UInt64.from(1),
+//         tokenAddress,
+//         Bool(true),
+//         validator1,
+//         signature,
+//         Bool(false),
+//         validator2,
+//         signature,
+//         Bool(false),
+//         validator3,
+//         signature,
+//       );
+//     }
+//   );
+
+//   tx.sign([feepayerKey])
+//   await tx.prove()
+
+
+//   const sentTx = await tx.send();
+//   await sentTx.wait();
+//   console.log("🚀 ~ sentTx:", sentTx.hash)
+// } catch (err) {
+//   console.log(err);
+// }
 
 function getTxnUrl(graphQlUrl: string, txnHash: string | undefined) {
   const txnBroadcastServiceName = new URL(graphQlUrl).hostname
