@@ -21,7 +21,54 @@ import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } 
 
 const allConfig = 
 {
-  
+  token: {
+    privateKey: 'EKDvfxpNvF9zcg6pqcuUkKZn65LXSP9xEQcmHd2ZADkJ68kX6HEK',
+    publicKey: 'B62qjN2JqvTCPK1VhpC6hkQa3DLgNAy9ivADNoSThTCM8vB66KjrLr9'
+  },
+  adminContract: {
+    privateKey: 'EKEy3Crg1gvtNgR2GcnWkQBGNJjHCwWPEthovzXKQMJZ819xJocA',
+    publicKey: 'B62qmAQ1S6Bnonvqf1tqfJV6eLRusQZ2Hk5268pzi2nZvmAWgQ93nkJ'
+  },
+  bridgeContract: {
+    privateKey: 'EKE9CDuW71shmTutA6iifdn5F4FFL7pjjtYhMrvsxeWV8tufcMF1',
+    publicKey: 'B62qpM9gRkgmRfZ6JFmZ4imKNJB58PYiaEDVCsFg5QvUTaT3cXsRLg2'
+  },
+  managerContract: {
+    privateKey: 'EKDtK97KfSCQhDnfJGferQKq3JZAHqikGhRwdisNDh14DpsX8BKe',
+    publicKey: 'B62qoqBVw9nXG7SNWtuntdXtTAELAe8fMKn5WBJM2pDzL8L9NHp7UbV'
+  },
+  validatorManagerContract: {
+    privateKey: 'EKEF7R4xR7RSehHaFfkmJVnBLxX4RvXpGTPTbdUXLVCh4GacMn1p',
+    publicKey: 'B62qrgVKH6Rd8G3YaS33cqaT18tAdXXksngmEzrn8q957fpcs1Bmskz'
+  },
+  validator_1: {
+    privateKey: 'EKEY2ezSkDBWz3G4CYgDwDJckUn3yUtUAKsBfQ5XMoFE82g3abM4',
+    publicKey: 'B62qkoyyJsms8mEJk74aFn6p2Y5nPNR5mgRKyUianMYMFaqQmK43fpE'
+  },
+  validator_2: {
+    privateKey: 'EKEC7Vor9iL6qwz5UHNcWxVB3Y9DDB2u9oPLMo6cibyoX8HgAJbw',
+    publicKey: 'B62qpJtPF3gQkfn4pXVYrADcwPBU2ogeox5fr5mS5rvqBZtysocg6B8'
+  },
+  validator_3: {
+    privateKey: 'EKF5tK8MTbdj2q1i1gz5Pkb9KWKTnRVyuou16Qp6CEvqwyUT4A4b',
+    publicKey: 'B62qpQQShEfBzJ1ZdtdFcLZ959EKEZ8EgBtYiqh1qPzk2aQUM5qRADD'
+  },
+  admin: {
+    privateKey: 'EKEJGajgS77nvYvXN4JFuRMJLihPyKM WAiemJYVRfWRFndrdGzRs',
+    publicKey: 'B62qmWDjTW1SLzrVkQ3Zr5FUFjAWf2KFTPJzQxyGKWpL2uitX3EK9p4'
+  },
+  minter_1: {
+    privateKey: 'EKEQb3UzmvKyDni3s36ayBz7vonmKrtqfgdQZGhq8wa15EV3pDqL',
+    publicKey: 'B62qjusMTNamLwcJeWhfQAozoRZgVfeTn3MvbDDm8k7g3rkdYeC1zoZ'
+  },
+  minter_2: {
+    privateKey: 'EKEWLLTZNNmKrohPksxxkEVLSNkGHVj3zJFektx7AC1ApysFTSnt',
+    publicKey: 'B62qnhdPmrEb2aGrUZdC8nEnBnLqcseCY1ne4L67Ayc5ryppbdcTce7'
+  },
+  minter_3: {
+    privateKey: 'EKEjYNhfrmHxoUmeyWuuZFg2M8rL9XcBd9b8XDAgrEAbijvdLDpX',
+    publicKey: 'B62qrCWt2kJnFtD7noh6sGK2wEJKUKb8RAbkBeKda91cTmofE2Uz1uo'
+  }
 }
 
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
@@ -35,8 +82,8 @@ let managerContractKey = PrivateKey.fromBase58(allConfig["managerContract"].priv
 let validatorManagerContractKey = PrivateKey.fromBase58(allConfig["validatorManagerContract"].privateKey);
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
-const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
+const MINAURL = 'https://api.minascan.io/node/devnet/v1/graphql';
+const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql';
 
 const network = Mina.Network({
   mina: MINAURL,
@@ -92,11 +139,39 @@ const upgradeTx = await Mina.transaction({ sender: feepayerAddress, fee },
     await update.account.verificationKey.set(verificationKey);
   }
 );
-await upgradeTx.sign([feepayerKey, adminContractKey]).prove();
+await upgradeTx.sign([feepayerKey]).prove();
 
 const sentTx = await upgradeTx.send();
 await sentTx.wait();
 console.log("🚀 ~ sentTx:", sentTx.hash)
+
+// // Get current verification key before upgrade
+// const adminContractAccount = await fetchAccount({publicKey: adminContractAddress});
+// console.log("Current verification key:", adminContractAccount.account?.zkapp?.verificationKey?.hash.toString());
+
+// const adminContract = new FungibleTokenAdmin(adminContractAddress)
+
+// const newVerificationKey = (await FungibleToken.compile()).verificationKey;
+// console.log("🚀 ~ verificationKey:", newVerificationKey.hash.toString())
+
+
+
+// // let userUpdated = AccountUpdate.createSigned(feepayerAddress);
+// // let nonce = userUpdated.account.nonce.get(); // nonce that o1js _thinks_ 
+// // console.log("🚀 ~ it ~ nonce:", nonce.toString())
+
+// const upgradeTx = await Mina.transaction({ sender: feepayerAddress, fee },
+//   async () => {
+//     // const update = await AccountUpdate.createSigned(adminContractAddress);
+//     // await update.account.verificationKey.set(verificationKey);
+//     await adminContract.updateVerificationKey(newVerificationKey);
+//   }
+// );
+// await upgradeTx.sign([feepayerKey]).prove();
+
+// const sentTx = await upgradeTx.send();
+// await sentTx.wait();
+// console.log("🚀 ~ sentTx:", sentTx.hash)
 
 
 
