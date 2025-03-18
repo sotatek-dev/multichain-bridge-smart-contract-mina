@@ -14,62 +14,8 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, Signature } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
-
-
-// check command line arg
-
-const allConfig = 
-{
-  token: {
-    privateKey: 'EKDr9hBqdjwZLecmphNF9cXWRBSWXHfSsnD2Pid5r2BUBmLiLoqM',
-    publicKey: 'B62qjHAiGSN1tEvp2E9TgPVxyyomwJFr8PKCB3yqKQL7AgJ7ieZ8j5L'
-  },
-  adminContract: {
-    privateKey: 'EKEHoabgJxLtvYFNnmsNkLo9mY1SZxipU3FjUpy1scBcjW2DF26f',
-    publicKey: 'B62qpyKsmMrHaiyMsuqggLSJbucfWVesh6LqY5kAvz7dTzhzgtx8826'
-  },
-  bridgeContract: {
-    privateKey: 'EKFMw2TtZoEaFgNDULA7PHikkvdqq4WGkP2SLTJP7gTfUAtTFdfD',
-    publicKey: 'B62qraiMK838V8f5DvsmquRRtc6zi1X9u8v257NHCFnX5QQzj9G365s'
-  },
-  managerContract: {
-    privateKey: 'EKF197bgnQtP7qNqNYwNtkndPAyPyv2RQgySqEZ8cwfNXCEGXRka',
-    publicKey: 'B62qqyMbSpoXTLimCaDgtmu8scdmrDxUykjjreurn18YLkeZ6NJJLhY'
-  },
-  validatorManagerContract: {
-    privateKey: 'EKFEjraTPnWmcuuABWUVwm4HFndJnMu5U2ox8tSFiWLcvTrHaTmz',
-    publicKey: 'B62qqarGzKhX18JgNePZGcqSowJg3T3YaStwj2uigs86C2ypSAcT9Sa'
-  },
-  validator_1: {
-    privateKey: 'EKDu1Jrm9LQ4yTZjNjcDvNggdvvwusjDSe7Krk43u3fLUTmcjRaW',
-    publicKey: 'B62qog352TxV8ug4o9TkQEsTEEWSpC6ERkXfq3bgZJvyBhraJ1VQ32H'
-  },
-  validator_2: {
-    privateKey: 'EKDjeb9oqvcvddLpPoGymM7CeECyv2YiBeSsvtMxgvxbCSR6tokA',
-    publicKey: 'B62qke4TwFqcmRL7FxVPNrz6Ne8YKVU1japGC5FMXoT9SfvTETHmKZz'
-  },
-  validator_3: {
-    privateKey: 'EKEHPrdTJdweigymbws2dAMUimoz8eapmrNZqkcz19z6svyYvB8A',
-    publicKey: 'B62qm75B7en1F5b8WVq4cxq6EAyoFVGtVBQiduJTRdchzh2kVQfJ25P'
-  },
-  admin: {
-    privateKey: "EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD",
-    publicKey: "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"
-  },
-  minter_1: {
-    privateKey: "EKDzBD67hfEP6FGteCMxQPkzLwWPvG7sdNtXprjLjuBNNgQbVCRD",
-    publicKey: "B62qjEURvygCt8F1k268edeUuy4RjmBtKibhpxnQxWXSxHhb1ZX3h4q"
-  },
-  minter_2: {
-    privateKey: 'EKFWi6XGsK9Wruu2pc9cLroKSggUrcs6XC2GTmbn1AwgHGkk3cdK',
-    publicKey: 'B62qrPwF3qKJvysk2ji248C22WnBiFLVsKqU7XdSrcj3P4wUByDbQfP'
-  },
-  minter_3: {
-    privateKey: 'EKEaKn1d8cfaLV32RA7abzkaiRXp45dwViEzrHdQ9uHb4kpWZest',
-    publicKey: 'B62qr2CLY4vgaZb9T9oW7RBKaKpL2NURTEkcVC6KHmLeYvGZKRfPPGp'
-  }
-}
+import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
+import { allConfig } from "../../deploy-config/config.js";
 
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
 

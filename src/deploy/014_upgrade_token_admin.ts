@@ -15,14 +15,7 @@
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, Signature } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
-
-
-// check command line arg
-
-const allConfig = 
-{
-  
-}
+import { allConfig } from "../../deploy-config/config.js";
 
 let feepayerKey = PrivateKey.fromBase58(allConfig.minter_1.privateKey);
 

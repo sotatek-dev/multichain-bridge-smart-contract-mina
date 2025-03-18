@@ -14,8 +14,8 @@
  */
 import fs from 'fs/promises';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field, Signature } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Secp256k1, ValidatorManager, Manager } from '../index.js';
-import { Bytes256, Ecdsa } from '../ecdsa/ecdsa.js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, ValidatorManager, Manager } from '../index.js';
+import { allConfig } from "../../deploy-config/config.js";
 
 // check command line arg
 
@@ -51,43 +51,6 @@ let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
 );
 
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-
-const allConfig = 
-{
-  token: {
-    privateKey: 'EKEUYQoAB6oAi3Xg3ae3tmZER1LY3fYhdmjCmx634AdDPeTt82dZ',
-    publicKey: 'B62qqzWNtFtTm4cQioZih828N5rUfSemkfv3at2n5usAEr55tBHHdpk'
-  },
-  adminContract: {
-    privateKey: 'EKDzKHCw28PUqJG2du5MweSrcv9sxeaL7f8tSW2VNf8Ln5TKejAR',
-    publicKey: 'B62qoRF1uWh92udym8hox8UA5MjG13g7voaZV4rvPvK72oeCQN5ui17'
-  },
-  bridgeContract: {
-    privateKey: 'EKFVE4fiRtBgdkKgffRzcNHZ6GJmkg95mWEDatmJ3ZueGgZg5K4W',
-    publicKey: 'B62qqKFZav5StzHmRkaU21Mw34CgGu5fWCsdGcCuxdgjZb3MSrxo67Q'
-  },
-  managerContract: {
-    privateKey: 'EKEmiXywqnKC8vWXko8ktKnGbYbQqmCHfrZ7YRbKRZEr1PREcDNN',
-    publicKey: 'B62qpTBL7K2NEYfiW5jLr4p8iY3x1kccyMETFi7ZUwFor5Viw337ivd'
-  },
-  validatorManagerContract: {
-    privateKey: 'EKEfwksv72JHarTSZAXgeSwcZGejvRkcdVmPQ7mujtczv2gJhQU6',
-    publicKey: 'B62qnFAsrYfqgRk8MD8F5Lbpi6RdqkEb7wqJjYhQk3NbC2mQmjcFGJ1'
-  },
-  validator_1: {
-    privateKey: 'EKE8MzLKBQQn3v53v6JSCXHRPvrTwAB6xytnxYfpATgYnX17bMeM',
-    publicKey: 'B62qnatDbNraYYPAnUYW1rGpS5tzXsGzLvyPebafNseYgNrHF83eu7d'
-  },
-  validator_2: {
-    privateKey: 'EKF3PE1286RVzZNgieYeDw96LrMKc6V2szhvV2zyj2Z9qLwzc1SG',
-    publicKey: 'B62qroF6gTiaDNBqFETV2wPWmdVxufxaQHr3gKSGqh9U4tXVYjJZsVc'
-  },
-  validator_3: {
-    privateKey: 'EKEqLGiiuaZwAV5XZeWGWBsQUmBCXAWR5zzq2vZtyCXou7ZYwryi',
-    publicKey: 'B62qjM9WyCn9BK2jyv6KkuLeXqiWsvaFPNtkNt9snt7U1TKxcZq9q7P'
-  }
-}
-
 
 let tokenKey = PrivateKey.fromBase58(allConfig["token"].privateKey);
 let adminContractKey = PrivateKey.fromBase58(allConfig["adminContract"].privateKey);

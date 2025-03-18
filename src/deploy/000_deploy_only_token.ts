@@ -15,7 +15,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager, Secp256k1 } from '../index.js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager } from '../index.js';
 
 // check command line arg
 
