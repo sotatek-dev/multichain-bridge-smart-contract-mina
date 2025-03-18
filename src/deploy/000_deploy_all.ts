@@ -15,7 +15,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
-import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager, Secp256k1 } from '../index.js';
+import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager } from '../index.js';
 
 // check command line arg
 
@@ -42,22 +42,15 @@ type Config = {
     }
   >;
 };
-let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
 
-let config = configJson.deployAliases[project_alias];
-
-let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.feepayerKeyPath, 'utf8')
-);
-
-let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let minter_1 = PrivateKey.fromBase58("EKEQb3UzmvKyDni3s36ayBz7vonmKrtqfgdQZGhq8wa15EV3pDqL");
+let feepayerKey = PrivateKey.fromBase58(minter_1.toBase58());
 let tokenKey = PrivateKey.random();
 let adminContractKey = PrivateKey.random();
 let bridgeContractKey = PrivateKey.random();
 let managerKey = PrivateKey.random();
 let validatorManagerKey = PrivateKey.random();
 // let minter_1 = PrivateKey.random();
-let minter_1 = PrivateKey.fromBase58("EKEZZrCTuRX4uWnp6YQXnUWkQ7ckW9XBQkbdLbqP9Xdg6exNh3uf");
 let minter_2 = PrivateKey.random();
 let minter_3 = PrivateKey.random();
 
@@ -67,8 +60,8 @@ const validator3Key = PrivateKey.random();
 const adminKey = PrivateKey.random();
 
 // set up Mina instance and contract we interact with
-const MINAURL = 'https://proxy.devnet.minaexplorer.com/graphql';
-const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql/';
+const MINAURL = 'https://api.minascan.io/node/devnet/v1/graphql';
+const ARCHIVEURL = 'https://api.minascan.io/archive/devnet/v1/graphql';
 
 const network = Mina.Network({
   mina: MINAURL,
@@ -89,7 +82,7 @@ await ValidatorManager.compile();
 console.log('compile the contract DONE...');
 
 
-const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
+const fee = Number(0.5) * 1e9; // in nanomina (1 billion = 1.0 mina)
 let feepayerAddress = feepayerKey.toPublicKey();
 let tokenAddress = tokenKey.toPublicKey();
 let adminContractAddress = adminContractKey.toPublicKey();
@@ -120,7 +113,12 @@ await fetchAccount({publicKey: tokenAddress});
 await fetchAccount({publicKey: adminAddress});
 await fetchAccount({publicKey: bridgeAddress});
 await fetchAccount({publicKey: managerAddress});
+await fetchAccount({publicKey: minter1Address});
 await fetchAccount({publicKey: validatorManagerAddress});
+const feePayerAccount = await fetchAccount({ publicKey: feepayerAddress });
+if (!feePayerAccount || !feePayerAccount.account) {
+  throw new Error('Fee payer account does not exist. Please fund it first.');
+}
 
 
 
