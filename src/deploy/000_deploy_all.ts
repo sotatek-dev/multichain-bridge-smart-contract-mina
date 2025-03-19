@@ -17,33 +17,8 @@ import path from 'path';
 import { Mina, PrivateKey, AccountUpdate, fetchAccount, PublicKey, UInt64, UInt8, Bool, Field } from 'o1js';
 import { FungibleToken, FungibleTokenAdmin, Bridge, Manager, ValidatorManager } from '../index.js';
 
-// check command line arg
 
-let deployAlias = process.argv[2];
-if (!deployAlias)
-  throw Error(`Missing <deployAlias> argument.
-
-Usage:
-node build/src/interact.js <deployAlias>
-`);
-
-const project_alias = deployAlias;
-
-// parse config and private key from file
-type Config = {
-  deployAliases: Record<
-    string,
-    {
-      url: string;
-      keyPath: string;
-      fee: string;
-      feepayerKeyPath: string;
-      feepayerAlias: string;
-    }
-  >;
-};
-
-let minter_1 = PrivateKey.fromBase58("EKEQb3UzmvKyDni3s36ayBz7vonmKrtqfgdQZGhq8wa15EV3pDqL");
+let minter_1 = PrivateKey.fromBase58("");
 let feepayerKey = PrivateKey.fromBase58(minter_1.toBase58());
 let tokenKey = PrivateKey.random();
 let adminContractKey = PrivateKey.random();

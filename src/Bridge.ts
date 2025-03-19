@@ -11,7 +11,8 @@ import {
   Provable,
   Field,
   MerkleMap,
-  Signature
+  Signature,
+  Encoding
 } from 'o1js'
 
 import { FungibleToken } from "mina-fungible-token"
@@ -51,6 +52,7 @@ export class Bridge extends SmartContract {
   @state(UInt64) threshold = State<UInt64>();
   @state(PublicKey) validatorManager = State<PublicKey>();
   @state(PublicKey) manager = State<PublicKey>();
+  @state(UInt64) nonce = State<UInt64>();
 
   events = { "Unlock": UnlockEvent, "Lock": LockEvent };
 
@@ -126,9 +128,16 @@ export class Bridge extends SmartContract {
     validator3: PublicKey,
     sig3: Signature
   ) {
+    const nonceTx = await this.nonce.getAndRequireEquals();
+    const DOMAIN = Encoding.stringToFields("MINA_BRIDGE")[0];
+    const scAddress = await this.address;
+
     const managerZkapp = new Manager(this.manager.getAndRequireEquals());
     managerZkapp.isMinter(this.sender.getAndRequireSignature());
     const msg = [
+      ...DOMAIN.toFields(),
+      ...nonceTx.toFields(),
+      ...scAddress.toFields(),
       ...receiver.toFields(),
       ...amount.toFields(),
       ...tokenAddr.toFields(),
@@ -148,6 +157,7 @@ export class Bridge extends SmartContract {
     await this.validateSig(msg, sig3, validator3, useSig3);
     const token = new FungibleToken(tokenAddr);
     await token.mint(receiver, amount);
+    await this.nonce.set(nonceTx.add(1));
     this.emitEvent('Unlock', new UnlockEvent(receiver, tokenAddr, amount, id));
   }
 

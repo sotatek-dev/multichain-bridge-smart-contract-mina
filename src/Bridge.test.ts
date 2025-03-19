@@ -1,9 +1,10 @@
-import { Account, AccountUpdate, Bool, EcdsaSignature, EcdsaSignatureV2, Encoding, Experimental, Field, Int64, MerkleMap, Mina, PrivateKey, Provable, PublicKey, Signature, UInt64, UInt8, fetchAccount } from 'o1js'
+import { Account, AccountUpdate, Bool, Circuit, CircuitString, EcdsaSignature, Encoding, Experimental, Field, Int64, MerkleMap, Mina, PrivateKey, Provable, PublicKey, Signature, UInt64, UInt8, fetchAccount } from 'o1js'
 import { Bridge } from './Bridge'
-import { FungibleToken, FungibleTokenAdmin } from 'mina-fungible-token';
+import { FungibleToken } from 'mina-fungible-token';
+import { FungibleTokenAdmin } from 'mina-fungible-token';
 import { ValidatorManager } from './ValidatorManager';
 import { Manager } from './Manager';
-const proofsEnabled = false
+const proofsEnabled = false;
 
 const Local = await Mina.LocalBlockchain({ proofsEnabled })
 Mina.setActiveInstance(Local)
@@ -143,14 +144,14 @@ describe("Bridge", () => {
         const adminToken = await token.getAdminContract();
         console.log("🚀 ~ adminToken:", adminToken.address.toBase58())
         
-        let mintTx = await Mina.transaction(userPubkey, async () => {
-            AccountUpdate.fundNewAccount(userPubkey, 1);
-            console.log("🚀 ~ mintTx ~ normalUserPubkey:", normalUserPubkey.toBase58())
-            await token.mint(normalUserPubkey, supply)
-        })
-        mintTx.sign([userPrivkey, adminTokenPrivkey])
-        await mintTx.prove()
-        await mintTx.send()
+        // let mintTx = await Mina.transaction(userPubkey, async () => {
+        //     AccountUpdate.fundNewAccount(userPubkey, 1);
+        //     console.log("🚀 ~ mintTx ~ normalUserPubkey:", normalUserPubkey.toBase58())
+        //     await token.mint(normalUserPubkey, supply)
+        // })
+        // mintTx.sign([userPrivkey, adminTokenPrivkey])
+        // await mintTx.prove()
+        // await mintTx.send()
     })
 
    
@@ -189,8 +190,21 @@ describe("Bridge", () => {
         const normalUserBalance = await token.getBalanceOf(normalUserPubkey);
         console.log("balance:", normalUserBalance.toString());
 
+
+        const nonceTx = await bridgeZkapp.nonce.get();
+        console.log("🚀 ~ it ~ nonceTx:", nonceTx)
+        const DOMAIN = Encoding.stringToFields("MINA_BRIDGE")[0];
+        const scAddress = bridgePubkey;
+        console.log("adminContractPubkey: ", adminContractPubkey.toBase58());
+        console.log("userPubkey: ", userPubkey.toBase58());
+        console.log("bridgePubkey: ", bridgePubkey.toBase58());
+        console.log("tokenPubkey: ", tokenPubkey.toBase58());
+
         let amount = UInt64.from(10);
         const msg = [
+            ...DOMAIN.toFields(),
+            ...nonceTx.toFields(),
+            ...scAddress.toFields(),
             ...normalUserPubkey.toFields(),
             ...amount.toFields(),
             ...tokenPubkey.toFields(),
@@ -210,6 +224,7 @@ describe("Bridge", () => {
             sender: userPubkey,
             nonce: +nonce.toString(),
         }, async () => {
+            await AccountUpdate.fundNewAccount(userPubkey, 1)
             await bridgeZkapp.unlock(
                 amount,
                 normalUserPubkey,
@@ -231,44 +246,8 @@ describe("Bridge", () => {
 
         await unlockTx.send()
 
-        // let unlockTx2 = await Mina.transaction({
-        //     sender: userPubkey,
-        //     nonce: +nonce.add(1).toString(),
-        // }, async () => {
-        //     await bridgeZkapp.unlock(
-        //         amount,
-        //         normalUserPubkey,
-        //         UInt64.from(1),
-        //         tokenPubkey,
-        //         Bool(true),
-        //         validator1Pubkey,
-        //         signature1,
-        //         Bool(true),
-        //         validator2Pubkey,
-        //         signature2,
-        //         Bool(true),
-        //         validator3Pubkey,
-        //         signature3,
-        //     );
-        // })
-        // unlockTx2.sign([userPrivkey])
-        // await unlockTx2.prove()
-
-        // await Promise.all([unlockTx.send(), unlockTx2.send()])
-
-        const beforeLockBalance = await token.getBalanceOf(normalUserPubkey);
-        console.log("before lock balance:", beforeLockBalance.toString());
-
-
-        // let lockTx = await Mina.transaction(normalUserPubkey, async () => {
-        //     await bridgeZkapp.lock(UInt64.from(5), Field.from(1), tokenPubkey);
-        // })
-        // lockTx.sign([normalUserPrivkey])
-        // await lockTx.prove()
-        // await lockTx.send()
-
-        // const afterLockBalance = await token.getBalanceOf(normalUserPubkey);
-        // console.log("after lock balance:", afterLockBalance.toString());
+        const nonce_ = await bridgeZkapp.nonce.get();
+        console.log("🚀 ~ it ~ nonce_:", nonce_.toString())
     })
 
     // it('unlock from with two signature ', async () => {
