@@ -32,10 +32,10 @@ import {
   ValidatorManager,
 } from "./index.js"
 
-import * as trace from 'autrace';
+// import * as trace from 'autrace';
 
-// Initialize AUTrace
-const autrace = new trace.AUTrace();
+// // Initialize AUTrace
+// const autrace = new trace.AUTrace();
 
 const proofsEnabled = false
 if (!proofsEnabled) console.log("Skipping proof generation in tests.")
@@ -176,12 +176,12 @@ describe("bridge integration", async () => {
 
     it('unlock from with three signature ', async () => {
 
-      // Initialize contracts for tracking
-      autrace.initializeContracts([bridgeZkapp, token, adminContract, managerZkapp, validatorZkapp]);
+      // // Initialize contracts for tracking
+      // autrace.initializeContracts([bridgeZkapp, token, adminContract, managerZkapp, validatorZkapp]);
 
-      // Optional: Get contract analysis
-      const contractAnalysis = autrace.getContractAnalysis();
-      autrace.clearTransactionState();
+      // // Optional: Get contract analysis
+      // const contractAnalysis = autrace.getContractAnalysis();
+      // autrace.clearTransactionState();
       const nonceTx = UInt64.from(0);
       console.log("🚀 ~ it ~ nonceTx:", nonceTx)
       const DOMAIN = Encoding.stringToFields("MINA_BRIDGE")[0];
@@ -240,15 +240,15 @@ describe("bridge integration", async () => {
       console.log("🚀 ~ it ~ accountUpdates:", accountUpdates)
       console.log("🚀 ~ it ~ accountUpdates:", accountUpdates.length)
 
-      const sendState = autrace.getTransactionState(await unlockTx.send());
-      const history = autrace.getStateHistory();
-      // Initialize visualizer with history
-      const visualizer = new trace.AUVisualizer(history);
+      // const sendState = autrace.getTransactionState(await unlockTx.send());
+      // const history = autrace.getStateHistory();
+      // // Initialize visualizer with history
+      // const visualizer = new trace.AUVisualizer(history);
 
-      // Generate different visualization formats
-      await visualizer.generateMarkdownFile('output.md')
+      // // Generate different visualization formats
+      // await visualizer.generateMarkdownFile('output.md')
 
-      // await unlockTx.send()
+      await unlockTx.send()
 
       const nonce_ = await bridgeZkapp.nonce.get();
       console.log("🚀 ~ it ~ nonce_:", nonce_.toString())
