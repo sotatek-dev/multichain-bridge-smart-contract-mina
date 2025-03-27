@@ -174,6 +174,16 @@ describe("bridge integration", async () => {
     setBridgePubTx.sign([userPrivkey])
     await setBridgePubTx.send()
 
+    console.log("==============LIST ADDRESSS==================");
+
+    console.log("Bridge public key is: ", bridgePubkey.toBase58());
+    console.log(" Token public key is: ", tokenPubkey.toBase58());
+    console.log("Token Admin Public Key is: ", adminContractPubkey.toBase58());
+    console.log("Manager Public Key is: ", managerPubkey.toBase58());
+    console.log("Validator Public Key is: ", validatorManagerPubkey.toBase58());
+
+    console.log("==============END LIST ADDRESSS==================");
+
     it('unlock from with three signature ', async () => {
 
       // // Initialize contracts for tracking
@@ -186,11 +196,6 @@ describe("bridge integration", async () => {
       console.log("🚀 ~ it ~ nonceTx:", nonceTx)
       const DOMAIN = Encoding.stringToFields("MINA_BRIDGE")[0];
       const scAddress = bridgePubkey;
-      console.log("adminContractPubkey: ", adminContractPubkey.toBase58());
-      console.log("userPubkey: ", userPubkey.toBase58());
-      console.log("bridgePubkey: ", bridgePubkey.toBase58());
-      console.log("tokenPubkey: ", tokenPubkey.toBase58());
-
       if (!DOMAIN) {
         throw new Error("DOMAIN is undefined");
       }
@@ -208,9 +213,6 @@ describe("bridge integration", async () => {
       let signature1 = Signature.create(validator1Privkey, msg);
       let signature2 = Signature.create(validator2Privkey, msg);
       let signature3 = Signature.create(validator3Privkey, msg);
-
-
-
 
       let unlockTx = await Mina.transaction({
         sender: userPubkey,
@@ -237,7 +239,13 @@ describe("bridge integration", async () => {
       await unlockTx.prove()
 
       const accountUpdates = JSON.parse(unlockTx.toJSON()).accountUpdates;
-      console.log("🚀 ~ it ~ accountUpdates:", accountUpdates)
+      // @ts-ignore
+      const simplifiedAccountUpdates = accountUpdates.map(update => ({
+        publicKey: update.body.publicKey,
+        tokenId: update.body.tokenId,
+      }));
+      console.log("🚀 ~ it ~ simplifiedAccountUpdates:", simplifiedAccountUpdates);
+      // console.log("🚀 ~ it ~ accountUpdates:", accountUpdates)
       console.log("🚀 ~ it ~ accountUpdates:", accountUpdates.length)
 
       // const sendState = autrace.getTransactionState(await unlockTx.send());
